@@ -1,0 +1,82 @@
+.reveal {
+  font-family: "Segoe UI", sans-serif;
+}
+
+.reveal .slides section {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-top: 50px;
+  width: 100%;
+}
+
+.card {
+  padding: 30px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px) scale(1.05);
+  background: rgba(255,255,255,0.15);
+}
+
+.card h3 {
+  margin-bottom: 15px;
+}
+
+.card p {
+  font-size: 0.6em;
+  opacity: 0.8;
+}
+
+.reveal canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+.slide-subtitle {
+  font-size: 0.55em;
+  opacity: 0.6;
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+.pareto-layout {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  width: 100%;
+}
+
+.pareto-chart-box {
+  width: 52%;
+  flex-shrink: 0;
+}
+
+.pareto-notes {
+  flex: 1;
+  text-align: left;
+}
+
+.pareto-notes ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pareto-notes li {
+  font-size: 0.55em;
+  margin-bottom: 24px;
+  padding-left: 20px;
+  border-left: 3px solid rgba(129,199,132,0.6);
+  line-height: 1.5;
+}

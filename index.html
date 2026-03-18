@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Full Registration - Keran Li</title>
+
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/reveal.css">
+  <link rel="stylesheet" href="node_modules/reveal.js/dist/theme/black.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="reveal">
+  <div class="slides">
+
+    <section>
+      <h1>Full Registration</h1>
+      <h3>Keran Li</h3>
+      <p>CAS + Generative Design + MOO</p>
+    </section>
+
+    <section>
+      <h2>Why this research?</h2>
+      <ul>
+        <li>NSGA-II dominates architectural optimisation</li>
+        <li>Simulation is slow</li>
+        <li>No adaptive intelligence</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Key Problems</h2>
+      <div class="card-grid">
+        <div class="card">
+          <h3>Algorithm Lock-in</h3>
+          <p>NSGA-II dominates most architectural optimisation workflows</p>
+        </div>
+        <div class="card">
+          <h3>High Simulation Cost</h3>
+          <p>Thousands of evaluations with expensive simulations</p>
+        </div>
+        <div class="card">
+          <h3>No Adaptive Intelligence</h3>
+          <p>Algorithms are static, no self-adaptive selection</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Algorithm Usage in Literature</h2>
+      <canvas id="chart" width="700" height="400"></canvas>
+    </section>
+
+    <section>
+      <h2>What is a Pareto Front?</h2>
+      <p class="slide-subtitle">Non-dominated solutions in multi-objective optimisation</p>
+      <div class="pareto-layout">
+        <div class="pareto-chart-box">
+          <canvas id="pareto-chart"></canvas>
+        </div>
+        <div class="pareto-notes">
+          <ul>
+            <li><strong>A</strong> and <strong>B</strong> are <em>non-dominated</em>: neither is better in all objectives</li>
+            <li>Grey points are <em>dominated</em> — worse in every objective than some Pareto solution</li>
+            <li>The red staircase is the <em>Pareto front</em></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script src="node_modules/reveal.js/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
