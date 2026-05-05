@@ -1,0 +1,190 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #d9d2c1;
+  overflow: hidden;
+  font-family: "Inter Tight", "Helvetica Neue", sans-serif;
+}
+
+#slide-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #d9d2c1;
+  transition: opacity 0.18s ease;
+}
+#slide-frame.swap { opacity: 0; }
+
+#deck-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d9d2c1;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #44546c;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+#deck-loading.show { opacity: 1; }
+
+#deck-hud {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+  z-index: 10;
+}
+#deck-hud.idle { opacity: 1; }
+
+#deck-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(26, 41, 66, 0.08);
+}
+#deck-progress::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--progress, 0%);
+  background: #8b2727;
+  transition: width 0.25s ease;
+}
+
+#deck-counter {
+  position: absolute;
+  bottom: 10px;
+  right: 22px;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: #44546c;
+  text-transform: uppercase;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  background: rgba(243, 239, 229, 0.9);
+  padding: 6px 12px;
+  border: 1px solid rgba(26, 41, 66, 0.12);
+  pointer-events: auto;
+}
+#deck-counter .now { color: #8b2727; font-weight: 600; }
+#deck-counter .sep { opacity: 0.4; }
+
+#deck-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 22px;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: #44546c;
+  text-transform: uppercase;
+  background: rgba(243, 239, 229, 0.9);
+  padding: 4px 10px;
+  border: 1px solid rgba(26, 41, 66, 0.12);
+  pointer-events: none;
+}
+#deck-hint kbd {
+  font-family: inherit;
+  background: #1a2942;
+  color: #faf7ee;
+  padding: 1px 6px;
+  margin: 0 2px;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  border-radius: 2px;
+}
+
+#deck-overview {
+  position: fixed;
+  inset: 0;
+  background: rgba(217, 210, 193, 0.96);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: stretch;
+  justify-content: center;
+  padding: 64px;
+  overflow: auto;
+  z-index: 20;
+}
+#deck-overview.show { display: flex; }
+
+#deck-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 22px;
+  width: 100%;
+  max-width: 1640px;
+  align-content: start;
+}
+.deck-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #f3efe5;
+  border: 1px solid rgba(26, 41, 66, 0.15);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.deck-thumb:hover {
+  transform: scale(1.03);
+  box-shadow: 0 16px 36px -16px rgba(26, 41, 66, 0.4);
+  border-color: #8b2727;
+}
+.deck-thumb.current {
+  border-color: #8b2727;
+  border-width: 2px;
+  box-shadow: 0 12px 28px -12px rgba(139, 39, 39, 0.5);
+}
+.deck-thumb iframe {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  border: 0;
+  transform-origin: top left;
+  pointer-events: none;
+}
+.deck-thumb-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 12px;
+  background: linear-gradient(0deg, rgba(26, 41, 66, 0.85) 0%, transparent 100%);
+  color: #faf7ee;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.deck-thumb-label .name {
+  font-family: "Cormorant Garamond", "Times New Roman", serif;
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #faf7ee;
+}

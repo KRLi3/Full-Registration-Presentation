@@ -2,80 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Full Registration - Keran Li</title>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/black.min.css">
-  <link rel="stylesheet" href="css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Full Registration · Keran Li · CAS Framework for Multi-Objective Generative Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/deck.css">
 </head>
 <body>
+  <iframe id="slide-frame"
+          title="Current slide"
+          allow="fullscreen"></iframe>
 
-<div class="reveal">
-  <div class="slides">
+  <div id="deck-loading">loading…</div>
 
-    <section>
-      <h1>A Complex Adaptive System Framework for Multi-Objective Generative Design</h1>
-      <h3>Keran Li</h3>
-      <p>2026/03/24</p>
-    </section>
-
-    <section>
-      <h2>Why this research?</h2>
-      <ul>
-        <li>NSGA-II dominates architectural optimisation</li>
-        <li>Simulation is slow</li>
-        <li>No adaptive intelligence</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>Key Problems</h2>
-      <div class="card-grid">
-        <div class="card">
-          <h3>Algorithm Lock-in</h3>
-          <p>NSGA-II dominates most architectural optimisation workflows</p>
-        </div>
-        <div class="card">
-          <h3>High Simulation Cost</h3>
-          <p>Thousands of evaluations with expensive simulations</p>
-        </div>
-        <div class="card">
-          <h3>No Adaptive Intelligence</h3>
-          <p>Algorithms are static, no self-adaptive selection</p>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <h2>Algorithm Usage in Literature</h2>
-      <canvas id="chart" width="700" height="400"></canvas>
-    </section>
-
-    <section>
-      <h2>What is a Pareto Front?</h2>
-      <p class="slide-subtitle">Non-dominated solutions in multi-objective optimisation</p>
-      <div class="pareto-layout">
-        <div class="pareto-chart-box">
-          <canvas id="pareto-chart"></canvas>
-        </div>
-        <div class="pareto-notes">
-          <ul>
-            <li><strong>A</strong> and <strong>B</strong> are <em>non-dominated</em>: neither is better in all objectives</li>
-            <li>Grey points are <em>dominated</em> — worse in every objective than some Pareto solution</li>
-            <li>The red staircase is the <em>Pareto front</em></li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
+  <div id="deck-hud" aria-hidden="false">
+    <div id="deck-progress"></div>
+    <div id="deck-hint">
+      <kbd>←</kbd> <kbd>→</kbd> / <kbd>scroll</kbd> nav · <kbd>O</kbd> overview · <kbd>F</kbd> full-screen
+    </div>
+    <div id="deck-counter">
+      <span class="now">01</span>
+      <span class="sep">/</span>
+      <span class="total">13</span>
+      <span class="sep">·</span>
+      <span id="deck-counter-name">Title</span>
+    </div>
   </div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="js/charts/barCharts.js"></script>
-<script src="js/charts/scatterCharts.js"></script>
-<script src="js/main.js"></script>
+  <div id="deck-overview" aria-hidden="true">
+    <div id="deck-overview-grid"></div>
+  </div>
 
+  <script src="assets/deck.js"></script>
 </body>
 </html>

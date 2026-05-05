@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Framework overview — three branches, one CAS lens</title>
+  <link rel="stylesheet" href="../../assets/slide-base.css">
+  <style>
+
+.main-rq {
+      position: absolute;
+      top: 245px;
+      left: 96px;
+      right: 96px;
+      height: 110px;
+      display: flex;
+      align-items: stretch;
+      background: rgba(250, 247, 238, 0.5);
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+    .main-rq .label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      flex-shrink: 0;
+      width: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid var(--rule);
+      background: var(--paper);
+    }
+    .main-rq blockquote {
+      flex: 1;
+      padding: 0 36px;
+      display: flex;
+      align-items: center;
+    }
+    .main-rq blockquote p {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 30px;
+      line-height: 1.25;
+      color: var(--ink);
+      margin: 0;
+      letter-spacing: -0.005em;
+    }
+    .main-rq blockquote p em { color: var(--accent); font-style: italic; }
+    .main-rq blockquote p .ins {
+      background: rgba(176, 125, 44, 0.18);
+      padding: 0 4px;
+      font-style: italic;
+    }
+    .main-rq blockquote { margin: 0; }
+
+.branches {
+      position: absolute;
+      top: 380px;
+      left: 96px;
+      right: 96px;
+      height: 440px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .branch {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 22px 26px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    
+    .branch .keyq-block {
+      margin-top: auto;
+    }
+    .branch.b1 { border-top: 4px solid var(--teal);   }
+    .branch.b2 { border-top: 4px solid var(--accent); }
+    .branch.b3 { border-top: 4px solid var(--ochre);  }
+
+    .branch-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0 0 6px;
+    }
+    .branch-num .num { color: var(--accent); font-weight: 600; }
+    .branch.b1 .branch-num .num { color: var(--teal);   }
+    .branch.b2 .branch-num .num { color: var(--accent); }
+    .branch.b3 .branch-num .num { color: var(--ochre);  }
+
+    .branch h2 {
+      font-family: var(--display);
+      font-style: italic;
+      font-weight: 500;
+      font-size: 26px;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin: 0 0 4px;
+    }
+    .branch h2 em { font-style: italic; }
+    .branch.b1 h2 em { color: var(--teal);   }
+    .branch.b2 h2 em { color: var(--accent); }
+    .branch.b3 h2 em { color: var(--ochre);  }
+
+    .branch .layer {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0 0 14px;
+    }
+    .branch .layer strong { color: var(--ink); font-weight: 600; }
+
+    .branch .rq {
+      font-family: var(--body);
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--ink);
+      margin: 0 0 16px;
+      padding: 12px 14px;
+      background: var(--bg);
+      border-left: 3px solid var(--rule);
+    }
+    .branch.b1 .rq { border-left-color: var(--teal);   }
+    .branch.b2 .rq { border-left-color: var(--accent); }
+    .branch.b3 .rq { border-left-color: var(--ochre);  }
+    .branch .rq strong { color: var(--ink); font-weight: 600; }
+    .branch .rq em { font-style: italic; color: var(--accent); }
+
+    .branch .keyq-head {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--rule);
+    }
+    .branch.b1 .keyq-head { color: var(--teal);   }
+    .branch.b2 .keyq-head { color: var(--accent); }
+    .branch.b3 .keyq-head { color: var(--ochre);  }
+
+    .branch .keyq-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .branch .keyq-list li {
+      font-family: var(--body);
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--ink);
+      padding-left: 18px;
+      position: relative;
+    }
+    .branch .keyq-list li::before {
+      content: "?";
+      position: absolute;
+      left: 0; top: 0;
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .branch.b1 .keyq-list li::before { color: var(--teal);   }
+    .branch.b2 .keyq-list li::before { color: var(--accent); }
+    .branch.b3 .keyq-list li::before { color: var(--ochre);  }
+
+.branch .status {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .branch .status .pill {
+      padding: 3px 10px;
+      border: 1px solid currentColor;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+    }
+    .branch .status .pill.done {
+      background: var(--sage);
+      border-color: var(--sage);
+      color: var(--paper);
+    }
+    .branch .status .pill.planned {
+      background: rgba(176, 125, 44, 0.15);
+      border-color: var(--ochre);
+      color: var(--ochre);
+    }
+    .branch .status .pill.inprog {
+      background: var(--paper);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .branch .status .ref {
+      font-family: var(--display);
+      font-style: italic;
+      letter-spacing: 0;
+      color: var(--ink);
+      text-transform: none;
+      font-size: 12px;
+    }
+
+.meta {
+      position: absolute;
+      top: 830px;
+      left: 96px;
+      right: 96px;
+      height: 160px;
+      display: grid;
+      grid-template-columns: 280px 1fr 320px;
+      gap: 32px;
+      align-items: stretch;
+    }
+    .meta-title {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 0;
+      border-right: 1px solid var(--rule);
+      padding-right: 24px;
+    }
+    .meta-title .lab {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .meta-title h3 {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 28px;
+      line-height: 1.1;
+      color: var(--ink);
+      margin: 0;
+      font-weight: 500;
+    }
+    .meta-title h3 em { color: var(--accent); }
+    .meta-title p {
+      font-family: var(--body);
+      font-size: 11.5px;
+      line-height: 1.4;
+      color: var(--ink-soft);
+      margin: 4px 0 0;
+    }
+
+    .meta-traits {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .trait {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--ink);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .trait .name {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--ink);
+      margin: 0;
+      font-weight: 500;
+    }
+    .trait .glyph {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .trait .body {
+      font-family: var(--body);
+      font-size: 11.5px;
+      line-height: 1.4;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+    .trait .body strong { color: var(--ink); font-weight: 600; }
+
+.meta-question {
+      background: rgba(139, 39, 39, 0.06);
+      border: 1px dashed var(--accent);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+    }
+    .meta-question .lab {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .meta-question p {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 16px;
+      line-height: 1.3;
+      color: var(--ink);
+      margin: 0;
+    }
+    .meta-question p em { color: var(--accent); font-style: italic; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <main class="slide">
+      <span class="corner-mark corner-tl">FRAMEWORK OVERVIEW</span>
+      <span class="corner-mark corner-tr">CHAPTER 2 &nbsp;·&nbsp; FRAMEWORK</span>
+
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">a complex adaptive system framework for multi-objective generative design</p>
+          <h1 class="slide-title">Three <em>branches</em>, one open question.</h1>
+          <p class="subtitle">
+            One main research question splits into three branches — algorithm adaptation, surrogate integration,
+            emergence &amp; dynamics. Each surfaces one structural characteristic of a Complex Adaptive System:
+            adaptation, feedback, emergence. Whether CAS is theoretical core or interpretative lens is the
+            open positioning this thesis must resolve.
+          </p>
+        </div>
+      </header>
+
+<section class="main-rq" aria-label="Main research question">
+        <span class="label">main RQ</span>
+        <blockquote>
+          <p>
+            As optimisation problems grow more complex, can the optimisation procedure itself be designed as
+            <span class="ins">an adaptive system</span> — rather than a fixed algorithmic pipeline?
+          </p>
+        </blockquote>
+      </section>
+
+<section class="branches" aria-label="Three research branches">
+
+<article class="branch b1">
+          <p class="branch-num"><span class="num">Branch 01</span> &nbsp;/&nbsp; algorithm adaptation</p>
+          <h2><em>Strategy</em> layer.</h2>
+          <p class="layer">layer · <strong>strategy</strong> &nbsp;·&nbsp; trait · adaptation</p>
+          <p class="rq">
+            <strong>Sub-RQ 1.</strong> Can the optimisation algorithm itself become
+            an <em>adaptive variable</em>, capable of switching or evolving according to system state —
+            rather than being fixed by tool convention (e.g. NSGA-II)?
+          </p>
+          <div class="keyq-block">
+            <p class="keyq-head">key questions</p>
+            <ul class="keyq-list">
+              <li>What indicators reflect problem structure mid-run?</li>
+              <li>When should algorithm switching occur?</li>
+              <li>Is switching beneficial in architectural cases?</li>
+            </ul>
+          </div>
+          <div class="status">
+            <span class="pill planned">planned</span>
+            <span class="ref">Year 2 &nbsp;·&nbsp; thesis ch. 5</span>
+          </div>
+        </article>
+
+<article class="branch b2">
+          <p class="branch-num"><span class="num">Branch 02</span> &nbsp;/&nbsp; surrogate integration</p>
+          <h2><em>Cognition</em> layer.</h2>
+          <p class="layer">layer · <strong>cognition</strong> &nbsp;·&nbsp; trait · feedback</p>
+          <p class="rq">
+            <strong>Sub-RQ 2.</strong> If the surrogate participates inside the decision loop
+            instead of being an offline accelerator, how does it <em>alter the system's perception</em> of the
+            problem space — and how should it self-correct against systematic bias?
+          </p>
+          <div class="keyq-block">
+            <p class="keyq-head">key questions</p>
+            <ul class="keyq-list">
+              <li>How to balance prediction and true simulation?</li>
+              <li>How to manage and propagate model uncertainty?</li>
+              <li>Does the surrogate change search dynamics?</li>
+            </ul>
+          </div>
+          <div class="status">
+            <span class="pill done">in progress</span>
+            <span class="ref">Year 1 &nbsp;·&nbsp; ch. 3 — see slides 02–06</span>
+          </div>
+        </article>
+
+<article class="branch b3">
+          <p class="branch-num"><span class="num">Branch 03</span> &nbsp;/&nbsp; emergence &amp; dynamics</p>
+          <h2><em>Dynamics</em> layer.</h2>
+          <p class="layer">layer · <strong>dynamics</strong> &nbsp;·&nbsp; trait · emergence</p>
+          <p class="rq">
+            <strong>Sub-RQ 3.</strong> Is optimisation merely a <em>search for solutions</em>, or does it reveal
+            the structure of the design problem itself — through emergent patterns in Pareto fronts and
+            variable-evolution trajectories?
+          </p>
+          <div class="keyq-block">
+            <p class="keyq-head">key questions</p>
+            <ul class="keyq-list">
+              <li>Can optimisation reveal hidden problem structure?</li>
+              <li>Do different strategies produce different emergent forms?</li>
+              <li>Are trajectory motifs interpretable as system signatures?</li>
+            </ul>
+          </div>
+          <div class="status">
+            <span class="pill planned">planned</span>
+            <span class="ref">Year 3 &nbsp;·&nbsp; thesis ch. 6</span>
+          </div>
+        </article>
+
+      </section>
+
+<section class="meta" aria-label="CAS positioning">
+
+        <div class="meta-title">
+          <span class="lab">CAS lens</span>
+          <h3>Three traits, one <em>open</em> position.</h3>
+          <p>The three branches each surface one CAS trait — the framework's vocabulary, not (yet) its formal core.</p>
+        </div>
+
+        <div class="meta-traits">
+          <article class="trait" style="border-top-color: var(--teal);">
+            <p class="glyph">trait · branch 01</p>
+            <p class="name">Adaptation.</p>
+            <p class="body">Algorithms adjust to system state — strategy is <strong>not fixed</strong> at design time.</p>
+          </article>
+          <article class="trait" style="border-top-color: var(--accent);">
+            <p class="glyph">trait · branch 02</p>
+            <p class="name">Feedback.</p>
+            <p class="body">Surrogate &harr; optimiser &harr; environment form a <strong>closed loop</strong>, not a pipeline.</p>
+          </article>
+          <article class="trait" style="border-top-color: var(--ochre);">
+            <p class="glyph">trait · branch 03</p>
+            <p class="name">Emergence.</p>
+            <p class="body">Pareto-front shape and trajectory motifs are <strong>not designed</strong> — they appear.</p>
+          </article>
+        </div>
+
+        <aside class="meta-question">
+          <span class="lab">open positioning</span>
+          <p>
+            Should CAS serve as the <em>theoretical core</em> of this thesis, or as an
+            <em>interpretative lens</em> for analysing optimisation behaviour?
+            The choice determines whether the contribution is paradigm-, system-, or algorithm-level.
+          </p>
+        </aside>
+
+      </section>
+
+      <footer class="slide-footer">
+        <span><span class="ref">Chapter 2</span> &nbsp;·&nbsp; framework overview</span>
+        <span class="pageno">— 02 —</span>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../../assets/slide-base.js"></script>
+  <script>SlideBase.fit('stage');</script>
+</body>
+</html>

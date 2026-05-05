@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Roadmap — three-year PhD timeline</title>
+  <link rel="stylesheet" href="../../assets/slide-base.css">
+  <style>
+
+.timeline-wrap {
+      position: absolute;
+      top: 270px;
+      left: 96px;
+      right: 96px;
+      height: 320px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 24px 32px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .timeline-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .timeline-head .lab {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .timeline-head h2 {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 24px;
+      line-height: 1.1;
+      color: var(--ink);
+      margin: 0;
+      font-weight: 500;
+    }
+    .timeline-head h2 em { color: var(--accent); }
+    .timeline-head .anchor {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      color: var(--ink-soft);
+      flex-shrink: 0;
+    }
+    .timeline-head .anchor strong { color: var(--ink); font-weight: 600; }
+
+    .timeline-svg-wrap {
+      flex: 1;
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+    }
+    .timeline-svg-wrap svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+.tl-axis { stroke: var(--ink); stroke-width: 1; }
+    .tl-tick { stroke: var(--ink); stroke-width: 1; }
+    .tl-grid { stroke: var(--rule-soft); stroke-width: 0.6; stroke-dasharray: 1 4; }
+    .tl-month {
+      fill: var(--ink-soft);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      text-anchor: middle;
+    }
+    .tl-year-bar.y1 { fill: var(--teal);   }
+    .tl-year-bar.y2 { fill: var(--accent); }
+    .tl-year-bar.y3 { fill: var(--ochre);  }
+    .tl-year-label {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 17px;
+      font-weight: 500;
+      fill: var(--paper);
+      dominant-baseline: middle;
+    }
+    .tl-year-sub {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      fill: var(--paper);
+      opacity: 0.92;
+      dominant-baseline: middle;
+    }
+
+.ms-tick {
+      stroke: var(--ink);
+      stroke-width: 1;
+    }
+    .ms-dot {
+      stroke: var(--ink);
+      stroke-width: 1;
+      fill: var(--paper);
+    }
+    .ms-dot.event { fill: var(--accent); stroke: var(--accent); }
+    .ms-dot.viva  { fill: var(--ink);    stroke: var(--ink);    }
+    .ms-dot.paper { fill: var(--paper);  stroke: var(--ochre); stroke-width: 1.4; }
+    .ms-dot.deliver { fill: var(--sage); stroke: var(--sage); }
+
+    .ms-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.04em;
+      fill: var(--ink);
+      text-anchor: middle;
+    }
+    .ms-label.event { fill: var(--accent); font-weight: 600; }
+    .ms-label.deliver { fill: var(--sage); font-weight: 600; }
+
+    .ms-leader {
+      stroke: var(--ink-soft);
+      stroke-width: 0.6;
+      stroke-dasharray: 2 2;
+    }
+
+.years {
+      position: absolute;
+      top: 610px;
+      left: 96px;
+      right: 96px;
+      height: 270px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+    .year-card {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 18px 22px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+    .year-card.y1 { border-top: 3px solid var(--teal);   }
+    .year-card.y2 { border-top: 3px solid var(--accent); }
+    .year-card.y3 { border-top: 3px solid var(--ochre);  }
+
+    .year-card .yhead {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .year-card .yhead .yt {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--ink);
+      margin: 0;
+      font-weight: 500;
+    }
+    .year-card.y1 .yhead .yt em { color: var(--teal); font-style: italic; }
+    .year-card.y2 .yhead .yt em { color: var(--accent); font-style: italic; }
+    .year-card.y3 .yhead .yt em { color: var(--ochre); font-style: italic; }
+    .year-card .yhead .yspan {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+    }
+
+    .year-card .focus {
+      font-family: var(--body);
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: var(--ink);
+      margin: 0;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--rule);
+    }
+    .year-card .focus strong { font-weight: 600; }
+    .year-card .focus em { color: var(--accent); font-style: italic; }
+
+    .year-card .ms-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1;
+    }
+    .year-card .ms-list li {
+      font-family: var(--body);
+      font-size: 11.5px;
+      line-height: 1.4;
+      color: var(--ink);
+      padding-left: 18px;
+      position: relative;
+    }
+    .year-card .ms-list li::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 7px;
+      width: 6px; height: 6px;
+      border: 1px solid var(--ink);
+      background: var(--paper);
+    }
+    .year-card .ms-list li.event::before    { background: var(--accent); border-color: var(--accent); }
+    .year-card .ms-list li.paper::before    { background: var(--paper);  border-color: var(--ochre); border-width: 1.4px; }
+    .year-card .ms-list li.viva::before     { background: var(--ink);    border-color: var(--ink);    }
+    .year-card .ms-list li.deliver::before  { background: var(--sage);   border-color: var(--sage);   }
+    .year-card .ms-list li .meta {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.04em;
+      color: var(--ink-soft);
+      margin-left: 6px;
+    }
+    .year-card .ms-list li strong { font-weight: 600; }
+    .year-card .ms-list li em { color: var(--accent); font-style: italic; }
+
+.pubs {
+      position: absolute;
+      top: 895px;
+      left: 96px;
+      right: 96px;
+      height: 75px;
+      background: var(--bg);
+      border: 1px dashed var(--ochre);
+      padding: 12px 22px;
+      display: grid;
+      grid-template-columns: 180px 1fr 1fr 1fr 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+    .pubs .lab {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .pubs .lab .top {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ochre);
+      font-weight: 600;
+    }
+    .pubs .lab .head {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 15px;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+    .pubs .lab .head em { color: var(--ochre); }
+    .pub {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-left: 14px;
+      border-left: 1px solid var(--rule);
+    }
+    .pub .ptag {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .pub .pname {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.2;
+      font-weight: 500;
+    }
+    .pub .pmeta {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.04em;
+      color: var(--ink-soft);
+      line-height: 1.3;
+    }
+    .pub .pmeta strong { color: var(--ink); font-weight: 600; }
+    .pub .pmeta .q1 { color: var(--accent); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <main class="slide">
+      <span class="corner-mark corner-tl">ROADMAP</span>
+      <span class="corner-mark corner-tr">CHAPTER 6 &nbsp;·&nbsp; ROADMAP</span>
+
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">research timeline &nbsp;·&nbsp; 2025-09 → 2028-09 &nbsp;·&nbsp; three years, three branches</p>
+          <h1 class="slide-title">A 36-month <em>roadmap</em>.</h1>
+          <p class="subtitle">
+            One year per CAS branch — surrogate (Year 1, in progress), algorithm adaptation (Year 2), emergence &amp; dynamics (Year 3).
+            Each year produces one or two peer-reviewed papers; the framework consolidates into a thesis-by-monograph at submission.
+            Publication strategy: four journal targets — one algorithm-side, two architectural-engineering, one tools — plus annual conference milestones.
+          </p>
+        </div>
+      </header>
+
+<section class="timeline-wrap" aria-label="36-month timeline with milestones">
+        <header class="timeline-head">
+          <span class="lab">figure 07.a</span>
+          <h2>Three years, <em>milestones above the axis</em>, deliverables below.</h2>
+          <span class="anchor">anchor: <strong>full registration · 2026-06</strong> &nbsp;·&nbsp; submission target: <strong>2028-09</strong></span>
+        </header>
+
+        <div class="timeline-svg-wrap">
+          <svg viewBox="0 0 1500 230" preserveAspectRatio="xMidYMid meet">
+
+<rect class="tl-year-bar y1" x="70"   y="116" width="453" height="44" rx="2"/>
+            <text class="tl-year-label" x="296" y="132" text-anchor="middle">Year 01</text>
+            <text class="tl-year-sub"   x="296" y="150" text-anchor="middle">SURROGATE · BRANCH 02</text>
+
+<rect class="tl-year-bar y2" x="524"  y="116" width="453" height="44" rx="2"/>
+            <text class="tl-year-label" x="750" y="132" text-anchor="middle">Year 02</text>
+            <text class="tl-year-sub"   x="750" y="150" text-anchor="middle">ALGORITHM · BRANCH 01</text>
+
+<rect class="tl-year-bar y3" x="977"  y="116" width="453" height="44" rx="2"/>
+            <text class="tl-year-label" x="1203" y="132" text-anchor="middle">Year 03</text>
+            <text class="tl-year-sub"   x="1203" y="150" text-anchor="middle">EMERGENCE · BRANCH 03</text>
+
+<line class="tl-axis" x1="70" y1="180" x2="1430" y2="180"/>
+
+<line class="tl-tick" x1="70"   y1="180" x2="70"   y2="188"/>
+            <line class="tl-tick" x1="184"  y1="180" x2="184"  y2="186"/>
+            <line class="tl-tick" x1="297"  y1="180" x2="297"  y2="186"/>
+            <line class="tl-tick" x1="411"  y1="180" x2="411"  y2="186"/>
+            <line class="tl-tick" x1="524"  y1="180" x2="524"  y2="188"/>
+            <line class="tl-tick" x1="637"  y1="180" x2="637"  y2="186"/>
+            <line class="tl-tick" x1="750"  y1="180" x2="750"  y2="186"/>
+            <line class="tl-tick" x1="864"  y1="180" x2="864"  y2="186"/>
+            <line class="tl-tick" x1="977"  y1="180" x2="977"  y2="188"/>
+            <line class="tl-tick" x1="1090" y1="180" x2="1090" y2="186"/>
+            <line class="tl-tick" x1="1203" y1="180" x2="1203" y2="186"/>
+            <line class="tl-tick" x1="1316" y1="180" x2="1316" y2="186"/>
+            <line class="tl-tick" x1="1430" y1="180" x2="1430" y2="188"/>
+
+<text class="tl-month" x="70"   y="208">2025·09</text>
+            <text class="tl-month" x="524"  y="208">2026·09</text>
+            <text class="tl-month" x="977"  y="208">2027·09</text>
+            <text class="tl-month" x="1430" y="208">2028·09</text>
+
+<line class="ms-leader"  x1="410" y1="78"  x2="410" y2="116"/>
+            <circle class="ms-dot viva" cx="410" cy="74" r="6"/>
+            <text class="ms-label" x="410" y="56" text-anchor="middle">FULL REGISTRATION</text>
+            <text class="ms-label" x="410" y="44" text-anchor="middle" style="font-size:8.5px; fill:var(--ink-soft); font-weight:500;">2026-06</text>
+
+<line class="ms-leader"  x1="486" y1="100" x2="486" y2="116"/>
+            <circle class="ms-dot event" cx="486" cy="96" r="6"/>
+            <text class="ms-label event" x="486" y="84" text-anchor="middle">eCAADe Lübeck</text>
+            <text class="ms-label" x="486" y="74" text-anchor="middle" style="font-size:8.5px; fill:var(--ink-soft); font-weight:500;">attend · poster</text>
+
+<line class="ms-leader"  x1="675" y1="100" x2="675" y2="116"/>
+            <circle class="ms-dot paper" cx="675" cy="96" r="6"/>
+            <text class="ms-label" x="675" y="84" text-anchor="middle" style="fill:var(--ochre); font-weight:600;">Algo journal</text>
+            <text class="ms-label" x="675" y="74" text-anchor="middle" style="font-size:8.5px; fill:var(--ink-soft); font-weight:500;">target Q1</text>
+
+<line class="ms-leader"  x1="826" y1="100" x2="826" y2="116"/>
+            <circle class="ms-dot paper" cx="826" cy="96" r="6"/>
+            <text class="ms-label" x="826" y="84" text-anchor="middle" style="fill:var(--ochre); font-weight:600;">Medusa</text>
+            <text class="ms-label" x="826" y="74" text-anchor="middle" style="font-size:8.5px; fill:var(--ink-soft); font-weight:500;">tools paper</text>
+
+<line class="ms-leader"  x1="939" y1="100" x2="939" y2="116"/>
+            <circle class="ms-dot paper" cx="939" cy="96" r="6"/>
+            <text class="ms-label" x="939" y="84" text-anchor="middle" style="fill:var(--ochre); font-weight:600;">eCAADe '27</text>
+            <text class="ms-label" x="939" y="74" text-anchor="middle" style="font-size:8.5px; fill:var(--ink-soft); font-weight:500;">Branch 01</text>
+
+<line class="ms-leader"  x1="1090" y1="100" x2="1090" y2="116"/>
+            <circle class="ms-dot paper" cx="1090" cy="96" r="6"/>
+            <text class="ms-label" x="1090" y="84" text-anchor="middle" style="fill:var(--ochre); font-weight:600;">B&amp;E #1</text>
+            <text class="ms-label" x="1090" y="74" text-anchor="middle" style="font-size:8.5px; fill:var(--ink-soft); font-weight:500;">target Q1</text>
+
+<line class="ms-leader"  x1="1278" y1="100" x2="1278" y2="116"/>
+            <circle class="ms-dot paper" cx="1278" cy="96" r="6"/>
+            <text class="ms-label" x="1278" y="84" text-anchor="middle" style="fill:var(--ochre); font-weight:600;">B&amp;E #2</text>
+
+<line class="ms-leader"  x1="1430" y1="78" x2="1430" y2="116"/>
+            <circle class="ms-dot deliver" cx="1430" cy="74" r="7"/>
+            <text class="ms-label deliver" x="1430" y="56" text-anchor="end">THESIS SUBMISSION</text>
+            <text class="ms-label" x="1430" y="44" text-anchor="end" style="font-size:8.5px; fill:var(--ink-soft); font-weight:500;">2028-09</text>
+          </svg>
+        </div>
+      </section>
+
+<section class="years" aria-label="Per-year milestone breakdown">
+
+        <article class="year-card y1">
+          <header class="yhead">
+            <p class="yt">Year <em>01.</em></p>
+            <span class="yspan">2025-09 → 2026-09</span>
+          </header>
+          <p class="focus">
+            <strong>Branch 02 — surrogate integration.</strong>
+            Build the framework, ship Medusa, finish the surrogate / acquisition / MOEA stack.
+          </p>
+          <ul class="ms-list">
+            <li class="deliver"><strong>Medusa framework v1</strong> <span class="meta">— 5 surrogates · 8 acq · 4 MOEAs</span></li>
+            <li class="viva"><strong>Full registration viva</strong> <span class="meta">— 2026-05</span></li>
+            <li class="event">eCAADe 2026 Lübeck <em>(attend / poster)</em> <span class="meta">— too late for full paper</span></li>
+            <li>Literature review &amp; thesis chapters 1–3 drafted</li>
+          </ul>
+        </article>
+
+        <article class="year-card y2">
+          <header class="yhead">
+            <p class="yt">Year <em>02.</em></p>
+            <span class="yspan">2026-09 → 2027-09</span>
+          </header>
+          <p class="focus">
+            <strong>Branch 01 — algorithm adaptation.</strong>
+            State-aware algorithm switching · σ²-aware MOEA selection · the contract knobs.
+          </p>
+          <ul class="ms-list">
+            <li class="paper"><strong>Algorithm journal</strong> <em>(Q2 → Q1)</em> <span class="meta">— TEVC / Eng. Optim. · 2027-01</span></li>
+            <li class="paper"><strong>Medusa tools paper</strong> <span class="meta">— SoftwareX or IJAC tools</span></li>
+            <li class="paper">eCAADe 2027 paper <em>(Branch 01)</em> <span class="meta">— deadline 2027-01/02</span></li>
+            <li>Empirical case studies — architectural problems, multi-seed</li>
+          </ul>
+        </article>
+
+        <article class="year-card y3">
+          <header class="yhead">
+            <p class="yt">Year <em>03.</em></p>
+            <span class="yspan">2027-09 → 2028-09</span>
+          </header>
+          <p class="focus">
+            <strong>Branch 03 — emergence &amp; dynamics.</strong>
+            Trajectory motifs · Pareto-front structure analysis · CAS framing consolidated.
+          </p>
+          <ul class="ms-list">
+            <li class="paper"><strong>Architectural journal #1</strong> <em>(Q2 → Q1)</em> <span class="meta">— B&amp;E / E&amp;B / AiC · 2027-12</span></li>
+            <li class="paper"><strong>Architectural journal #2</strong> <em>(Q2 → Q1)</em> <span class="meta">— Branch 03 results · 2028-04</span></li>
+            <li>Thesis writing-up &amp; chapter integration</li>
+            <li class="deliver"><strong>Thesis submission</strong> <span class="meta">— 2028-09</span></li>
+          </ul>
+        </article>
+
+      </section>
+
+<section class="pubs" aria-label="Publication strategy">
+        <div class="lab">
+          <span class="top">publication strategy</span>
+          <span class="head">Four <em>journal</em> targets · annual conferences.</span>
+        </div>
+        <div class="pub">
+          <span class="ptag">algorithm</span>
+          <span class="pname">×&nbsp;1 paper</span>
+          <span class="pmeta"><strong>target Q1</strong> &nbsp;·&nbsp; <span class="q1">TEVC</span> / Eng. Optim. / ASoC</span>
+        </div>
+        <div class="pub">
+          <span class="ptag">architectural eng.</span>
+          <span class="pname">×&nbsp;2 papers</span>
+          <span class="pmeta"><strong>target Q1</strong> &nbsp;·&nbsp; <span class="q1">B&amp;E</span> / E&amp;B / AiC</span>
+        </div>
+        <div class="pub">
+          <span class="ptag">tools</span>
+          <span class="pname">×&nbsp;1 paper</span>
+          <span class="pmeta">SoftwareX / IJAC tools · standalone</span>
+        </div>
+        <div class="pub">
+          <span class="ptag">conference</span>
+          <span class="pname">eCAADe&nbsp;·&nbsp;ACADIA</span>
+          <span class="pmeta">milestone, not terminus &nbsp;·&nbsp; extend → IJAC</span>
+        </div>
+      </section>
+
+      <footer class="slide-footer">
+        <span><span class="ref">Chapter 6</span> &nbsp;·&nbsp; roadmap &nbsp;·&nbsp; 2025-09 → 2028-09</span>
+        <span class="pageno">— 13 —</span>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../../assets/slide-base.js"></script>
+  <script>SlideBase.fit('stage');</script>
+</body>
+</html>

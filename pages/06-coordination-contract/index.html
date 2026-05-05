@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Beyond pipeline — a coordination contract</title>
+  <link rel="stylesheet" href="../../assets/slide-base.css">
+  <style>
+
+.diptych {
+      position: absolute;
+      top: 245px;
+      left: 96px;
+      right: 96px;
+      height: 250px;
+      display: grid;
+      grid-template-columns: 380px 48px 380px 28px 1fr;
+      gap: 0;
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+      min-height: 0;
+      cursor: zoom-in;
+      transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1),
+                  box-shadow 0.28s ease,
+                  z-index 0s linear 0.28s;
+      transform-origin: center center;
+      position: relative;
+      z-index: 1;
+    }
+    .panel.before { border-top: 3px solid var(--ink-soft); }
+    .panel.after  { border-top: 3px solid var(--accent); }
+    
+    .panel:hover {
+      transform: scale(2);
+      box-shadow: 0 32px 100px -20px rgba(26, 41, 66, 0.45);
+      overflow: visible;
+      z-index: 80;
+      transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1),
+                  box-shadow 0.28s ease,
+                  z-index 0s linear 0s;
+    }
+    
+    .panel.before:hover { transform-origin: 0 50%; }
+    .panel.after:hover  { transform-origin: 100% 50%; }
+    .panel header {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+    .panel header .label {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .panel.before header .label { color: var(--ink-soft); }
+    .panel header h2 {
+      font-family: var(--display);
+      font-style: italic;
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin: 0;
+    }
+    .panel.before header h2 em { color: var(--ink-soft); font-style: italic; }
+    .panel.after  header h2 em { color: var(--accent);   font-style: italic; }
+    .panel .pitch {
+      font-family: var(--body);
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+    .panel .pitch strong { color: var(--ink); font-weight: 600; }
+
+.panel-svg {
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .panel-svg svg {
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+      display: block;
+    }
+
+.arch-node {
+      stroke-width: 2;
+    }
+    .arch-node.surrogate { fill: var(--paper); stroke: var(--teal);   }
+    .arch-node.acq       { fill: var(--paper); stroke: var(--accent); }
+    .arch-node.moea      { fill: var(--paper); stroke: var(--ochre);  }
+    .arch-node.filled.surrogate { fill: var(--teal);   stroke: var(--teal);   }
+    .arch-node.filled.acq       { fill: var(--accent); stroke: var(--accent); }
+    .arch-node.filled.moea      { fill: var(--ochre);  stroke: var(--ochre);  }
+
+    .arch-glyph {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 24px;
+      font-weight: 600;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+    .arch-glyph.outline { fill: var(--ink); }
+    .arch-glyph.filled  { fill: var(--paper); }
+
+    .arch-label {
+      fill: var(--ink);
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .arch-sub {
+      fill: var(--ink-soft);
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .arch-sub.role-cog { fill: var(--teal);   font-weight: 600; }
+    .arch-sub.role-str { fill: var(--accent); font-weight: 600; }
+    .arch-sub.role-dyn { fill: var(--ochre);  font-weight: 600; }
+
+.arch-edge {
+      fill: none;
+      stroke: var(--ink);
+      stroke-width: 1.4;
+      stroke-linecap: round;
+    }
+    .arch-edge.thin     { stroke: var(--ink-soft); stroke-width: 1.2; opacity: 0.55; }
+    .arch-edge.contract { stroke: var(--accent);   stroke-width: 1.6; opacity: 0.85; }
+    .arch-edge.absent   {
+      stroke: var(--ink-soft);
+      stroke-width: 0.9;
+      stroke-dasharray: 3 4;
+      opacity: 0.35;
+    }
+
+.arch-side-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      fill: var(--ink-soft);
+    }
+    .arch-side-label.contract { fill: var(--accent); font-weight: 600; }
+    .arch-side-label.title    { font-weight: 600; fill: var(--ink); }
+    .arch-leader {
+      stroke: var(--rule);
+      stroke-width: 0.6;
+      stroke-dasharray: 2 2;
+      fill: none;
+    }
+    .arch-side-card {
+      fill: var(--paper);
+      stroke: var(--rule);
+      stroke-width: 0.8;
+    }
+    .arch-side-card.contract { stroke: var(--accent); stroke-width: 1; }
+    .arch-side-card.absent { fill: rgba(199, 191, 169, 0.3); stroke-dasharray: 2 3; }
+
+.diptych-divider {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .diptych-divider::before {
+      content: "";
+      position: absolute;
+      top: 30px; bottom: 30px;
+      left: 50%;
+      width: 1px;
+      background: var(--rule);
+      transform: translateX(-50%);
+    }
+    .diptych-divider .arrow {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--bg);
+      padding: 14px 0;
+      font-weight: 600;
+    }
+    .diptych-divider .arrow em {
+      font-family: var(--display);
+      font-size: 14px;
+      letter-spacing: 0;
+      font-style: italic;
+      text-transform: none;
+      color: var(--ink);
+      padding: 0 6px;
+    }
+
+.lineage-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .lineage-stack .head {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin: 0 0 2px;
+      flex-shrink: 0;
+    }
+    .lineage-stack .head em {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 13px;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--ink);
+      font-weight: 500;
+    }
+    .lineage-card {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-left: 3px solid var(--ochre);
+      padding: 8px 12px 8px 14px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2px;
+      flex: 1 1 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .lineage-card .who {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.1;
+      margin: 0;
+    }
+    .lineage-card .who a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.18s ease, border-color 0.18s ease;
+    }
+    .lineage-card .who a:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .lineage-card .who a:visited { color: inherit; }
+    .lineage-card .who small {
+      font-family: var(--mono);
+      font-style: normal;
+      font-size: 8.5px;
+      letter-spacing: 0.06em;
+      color: var(--ink-soft);
+      margin-left: 4px;
+    }
+    .lineage-card .signal-row {
+      font-family: var(--body);
+      font-size: 10.5px;
+      color: var(--ink-soft);
+      line-height: 1.35;
+      margin: 0;
+    }
+    .lineage-card .signal-row code {
+      font-family: var(--mono);
+      font-size: 10px;
+      background: rgba(176, 125, 44, 0.10);
+      color: var(--accent);
+      padding: 0 3px;
+    }
+    .lineage-card .signal-row strong { color: var(--ink); font-weight: 600; }
+
+.knobs {
+      position: absolute;
+      top: 510px;
+      left: 96px;
+      right: 96px;
+      height: 380px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 18px;
+    }
+    .knob-col {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 14px 18px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .knob-col.cog { border-top: 3px solid var(--teal);   }
+    .knob-col.str { border-top: 3px solid var(--accent); }
+    .knob-col.dyn { border-top: 3px solid var(--ochre);  }
+
+    .knob-col-header {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .knob-col-header .role {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .knob-col.cog .role { color: var(--teal);   }
+    .knob-col.str .role { color: var(--accent); }
+    .knob-col.dyn .role { color: var(--ochre);  }
+    .knob-col-header h3 {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 20px;
+      line-height: 1;
+      color: var(--ink);
+      margin: 0;
+      font-weight: 500;
+    }
+    .knob-col-header .sub {
+      font-family: var(--body);
+      font-size: 11px;
+      color: var(--ink-soft);
+      margin: 2px 0 0;
+      line-height: 1.35;
+    }
+
+    .knob-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1 1 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .knob {
+      display: grid;
+      grid-template-rows: auto auto auto;
+      gap: 1px;
+      padding-left: 9px;
+      border-left: 2px solid var(--rule-soft);
+    }
+    .knob.primary {
+      border-left-color: var(--accent);
+    }
+    .knob .knob-name {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .knob .knob-name code {
+      background: rgba(176, 125, 44, 0.10);
+      color: var(--accent);
+      padding: 0 3px;
+      font-size: 11px;
+    }
+    .knob .knob-shift {
+      font-family: var(--body);
+      font-size: 12px;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+    .knob .knob-shift strong { color: var(--ink); font-weight: 600; }
+    .knob .knob-shift em { color: var(--accent); font-style: italic; }
+    .knob .knob-strength {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      color: var(--ochre);
+      font-weight: 600;
+    }
+    .knob .knob-strength::before {
+      content: "·";
+      margin-right: 4px;
+      color: var(--ochre);
+    }
+
+.diagnostics {
+      position: absolute;
+      top: 865px;
+      left: 96px;
+      right: 96px;
+      height: 60px;
+      background: var(--bg);
+      border: 1px dashed var(--accent);
+      padding: 0 22px;
+      display: grid;
+      grid-template-columns: 200px 1fr 1fr 1fr;
+      gap: 22px;
+      align-items: center;
+    }
+    .diagnostics .lab {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .diagnostics .lab .tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .diagnostics .lab .head {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 14px;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+    .diag {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-left: 1px solid var(--rule);
+      padding-left: 16px;
+    }
+    .diag .num {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0;
+      font-weight: 500;
+      line-height: 1.1;
+    }
+    .diag .body {
+      font-family: var(--body);
+      font-size: 10.5px;
+      color: var(--ink-soft);
+      line-height: 1.35;
+    }
+    .diag .body strong { color: var(--ink); font-weight: 600; }
+
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <main class="slide">
+      <span class="corner-mark corner-tl">COORDINATION CONTRACT</span>
+      <span class="corner-mark corner-tr">CHAPTER 4 &nbsp;·&nbsp; THESIS</span>
+
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">thesis &nbsp;·&nbsp; the unnamed protocol behind host-coupled SAEAs</p>
+          <h1 class="slide-title">Three modules, one <em>conversation</em>.</h1>
+          <p class="subtitle">
+            Existing host-coupled SAEAs (K-RVEA, MOEA/D-EGO, probabilistic-dominance NSGA-II) hard-code
+            specific signals between surrogate, acquisition and MOEA — but the literature has not named
+            the underlying protocol. This work lifts the implicit handshake into an explicit
+            communication contract, with CAS as the framing.
+          </p>
+        </div>
+      </header>
+
+<section class="diptych" aria-label="Pipeline (current) vs Contract (target)">
+
+        <article class="panel before">
+          <header>
+            <span class="label">state of the art</span>
+            <h2><em>Loose pipeline.</em></h2>
+          </header>
+          <p class="pitch">
+            Three modules, three minimal signals — no module aware of any other's internal state.
+          </p>
+          <div class="panel-svg" aria-hidden="true">
+            <svg viewBox="0 0 480 280" preserveAspectRatio="xMidYMid meet">
+
+<line class="arch-edge thin" x1="160" y1="110" x2="320" y2="110"/>
+              <line class="arch-edge thin" x1="160" y1="110" x2="240" y2="210"/>
+              <line class="arch-edge thin" x1="240" y1="210" x2="320" y2="110"/>
+
+<line class="arch-edge absent" x1="320" y1="116" x2="160" y2="116"/>
+              <line class="arch-edge absent" x1="240" y1="204" x2="164" y2="110"/>
+              <line class="arch-edge absent" x1="320" y1="116" x2="245" y2="210"/>
+
+<line class="arch-leader" x1="240" y1="78" x2="240" y2="105"/>
+              <text class="arch-side-label title" x="240" y="62" text-anchor="middle">μ · σ²</text>
+              <text class="arch-side-label" x="240" y="74" text-anchor="middle" style="font-size:9px;">surrogate → acq</text>
+
+<line class="arch-leader" x1="125" y1="178" x2="195" y2="155"/>
+              <text class="arch-side-label title" x="50" y="174" text-anchor="start">μ <tspan style="fill:#8b2727; font-style:italic">(σ² discarded)</tspan></text>
+              <text class="arch-side-label" x="50" y="186" text-anchor="start" style="font-size:9px;">surrogate → moea</text>
+
+<line class="arch-leader" x1="355" y1="178" x2="285" y2="155"/>
+              <text class="arch-side-label title" x="430" y="174" text-anchor="end">K candidates</text>
+              <text class="arch-side-label" x="430" y="186" text-anchor="end" style="font-size:9px;">moea → acq</text>
+
+<circle class="arch-node surrogate" cx="160" cy="110" r="14"/>
+              <text class="arch-glyph outline" x="160" y="110" style="fill:var(--teal)">C</text>
+
+              <circle class="arch-node acq"       cx="320" cy="110" r="14"/>
+              <text class="arch-glyph outline" x="320" y="110" style="fill:var(--accent)">S</text>
+
+              <circle class="arch-node moea"      cx="240" cy="210" r="14"/>
+              <text class="arch-glyph outline" x="240" y="210" style="fill:var(--ochre)">D</text>
+
+<text class="arch-label" x="160" y="42" text-anchor="middle">Surrogate</text>
+              <text class="arch-sub role-cog"  x="160" y="26" text-anchor="middle">cognition</text>
+
+              <text class="arch-label" x="320" y="42" text-anchor="middle">Acquisition</text>
+              <text class="arch-sub role-str"  x="320" y="26" text-anchor="middle">strategy</text>
+
+              <text class="arch-label" x="240" y="244" text-anchor="middle">MOEA host</text>
+              <text class="arch-sub role-dyn"  x="240" y="260" text-anchor="middle">dynamics</text>
+            </svg>
+          </div>
+        </article>
+
+        <div class="diptych-divider" aria-hidden="true">
+          <span class="arrow">target<em>·</em>contract</span>
+        </div>
+
+        <article class="panel after">
+          <header>
+            <span class="label">thesis target</span>
+            <h2>Named <em>protocol</em>.</h2>
+          </header>
+          <p class="pitch">
+            Each module exposes observables, accepts knobs — <em>local rules, shared blackboard, emergent coordination</em>.
+          </p>
+          <div class="panel-svg" aria-hidden="true">
+            <svg viewBox="0 0 480 280" preserveAspectRatio="xMidYMid meet">
+
+<line class="arch-edge contract" x1="160" y1="106" x2="320" y2="106"/>
+              <line class="arch-edge contract" x1="320" y1="114" x2="160" y2="114"/>
+
+<line class="arch-edge contract" x1="156" y1="114" x2="236" y2="210"/>
+              <line class="arch-edge contract" x1="244" y1="210" x2="164" y2="114"/>
+
+<line class="arch-edge contract" x1="316" y1="114" x2="244" y2="206"/>
+              <line class="arch-edge contract" x1="248" y1="210" x2="324" y2="118"/>
+
+<line class="arch-leader" x1="240" y1="84" x2="240" y2="100"/>
+              <text class="arch-side-label contract title" x="240" y="56" text-anchor="middle">μ · σ² · obs Y</text>
+              <text class="arch-side-label" x="240" y="68" text-anchor="middle" style="font-size:11px;">↕</text>
+              <text class="arch-side-label contract title" x="240" y="80" text-anchor="middle">θ-freeze · retrain hint</text>
+
+<line class="arch-leader" x1="125" y1="178" x2="195" y2="155"/>
+              <text class="arch-side-label contract title" x="50" y="160" text-anchor="start">niche state · stagnation</text>
+              <text class="arch-side-label" x="50" y="174" text-anchor="start" style="font-size:11px;">↕</text>
+              <text class="arch-side-label contract title" x="50" y="188" text-anchor="start">μ · σ² · obs Y</text>
+
+<line class="arch-leader" x1="355" y1="178" x2="285" y2="155"/>
+              <text class="arch-side-label contract title" x="430" y="160" text-anchor="end">K candidates · ratios</text>
+              <text class="arch-side-label" x="430" y="174" text-anchor="end" style="font-size:11px;">↕</text>
+              <text class="arch-side-label contract title" x="430" y="188" text-anchor="end">μ · σ²</text>
+
+<circle class="arch-node filled surrogate" cx="160" cy="110" r="14"/>
+              <text class="arch-glyph filled" x="160" y="110">C</text>
+
+              <circle class="arch-node filled acq"       cx="320" cy="110" r="14"/>
+              <text class="arch-glyph filled" x="320" y="110">S</text>
+
+              <circle class="arch-node filled moea"      cx="240" cy="210" r="14"/>
+              <text class="arch-glyph filled" x="240" y="210">D</text>
+
+<text class="arch-label" x="160" y="42" text-anchor="middle">Surrogate</text>
+              <text class="arch-sub role-cog"  x="160" y="26" text-anchor="middle">cognition</text>
+
+              <text class="arch-label" x="320" y="42" text-anchor="middle">Acquisition</text>
+              <text class="arch-sub role-str"  x="320" y="26" text-anchor="middle">strategy</text>
+
+              <text class="arch-label" x="240" y="244" text-anchor="middle">MOEA host</text>
+              <text class="arch-sub role-dyn"  x="240" y="260" text-anchor="middle">dynamics</text>
+            </svg>
+          </div>
+        </article>
+
+<div aria-hidden="true"></div>
+
+<aside class="lineage-stack" aria-label="Three published instances of the protocol">
+          <p class="head">prior art &nbsp;·&nbsp; <em>each fixes a different signal tuple</em></p>
+          <article class="lineage-card">
+            <p class="who">
+              <a href="https://doi.org/10.1109/TEVC.2016.2622301" target="_blank" rel="noopener">K-RVEA</a>
+              <small>Chugh 2018 · IEEE TEVC</small>
+            </p>
+            <p class="signal-row">
+              MOEA → acq: <code>I<sub>active</sub></code> + temporal Δ — switches infill between APD-best and σ-max.
+            </p>
+          </article>
+          <article class="lineage-card">
+            <p class="who">
+              <a href="https://doi.org/10.1109/TEVC.2009.2033671" target="_blank" rel="noopener">MOEA/D-EGO</a>
+              <small>Zhang 2010 · IEEE TEVC</small>
+            </p>
+            <p class="signal-row">
+              MOEA → acq: <code>weight-vector ID</code> — per-subproblem GP indexed by decomposition state.
+            </p>
+          </article>
+          <article class="lineage-card">
+            <p class="who">
+              <a href="https://doi.org/10.1038/s41598-023-40019-6" target="_blank" rel="noopener">Prob.-dominance NSGA</a>
+              <small>Gu 2023 · Sci. Rep.</small>
+            </p>
+            <p class="signal-row">
+              Surrogate → MOEA: <strong>σ²</strong> enters non-dominated sort itself — uncertainty in selection.
+            </p>
+          </article>
+        </aside>
+
+      </section>
+
+<section class="knobs" aria-label="Concrete adjustment points per module">
+
+        <article class="knob-col cog">
+          <header class="knob-col-header">
+            <span class="role">cognition · surrogate</span>
+            <h3>Surrogate knobs.</h3>
+            <p class="sub">three adjustment points · weight, schedule, kernel</p>
+          </header>
+          <div class="knob-list">
+            <div class="knob">
+              <span class="knob-name">training data weighting</span>
+              <span class="knob-shift">samples near current ND archive get <strong>up-weighted</strong> — the region acquisition cares about</span>
+              <span class="knob-strength">strength · sample-weight multiplier</span>
+            </div>
+            <div class="knob primary">
+              <span class="knob-name">retrain trigger</span>
+              <span class="knob-shift">replace fixed-N retrain with <em>perturbation-driven</em>: refit only when |Δμ on existing pop| &gt; threshold</span>
+              <span class="knob-strength">strength · perturbation threshold τ<sub>refit</sub></span>
+            </div>
+            <div class="knob">
+              <span class="knob-name">lengthscale warm-start</span>
+              <span class="knob-shift">previous ℓ as init for current EM / BFGS instead of cold-start — cuts retrain wall-clock</span>
+              <span class="knob-strength">strength · warm-start blend ratio</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="knob-col str">
+          <header class="knob-col-header">
+            <span class="role">strategy · acquisition</span>
+            <h3>Acquisition knobs.</h3>
+            <p class="sub">re-route λ · ξ · candidate pool through MOO state</p>
+          </header>
+          <div class="knob-list">
+            <div class="knob primary">
+              <span class="knob-name">scalarisation λ source <code>EI · ParEGO · UCB</code></span>
+              <span class="knob-shift">λ no longer uniform Dirichlet — sampled from MOO's <em>per-direction priority</em> (niche-empty + stagnant + σ-high)</span>
+              <span class="knob-strength">strength · priority temperature</span>
+            </div>
+            <div class="knob">
+              <span class="knob-name">explore coefficient <code>ξ</code> / <code>β</code></span>
+              <span class="knob-shift">scale by global stagnation: MOO stuck → enlarge ξ to push exploration</span>
+              <span class="knob-strength">strength · stagnation gain γ</span>
+            </div>
+            <div class="knob">
+              <span class="knob-name">candidate pool</span>
+              <span class="knob-shift">pool = MOO current population (free signal) instead of random / Latin — many implementations skip this</span>
+              <span class="knob-strength">strength · binary on/off</span>
+            </div>
+            <div class="knob">
+              <span class="knob-name">EHVI ref-point <code>r</code></span>
+              <span class="knob-shift">adapt to ND archive envelope + margin instead of static; matches q-EHVI auto-ref pattern</span>
+              <span class="knob-strength">strength · margin ratio</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="knob-col dyn">
+          <header class="knob-col-header">
+            <span class="role">dynamics · MOEA host</span>
+            <h3>MOEA knobs.</h3>
+            <p class="sub">σ²-aware selection · niche reporting</p>
+          </header>
+          <div class="knob-list">
+            <div class="knob primary">
+              <span class="knob-name">dominance test (NSGA)</span>
+              <span class="knob-shift">deterministic <code>a ≻ b</code> → <em>probabilistic</em> P(a ≻ b) &gt; τ — high-σ "dominated" solutions are protected</span>
+              <span class="knob-strength">strength · τ probabilistic threshold</span>
+            </div>
+            <div class="knob">
+              <span class="knob-name">crowding distance (NSGA-II)</span>
+              <span class="knob-shift">multiplied by <code>(1 + α · σ_norm)</code> — uncertain solutions get more diversity credit</span>
+              <span class="knob-strength">strength · α</span>
+            </div>
+            <div class="knob">
+              <span class="knob-name">niche count (NSGA-III)</span>
+              <span class="knob-shift">σ-high members <em>discounted</em> (β) — "may not really be in this niche"</span>
+              <span class="knob-strength">strength · β niche-discount</span>
+            </div>
+            <div class="knob primary">
+              <span class="knob-name">per-ref-point report <code>→ acq</code></span>
+              <span class="knob-shift"><strong>emit each gen</strong>: niche count · k-gen HV Δ · associated-σ avg — the core MOO→acq signal</span>
+              <span class="knob-strength">always on · zero-cost observable</span>
+            </div>
+          </div>
+        </article>
+
+      </section>
+
+<aside class="synthesis" aria-label="Synthesis claim">
+        <span class="label">claim &nbsp;·&nbsp; the real research question</span>
+        <blockquote>
+          Exposing observables and knobs is the engineering half. The research half is
+          <em>how each module self-adjusts when it reads the others' state</em> —
+          how a surrogate <em>retrains</em> on niche stagnation, how acquisition turns
+          niche history into a <em>weighted λ distribution</em>, how an MOEA balances σ²-aware
+          <em>probabilistic dominance</em> against confirmed solutions —
+          <span class="ins">interface is contract, algorithm is adaptation, the Pareto Front itself is emergent</span>.
+        </blockquote>
+      </aside>
+
+      <footer class="slide-footer">
+        <span><span class="ref">Chapter 4</span> &nbsp;·&nbsp; coordination contract</span>
+        <span class="pageno">— 11 —</span>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../../assets/slide-base.js"></script>
+  <script>SlideBase.fit('stage');</script>
+</body>
+</html>

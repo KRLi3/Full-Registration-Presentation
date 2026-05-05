@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Literature landscape — where this thesis sits</title>
+  <link rel="stylesheet" href="../../assets/slide-base.css">
+  <style>
+    .lit-grid {
+      position: absolute;
+      top: 250px;
+      left: 96px;
+      right: 96px;
+      height: 660px;
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 28px;
+    }
+
+    .col-framing,
+    .col-methods {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 20px 24px 16px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .col-framing { overflow: hidden; }
+    .col-methods {
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .col-methods::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;
+    }
+    .col-framing { border-top: 3px solid var(--ink-soft); }
+    .col-methods { border-top: 3px solid var(--accent); }
+
+    .col-head {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .col-head .lab {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .col-framing .col-head .lab { color: var(--ink-soft); }
+    .col-head h2 {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 26px;
+      line-height: 1.05;
+      color: var(--ink);
+      margin: 0;
+      font-weight: 500;
+    }
+    .col-head h2 em { color: var(--accent); }
+    .col-framing .col-head h2 em { color: var(--ink-soft); }
+    .col-head .sub {
+      font-family: var(--body);
+      font-size: 11.5px;
+      line-height: 1.4;
+      color: var(--ink-soft);
+      margin: 4px 0 0;
+    }
+    .col-head .sub em { color: var(--accent); font-style: italic; }
+
+    .cluster {
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px dashed var(--rule);
+      transition: none;
+    }
+    .col-methods .cluster:hover {
+      transform: none;
+      box-shadow: none;
+      z-index: auto;
+    }
+    .cluster:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .cluster .row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin: 0 0 6px;
+    }
+    .cluster .num {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--ink-soft);
+      flex-shrink: 0;
+      width: 26px;
+    }
+    .cluster .name {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 18px;
+      line-height: 1.1;
+      color: var(--ink);
+      margin: 0;
+      font-weight: 500;
+      flex: 1;
+    }
+    .cluster .count {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      color: var(--ink-soft);
+      flex-shrink: 0;
+      padding: 2px 8px;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+    }
+    .cluster.t1 .count { border-color: var(--teal);   color: var(--teal);   }
+    .cluster.t2 .count { border-color: var(--accent); color: var(--accent); }
+    .cluster.t3 .count { border-color: var(--ochre);  color: var(--ochre);  }
+    .cluster.t4 .count { border-color: var(--sage);   color: var(--sage);   }
+    .cluster.t1 .num { color: var(--teal);   }
+    .cluster.t2 .num { color: var(--accent); }
+    .cluster.t3 .num { color: var(--ochre);  }
+    .cluster.t4 .num { color: var(--sage);   }
+
+    .cluster .anchors {
+      list-style: none;
+      margin: 0;
+      padding: 0 0 0 38px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .cluster .anchors li {
+      font-family: var(--body);
+      font-size: 11px;
+      line-height: 1.35;
+      color: var(--ink);
+    }
+    .cluster .anchors li .who {
+      font-family: var(--display);
+      font-style: italic;
+      color: var(--ink);
+      font-weight: 500;
+    }
+    .cluster .anchors li .who a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.18s ease, border-color 0.18s ease;
+    }
+    .cluster .anchors li .who a:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .cluster .anchors li .who a:visited { color: inherit; }
+    .cluster .anchors li .desc {
+      color: var(--ink-soft);
+      font-size: 11px;
+    }
+    .cluster .anchors li .pdf {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ochre);
+      margin-left: 4px;
+    }
+    .cluster details {
+      margin-top: 4px;
+      padding-left: 38px;
+    }
+    .cluster details summary {
+      list-style: none;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      padding: 4px 0 2px;
+      transition: color 0.18s ease;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .cluster details summary::-webkit-details-marker { display: none; }
+    .cluster details summary::before {
+      content: "+";
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 16px;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0;
+      transition: transform 0.18s ease;
+      display: inline-block;
+      width: 12px;
+    }
+    .cluster details[open] summary::before { content: "−"; }
+    .cluster details summary:hover { color: var(--accent); }
+    .cluster details ol {
+      list-style: none;
+      counter-reset: paper-counter;
+      margin: 8px 0 0;
+      padding: 8px 6px 0 0;
+      border-top: 1px dashed var(--rule);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .cluster details ol li {
+      counter-increment: paper-counter;
+      font-family: var(--body);
+      font-size: 10px;
+      line-height: 1.4;
+      color: var(--ink);
+      padding-left: 22px;
+      position: relative;
+    }
+    .cluster details ol li::before {
+      content: counter(paper-counter) ".";
+      position: absolute;
+      left: 0;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--ink-soft);
+      font-weight: 600;
+    }
+    .cluster details ol li em {
+      font-style: italic;
+      color: var(--ink-soft);
+    }
+
+    .framing-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex: 1;
+    }
+    .framing-list li {
+      padding-left: 14px;
+      border-left: 2px solid var(--rule);
+    }
+    .framing-list li.foundational { border-left-color: var(--ink); }
+    .framing-list li .who {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 16px;
+      line-height: 1.15;
+      color: var(--ink);
+      font-weight: 500;
+      margin: 0 0 2px;
+    }
+    .framing-list li .where {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.06em;
+      color: var(--ink-soft);
+      margin: 0 0 4px;
+    }
+    .framing-list li .role {
+      font-family: var(--body);
+      font-size: 11.5px;
+      line-height: 1.4;
+      color: var(--ink);
+      margin: 0;
+    }
+    .framing-list li .role em { color: var(--accent); font-style: italic; }
+
+    .framing-foot {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--rule);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+    .framing-foot strong { color: var(--ink); font-weight: 600; }
+
+    .methods-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--rule);
+    }
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .stat .num {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 26px;
+      line-height: 1;
+      font-weight: 500;
+    }
+    .stat.t1 .num { color: var(--teal);   }
+    .stat.t2 .num { color: var(--accent); }
+    .stat.t3 .num { color: var(--ochre);  }
+    .stat.t4 .num { color: var(--sage);   }
+    .stat .lbl {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      font-weight: 600;
+      line-height: 1.3;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <main class="slide">
+      <span class="corner-mark corner-tl">LITERATURE LANDSCAPE</span>
+      <span class="corner-mark corner-tr">CHAPTER 5 &nbsp;·&nbsp; LITERATURE</span>
+
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">literature &nbsp;·&nbsp; framing vs methods &nbsp;·&nbsp; where this thesis sits</p>
+          <h1 class="slide-title">Two columns, <em>five</em> clusters.</h1>
+          <p class="subtitle">
+            Methods drive the thesis; framing gives it vocabulary. The right column is the body of work this
+            research builds on — surrogate-assisted MOEAs, generative-design workflows, building-performance
+            applications. The left column is small but load-bearing: CAS appears as the <em>interpretative
+            lens</em> through which the methods cohere, not as a formal core.
+          </p>
+        </div>
+      </header>
+
+      <section class="lit-grid" aria-label="Literature landscape">
+
+        <article class="col-framing">
+          <header class="col-head">
+            <span class="lab">framing &nbsp;·&nbsp; theoretical lens</span>
+            <h2><em>CAS</em> as vocabulary.</h2>
+            <p class="sub">
+              Three anchors. CAS is a <em>lens</em> — it gives names (adaptation, feedback, emergence) to
+              behaviour the methods produce, not a formal mechanism the methods implement.
+            </p>
+          </header>
+          <ul class="framing-list">
+            <li class="foundational">
+              <p class="who">Holland 1995</p>
+              <p class="where">Addison-Wesley · book · CAS canon</p>
+              <p class="role">
+                <em>Hidden Order</em> — origin of the adaptive-agents framing and the
+                trio adaptation / non-linearity / aggregation that this thesis re-uses.
+              </p>
+            </li>
+            <li>
+              <p class="who">Mitchell 2009</p>
+              <p class="where">Oxford UP · book · modern survey</p>
+              <p class="role">
+                <em>Complexity: A Guided Tour</em> — accessible synthesis of CAS, used here to
+                ground emergence terminology without going formal.
+              </p>
+            </li>
+            <li>
+              <p class="who">Batty 2007</p>
+              <p class="where">MIT Press · book · CAS in built-environment</p>
+              <p class="role">
+                <em>Cities and Complexity</em> — closest precedent for applying CAS vocabulary to
+                physical-design domains, the bridge from CAS to architecture.
+              </p>
+            </li>
+          </ul>
+          <p class="framing-foot">
+            <strong>Scope decision:</strong> CAS as <em>interpretative lens</em>, not theoretical core
+            (see slide 02 — open positioning).
+          </p>
+        </article>
+
+        <article class="col-methods">
+          <header class="col-head">
+            <span class="lab">methods &nbsp;·&nbsp; the body of work</span>
+            <h2>Four clusters · ~<em>50</em> anchors.</h2>
+            <p class="sub">
+              Curated from the candidate's reading set plus deck-cited foundations. Counts are unique-paper
+              counts; the clusters overlap occasionally (e.g. surrogate + envelope-MOO).
+            </p>
+          </header>
+
+          <article class="cluster t1">
+            <div class="row">
+              <span class="num">01</span>
+              <span class="name">Generative + parametric MOO.</span>
+              <span class="count">16 papers</span>
+            </div>
+            <ul class="anchors">
+              <li><span class="who">Wortmann, Cichocka &amp; Waibel 2022</span> — <span class="desc">simulation-based optimisation in arch., practitioner survey, <em>Energy &amp; Buildings</em></span></li>
+              <li><span class="who"><a href="https://doi.org/10.3390/buildings15071777" target="_blank" rel="noopener">Huang et al. 2025</a></span> — <span class="desc">performance-driven generative-design systematic review, <em>Buildings</em></span></li>
+              <li><span class="who">Li et al. 2024</span> — <span class="desc">multi-task ANN integration for sustainable building MOO, <em>Applied Energy</em></span></li>
+            </ul>
+            <details>
+              <summary>Show all 16</summary>
+              <ol>
+                <li><em>Li et al. 2024</em> — A novel multi-objective generative design approach for sustainable building using multi-task learning (ANN) integration</li>
+                <li><em>Bouillon et al. 2025</em> — Multi-LOD generative approach for multi-objective sustainability optimization from the early stages of building design</li>
+                <li><em>Lin, Zhang &amp; Tiong 2023</em> — Multi-objective optimization ensembled generative design for large-diameter tunnel passing underneath existing tunnels</li>
+                <li><em>Barreto et al. 2025</em> — Multi-objective generative design for sustainable timber shading elements: thermal optimization and modular adaptation in Brazilian coastal environments</li>
+                <li><em>Ain et al. 2025</em> — Generative design and multi-objective optimization for enhanced building thermal performance</li>
+                <li><em>Y. Li et al. 2023</em> — Performance in generation: an automatic generalizable generative-design-based performance optimization framework</li>
+                <li><em>R. Li et al. 2024</em> — Multi-objective optimization for generative morphological design — new rural community in China</li>
+                <li><em>M. Li et al. 2025</em> — A performance-responsive generative design framework integrating MOO for residential building layout (Tianjin)</li>
+                <li><em>Wortmann, Cichocka &amp; Waibel 2022</em> — Simulation-based optimization in architecture and building engineering, practitioner survey</li>
+                <li><em>Cudzik &amp; Nessel 2025</em> — Algorithmic space optimization in building adaptations: generative design comparison</li>
+                <li><em>Wefki et al. 2025</em> — A generative design-based optimization model for multi-objective construction site layout planning</li>
+                <li><em>Liu et al. 2024</em> — Multi-objective optimization design of university student center in China based on low energy consumption and thermal comfort</li>
+                <li><em>Fang et al. 2024</em> — Construction of sustainable building performance optimization design model based on sensitive multi-objective decision making</li>
+                <li><em>Huang et al. 2025</em> — Performance-driven generative design in buildings: a systematic review</li>
+                <li><em>Zhang et al. 2024</em> — Does architectural design require single-objective or multi-objective optimisation? Comparative study</li>
+                <li><em>Sahnoune &amp; Benhassine 2023</em> — Pareto-based MOO framework for early-stage architectural design</li>
+              </ol>
+            </details>
+          </article>
+
+          <article class="cluster t2">
+            <div class="row">
+              <span class="num">02</span>
+              <span class="name">Surrogate-assisted MOEAs.</span>
+              <span class="count">8 papers</span>
+            </div>
+            <ul class="anchors">
+              <li><span class="who"><a href="https://doi.org/10.1109/TEVC.2016.2622301" target="_blank" rel="noopener">Chugh et al. 2018</a></span> — <span class="desc">K-RVEA, the canonical host-coupled SAEA, <em>IEEE TEVC</em></span></li>
+              <li><span class="who"><a href="https://doi.org/10.1109/TEVC.2009.2033671" target="_blank" rel="noopener">Zhang et al. 2010</a></span> — <span class="desc">MOEA/D-EGO, decomposition-based surrogate, <em>IEEE TEVC</em></span></li>
+              <li><span class="who"><a href="https://doi.org/10.1038/s41598-023-40019-6" target="_blank" rel="noopener">Gu et al. 2023</a></span> — <span class="desc">probabilistic-dominance NSGA, σ² in MOEA selection, <em>Sci. Rep.</em></span></li>
+            </ul>
+            <details>
+              <summary>Show all 8</summary>
+              <ol>
+                <li><em>Chugh et al. 2018</em> — K-RVEA: a Kriging-assisted reference-vector-guided EA for many-objective optimisation, <em>IEEE TEVC</em></li>
+                <li><em>Chugh et al. 2018 (GECCO)</em> — HK-RVEA: heterogeneous Kriging-assisted RVEA for objectives of different latency</li>
+                <li><em>Zhang, Liu, Tsang &amp; Virginas 2010</em> — Expensive multi-objective optimisation by MOEA/D with GP models (MOEA/D-EGO), <em>IEEE TEVC</em></li>
+                <li><em>Pan, He, Tian, Wang, Zhang &amp; Jin 2019</em> — A classification-based surrogate-assisted EA (CSEA), <em>IEEE TEVC</em></li>
+                <li><em>Gu et al. 2023</em> — Two-stage probabilistic-dominance surrogate-assisted MOEA, <em>Sci. Rep.</em></li>
+                <li><em>Daulton, Balandat &amp; Bakshy 2020</em> — q-EHVI: differentiable expected hypervolume improvement for parallel MOO BO, <em>NeurIPS</em></li>
+                <li><em>Chen et al. 2021</em> — Multiobjective optimisation of building energy consumption based on BIM-DB and LSSVM-NSGA-II, <em>J. Cleaner Production</em></li>
+                <li><em>Elwy &amp; Hagishima 2024</em> — The AI reformation of sustainable building design: surrogate-model systematic review, <em>Energy &amp; Buildings</em></li>
+              </ol>
+            </details>
+          </article>
+
+          <article class="cluster t3">
+            <div class="row">
+              <span class="num">03</span>
+              <span class="name">MOEA &amp; acquisition foundations.</span>
+              <span class="count">8 papers</span>
+            </div>
+            <ul class="anchors">
+              <li><span class="who"><a href="https://doi.org/10.1109/4235.996017" target="_blank" rel="noopener">Deb et al. 2002</a></span> — <span class="desc">NSGA-II, the de-facto baseline, <em>IEEE TEVC</em></span></li>
+              <li><span class="who"><a href="https://doi.org/10.1109/TEVC.2013.2281535" target="_blank" rel="noopener">Deb &amp; Jain 2014</a></span> — <span class="desc">NSGA-III for many-objective, reference-point niching, <em>IEEE TEVC</em></span></li>
+              <li><span class="who"><a href="https://doi.org/10.1109/TEVC.2016.2519378" target="_blank" rel="noopener">Cheng et al. 2016</a></span> — <span class="desc">RVEA, angle-penalised distance, <em>IEEE TEVC</em></span></li>
+              <li><span class="who"><a href="https://doi.org/10.1023/A:1008306431147" target="_blank" rel="noopener">Jones et al. 1998</a></span> — <span class="desc">EI / efficient global optimisation, <em>J. Global Optim.</em></span></li>
+            </ul>
+            <details>
+              <summary>Show all 8</summary>
+              <ol>
+                <li><em>Deb, Pratap, Agarwal &amp; Meyarivan 2002</em> — A fast and elitist multiobjective genetic algorithm: NSGA-II, <em>IEEE TEVC</em></li>
+                <li><em>Deb &amp; Jain 2014</em> — An evolutionary many-objective optimization algorithm using reference-point-based non-dominated sorting (NSGA-III), <em>IEEE TEVC</em></li>
+                <li><em>Zhang &amp; Li 2007</em> — MOEA/D: a multiobjective evolutionary algorithm based on decomposition, <em>IEEE TEVC</em></li>
+                <li><em>Li &amp; Zhang 2009</em> — Multiobjective optimization problems with complicated Pareto sets — MOEA/D-DE variant, <em>IEEE TEVC</em></li>
+                <li><em>Cheng, Jin, Olhofer &amp; Sendhoff 2016</em> — A reference vector guided EA for many-objective optimization (RVEA), <em>IEEE TEVC</em></li>
+                <li><em>Jones, Schonlau &amp; Welch 1998</em> — Efficient global optimization of expensive black-box functions (EI), <em>J. Global Optim.</em></li>
+                <li><em>Knowles 2006</em> — ParEGO: a hybrid algorithm with on-line landscape approximation for expensive MOO, <em>IEEE TEVC</em></li>
+                <li><em>Emmerich, Beume &amp; Naujoks 2005</em> — An EMO algorithm using the hypervolume measure as selection criterion (EHVI), <em>EMO 2005</em></li>
+              </ol>
+            </details>
+          </article>
+
+          <article class="cluster t4">
+            <div class="row">
+              <span class="num">04</span>
+              <span class="name">Building application domain.</span>
+              <span class="count">24 papers</span>
+            </div>
+            <ul class="anchors">
+              <li><span class="who">Ascione et al. 2015</span> — <span class="desc">envelope MOO, foundational pair-objective study, <em>Sustainability</em></span></li>
+              <li><span class="who">Pan et al. 2016</span> — <span class="desc">thermal comfort + energy MOO, canonical, <em>CCC</em></span></li>
+              <li><span class="who">Sun et al. 2021</span> — <span class="desc">windows + shading multi-objective, four-objective design space</span></li>
+            </ul>
+            <details>
+              <summary>Show all 24</summary>
+              <ol>
+                <li><em>Ascione et al. 2015</em> — Design of the building envelope: novel multi-objective approach for energy + thermal comfort</li>
+                <li><em>Fesanghary, Asadi &amp; Geem 2012</em> — Low-emission and energy-efficient residential buildings via MOO (canonical early)</li>
+                <li><em>Pan, Li, Xue &amp; Liu 2016</em> — MOO for building performance: thermal comfort + energy</li>
+                <li><em>Ciardiello et al. 2020</em> — MO approach to optimisation of shape and envelope in building energy design</li>
+                <li><em>Giouri, Tenpierik &amp; Turrin 2020</em> — Zero-energy potential of high-rise office in Mediterranean climate via MOO</li>
+                <li><em>Qiao &amp; Liu 2020</em> — Impact of building greening on energy consumption: quantitative computational approach</li>
+                <li><em>Zhao &amp; Du 2020</em> — Multi-objective optimisation design for windows and shading: office, China climates</li>
+                <li><em>Sun et al. 2021</em> — Windows + shading configuration: energy / thermal / visual / sound four-objective</li>
+                <li><em>Samarasinghalage et al. 2022</em> — MOO framework for building-integrated PV envelope: energy vs cost</li>
+                <li><em>Fan, Liu &amp; Tang 2022</em> — Gymnasium facade shading-ratio MOO: energy load + daylight comfort</li>
+                <li><em>Nazari et al. 2023</em> — MOO designing window and shading systems considering occupant comfort</li>
+                <li><em>Bao &amp; Zhang 2024</em> — Energy-saving retrofit design via improved grasshopper MOO</li>
+                <li><em>Wei et al. 2024</em> — Comprehensive MOO of external window design</li>
+                <li><em>Zhang, Teoh &amp; Zhang 2024</em> — Energy-efficient design considering urban heat island effects</li>
+                <li><em>Tian &amp; Chai 2025</em> — Building design and operation MOO: energy costs vs emissions</li>
+                <li><em>Qiu et al. 2024</em> — Performance-based MOO considering interplay between buildings and urban environments</li>
+                <li><em>Guo et al. 2025</em> — Cold-region office MOO balancing outdoor thermal comfort and energy</li>
+                <li><em>Zou, Sun &amp; Gao 2025</em> — Inner Mongolia rural residential MOO design</li>
+                <li><em>Duan et al. 2026</em> — BPNN + NSGA-III for cold-region rural residential, Shangqiu</li>
+                <li><em>Chaturvedi et al. 2025</em> — Glazing/shading MOO for cooling-dominant climates of India</li>
+                <li><em>Xia, Ali &amp; Mahyuddin 2025</em> — Window design MOO for energy + thermal comfort in school buildings, hot-humid</li>
+                <li><em>Shahi, Beesley &amp; Haas 2023</em> — Building-adaptation appraisal via interactive MOO</li>
+                <li><em>Ganesh et al. 2025</em> — Box-Behnken response-surface MOO for indoor comfort + energy</li>
+                <li><em>Shirzadi, Lau &amp; Stylianou 2025</em> — ML-based surrogates for early-stage urban building energy design</li>
+              </ol>
+            </details>
+          </article>
+
+        </article>
+
+      </section>
+
+      <aside class="synthesis" aria-label="Synthesis claim">
+        <span class="label">claim</span>
+        <blockquote>
+          The <em>methods column</em> drives the work — surrogate-assisted MOEAs and the generative-design
+          tradition give the technical machinery. The <em>framing column</em> gives it a vocabulary:
+          <span class="ins">CAS as interpretation, not implementation</span> —
+          a lens for adaptation, feedback, and emergence.
+        </blockquote>
+      </aside>
+
+      <footer class="slide-footer">
+        <span><span class="ref">Chapter 5</span> &nbsp;·&nbsp; literature landscape</span>
+        <span class="pageno">— 12 —</span>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../../assets/slide-base.js"></script>
+  <script>SlideBase.fit('stage');</script>
+</body>
+</html>

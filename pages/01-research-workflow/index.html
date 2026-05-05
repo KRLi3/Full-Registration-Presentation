@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Research Workflow — Surrogate-Assisted Multi-Objective Optimisation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f3efe5;
+      --paper: #faf7ee;
+      --ink: #1a2942;
+      --ink-soft: #44546c;
+      --rule: #c7bfa9;
+      --rule-soft: #d9d0b8;
+      --accent: #8b2727;
+      --ochre: #b07d2c;
+      --sage: #5e7458;
+      --teal: #2f5d6e;
+
+      --display: "Cormorant Garamond", "Times New Roman", serif;
+      --body: "Inter Tight", "Helvetica Neue", sans-serif;
+      --mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; padding: 0;
+      background: #d9d2c1;
+      color: var(--ink);
+      font-family: var(--body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px 18px;
+    }
+
+.stage {
+      width: 1920px;
+      height: 1080px;
+      transform-origin: center center;
+      position: relative;
+    }
+
+    .slide {
+      width: 1920px;
+      height: 1080px;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 1px 0 rgba(26, 41, 66, 0.06),
+        0 30px 80px -30px rgba(26, 41, 66, 0.25);
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(rgba(26, 41, 66, 0.04) 1px, transparent 1px),
+        radial-gradient(rgba(176, 125, 44, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px, 73px 73px;
+      background-position: 0 0, 12px 18px;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+    }
+
+    .slide::after {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(180deg, transparent 0, transparent 92%, rgba(26, 41, 66, 0.04) 100%),
+        linear-gradient(0deg, transparent 0, transparent 92%, rgba(26, 41, 66, 0.04) 100%);
+      pointer-events: none;
+    }
+
+.corner-mark {
+      position: absolute;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--ink-soft);
+      top: 28px;
+    }
+    .corner-tl { left: 96px; }
+    .corner-tr { right: 96px; text-align: right; }
+
+    header {
+      position: absolute;
+      top: 64px;
+      left: 96px;
+      right: 96px;
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 64px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 12px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 32px; height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-weight: 500;
+      font-size: 56px;
+      line-height: 1.02;
+      letter-spacing: -0.01em;
+      margin: 0;
+      color: var(--ink);
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .subtitle {
+      margin: 14px 0 0;
+      font-size: 16px;
+      line-height: 1.45;
+      color: var(--ink-soft);
+      max-width: 1180px;
+    }
+
+    .legend {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      color: var(--ink-soft);
+      padding: 14px 18px;
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      align-self: end;
+    }
+    .legend-row {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 14px;
+      align-items: center;
+      white-space: nowrap;
+    }
+    .legend-row .arrow {
+      height: 1px;
+      width: 36px;
+      position: relative;
+      background: currentColor;
+    }
+    .legend-row .arrow::after {
+      content: "";
+      position: absolute;
+      right: -1px;
+      top: -3px;
+      border: 3.5px solid transparent;
+      border-left-color: currentColor;
+    }
+    .legend-row.main { color: var(--ink); }
+    .legend-row.loop { color: var(--ochre); }
+    .legend-row.loop  .arrow { background: transparent; border-top: 1.4px dashed currentColor; }
+    .legend-row.online { color: var(--accent); }
+    .legend-row.online .arrow { background: transparent; border-top: 1.6px dashed currentColor; }
+    .legend-row .lbl {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+    }
+
+    .control-row {
+      position: absolute;
+      top: 270px;
+      left: 96px;
+      right: 96px;
+      display: flex;
+      align-items: flex-start;
+      gap: 22px;
+    }
+
+.mode-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .mode-bar-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-right: 6px;
+    }
+
+    .mode-btn {
+      height: 40px;
+      padding: 0 22px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--rule);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      line-height: 1;
+      color: var(--ink-soft);
+      transition: color 0.18s ease, border-color 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mode-btn:hover {
+      color: var(--ink);
+      border-top-color: var(--ink-soft);
+    }
+    .mode-btn[aria-pressed="true"] {
+      color: var(--ink);
+      border-top-color: var(--ink);
+    }
+    .mode-btn[aria-pressed="true"][data-mode="online"] {
+      color: var(--accent);
+      border-top-color: var(--accent);
+    }
+    .mode-btn[aria-pressed="true"][data-mode="offline"] {
+      color: var(--teal);
+      border-top-color: var(--teal);
+    }
+    .mode-btn[aria-pressed="true"][data-mode="pure"] {
+      color: var(--ochre);
+      border-top-color: var(--ochre);
+    }
+
+.diagram {
+      position: absolute;
+      top: 340px;
+      left: 96px;
+      right: 96px;
+      bottom: 100px;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    /* All nodes are paper-cards. Type is conveyed by a left accent
+       bar (rendered as a separate <rect>), not by changing the body
+       shape — keeps the diagram in the same visual language as every
+       other slide in the deck. */
+    .node-body   { fill: var(--paper); stroke: var(--rule); stroke-width: 1; }
+    .node-accent { stroke: none; }
+    .node-accent.process  { fill: var(--ink-soft); }
+    .node-accent.data     { fill: var(--ochre);    }
+    .node-accent.decision { fill: var(--accent);   }
+    .node-accent.output   { fill: var(--sage);     }
+    .node-accent.model    { fill: var(--teal);     }
+
+    .node-title {
+      fill: var(--ink);
+      font-family: var(--body);
+      font-size: 13.5px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      text-anchor: start;
+    }
+    .node-sub {
+      fill: var(--ink-soft);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.02em;
+      text-anchor: start;
+    }
+    .node-tag {
+      fill: var(--ink-soft);
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 500;
+      text-anchor: start;
+    }
+    .node-typetag {
+      fill: var(--ink-soft);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 500;
+      text-anchor: end;
+      opacity: 0.7;
+    }
+
+    .arrow {
+      fill: none;
+      stroke: var(--ink);
+      stroke-width: 1.4;
+      stroke-linecap: round;
+      marker-end: url(#arrowMain);
+    }
+    .arrow-loop {
+      fill: none;
+      stroke: var(--ochre);
+      stroke-width: 1.3;
+      stroke-linecap: round;
+      stroke-dasharray: 5 4;
+      marker-end: url(#arrowLoop);
+    }
+    .arrow-online {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-dasharray: 6 4;
+      marker-end: url(#arrowOnline);
+    }
+
+    .edge-label {
+      fill: var(--ink-soft);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-anchor: middle;
+    }
+    .edge-label.online {
+      fill: var(--accent);
+      font-weight: 600;
+    }
+
+    .phase-rule { stroke: var(--rule-soft); stroke-width: 1; stroke-dasharray: 1 5; }
+    .phase-label {
+      fill: var(--accent);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-anchor: start;
+      text-transform: uppercase;
+    }
+    .phase-label-name {
+      fill: var(--ink);
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      text-anchor: start;
+    }
+
+[data-mode-vis] { transition: opacity 0.32s ease, filter 0.32s ease; }
+
+.stage[data-mode="pure"] [data-mode-vis~="surrogate"],
+    .stage[data-mode="pure"] [data-mode-vis~="surrogate-only"],
+    .stage[data-mode="pure"] [data-mode-vis~="infill"] {
+      opacity: 0.12;
+      filter: grayscale(0.8);
+    }
+    
+    .stage[data-mode="offline"] [data-mode-vis~="infill"] {
+      opacity: 0.12;
+      filter: grayscale(0.8);
+    }
+
+.stage:not([data-mode="pure"]) [data-mode-vis~="pure-only"] {
+      display: none;
+    }
+    .stage[data-mode="pure"] [data-mode-vis~="online-only"],
+    .stage[data-mode="offline"] [data-mode-vis~="online-only"] {
+      display: none;
+    }
+    
+    .stage[data-mode="online"] [data-mode-vis~="bypass-infill"] {
+      display: none;
+    }
+
+footer {
+      position: absolute;
+      bottom: 36px;
+      left: 96px;
+      right: 96px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--ink-soft);
+      border-top: 1px solid var(--rule-soft);
+      padding-top: 14px;
+    }
+    footer .ref { color: var(--ink); font-weight: 600; }
+    footer .pageno { font-family: var(--display); font-style: italic; font-size: 18px; color: var(--ink); }
+
+.notes {
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 40px;
+      padding: 4px 0 4px 16px;
+      border-left: 2px solid var(--ochre);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .notes .key {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ochre);
+      letter-spacing: 0.22em;
+      font-weight: 600;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .notes p {
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 1.4;
+      color: var(--ink-soft);
+    }
+    .notes-content { display: none; }
+    .stage[data-mode="pure"]    .notes-content[data-for="pure"]    { display: contents; }
+    .stage[data-mode="offline"] .notes-content[data-for="offline"] { display: contents; }
+    .stage[data-mode="online"]  .notes-content[data-for="online"]  { display: contents; }
+  </style>
+  <script src="../../assets/glossary-tooltips.js"></script>
+  <script src="../../assets/slide-bridge.js"></script>
+</head>
+<body>
+  <div class="stage" id="stage" data-mode="pure">
+    <main class="slide">
+      <span class="corner-mark corner-tl">RESEARCH WORKFLOW</span>
+      <span class="corner-mark corner-tr">CHAPTER 3 &nbsp;·&nbsp; METHODOLOGY</span>
+
+      <header>
+        <div>
+          <p class="eyebrow">Methodology &nbsp;·&nbsp; surrogate-assisted multi-objective optimisation</p>
+          <h1>The research <em>workflow</em>, end&nbsp;to&nbsp;end.</h1>
+          <p class="subtitle">From problem definition through statistical reporting — the procedural map every experiment in this thesis follows. Pick a regime to see the active flow; greyed-out nodes are skipped in that mode.</p>
+        </div>
+
+        <div class="legend">
+          <div class="legend-row main"><span class="arrow"></span><span class="lbl">main flow</span></div>
+          <div class="legend-row loop"><span class="arrow"></span><span class="lbl">iteration loop</span></div>
+          <div class="legend-row online"><span class="arrow"></span><span class="lbl">online infill</span></div>
+        </div>
+      </header>
+
+<div class="control-row">
+        <div class="mode-bar" role="tablist" aria-label="Optimisation regime">
+          <span class="mode-bar-label">Regime</span>
+          <button class="mode-btn" data-mode="pure" aria-pressed="true" role="tab">Pure</button>
+          <button class="mode-btn" data-mode="offline" aria-pressed="false" role="tab">Offline</button>
+          <button class="mode-btn" data-mode="online" aria-pressed="false" role="tab">Online</button>
+        </div>
+
+        <aside class="notes" aria-label="Method notes">
+          <span class="notes-content" data-for="pure">
+            <span class="key">Pure</span>
+            <p>Skips Phases 02–03 entirely. The EA evaluates every individual through the true simulation; no surrogate exists, so post-hoc verification is unnecessary.</p>
+          </span>
+          <span class="notes-content" data-for="offline">
+            <span class="key">Offline</span>
+            <p>Builds the surrogate once from LHS samples. Optimisation runs purely against the predictions; no infill, no retraining during the search.</p>
+          </span>
+          <span class="notes-content" data-for="online">
+            <span class="key">Online</span>
+            <p>Burgundy infill loop active: every K generations, top candidates are evaluated by the true simulation and fed back to retrain the surrogate (M₀ → M₁ → M₂ …).</p>
+          </span>
+        </aside>
+      </div>
+
+      <section class="diagram" aria-label="Research workflow flowchart">
+        <svg id="flowchart" viewBox="0 0 1728 600" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="diagram-title">
+          <title id="diagram-title">End-to-end research workflow (mode-aware)</title>
+
+          <defs>
+            <marker id="arrowMain" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth">
+              <path d="M1,1 L8,4.5 L1,8 L2.5,4.5 Z" fill="#1a2942"/>
+            </marker>
+            <marker id="arrowLoop" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth">
+              <path d="M1,1 L8,4.5 L1,8 Z" fill="#b07d2c"/>
+            </marker>
+            <marker id="arrowOnline" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth">
+              <path d="M1,1 L8,4.5 L1,8 Z" fill="#8b2727"/>
+            </marker>
+          </defs>
+
+          <g id="layer-rules"></g>
+          <g id="layer-headers"></g>
+          <g id="layer-nodes"></g>
+          <g id="layer-edges"></g>
+          <g id="layer-labels"></g>
+        </svg>
+      </section>
+
+      <footer>
+        <span><span class="ref">Chapter 3</span> &nbsp;·&nbsp; methodology</span>
+        <span class="pageno">— 04 —</span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    'use strict';
+
+const VIEW_W = 1728;
+    const VIEW_H = 600;
+
+    const PHASES = [
+      { id: 1, label: 'PHASE 01', name: 'Problem',      x:    0, width: 240 },
+      { id: 2, label: 'PHASE 02', name: 'Sampling',     x:  280, width: 240, modes: ['offline', 'online'] },
+      { id: 3, label: 'PHASE 03', name: 'Surrogate',    x:  560, width: 240, modes: ['offline', 'online'] },
+      { id: 4, label: 'PHASE 04', name: 'Optimisation', x:  840, width: 340 },
+      { id: 5, label: 'PHASE 05', name: 'Validation',   x: 1220, width: 240 },
+      { id: 6, label: 'PHASE 06', name: 'Reporting',    x: 1500, width: 228 },
+    ];
+
+const ROW_Y_BY_PHASE = {
+      1: { 0:  90, 1: 220, 4: 410 },
+      2: { 0:  90, 1: 220, 4: 410 },
+      3: { 0:  90, 1: 220, 4: 410 },
+      5: { 0:  90, 1: 220, 4: 410 },
+      6: { 0:  90, 1: 220, 4: 410 },
+    };
+    const ROW_Y_PHASE4 = {
+      online:  { 0:  90, 1: 220, 2: 360, 3: 480 },
+      offline: { 0:  90, 1: 220, 4: 410 },
+      pure:    { 0:  90, 1: 220, 4: 410 },
+    };
+    function rowY(phase, row, mode) {
+      if (phase === 4) {
+        const schema = ROW_Y_PHASE4[mode] || ROW_Y_PHASE4.online;
+        if (schema[row] !== undefined) return schema[row];
+      }
+      const schema = ROW_Y_BY_PHASE[phase];
+      if (schema && schema[row] !== undefined) return schema[row];
+      return 90 + row * 130;
+    }
+
+    const NODE_W = { 1: 240, 2: 240, 3: 240, 4: 340, 5: 240, 6: 228 };
+    const NODE_H = 70;
+    const DECISION_H = 78;
+    const OUTPUT_H = 78;
+    const TALL_H = 86;
+
+    const NODES = [
+      { id: '01a', phase: 1, row: 0, kind: 'rect',
+        title: 'Problem definition',
+        subs: ['d variables · m objectives', 'expensive · parametric'] },
+      { id: '01b', phase: 1, row: 1, kind: 'decision',
+        title: 'Convention',
+        subs: ['A — fixed FE budget', 'B — offline-SBO'] },
+      { id: '01c', phase: 1, row: 4, kind: 'rect',
+        title: 'Setup',
+        subs: ['N seeds · pop · gen · mut', 'infill cadence (online only)'] },
+
+      { id: '02a', phase: 2, row: 0, kind: 'rect',
+        title: 'Latin Hypercube design',
+        subs: ['N₀ initial points', 'SMT mixed-integer LHS'],
+        modes: ['offline', 'online'] },
+      { id: '02b', phase: 2, row: 1, kind: 'rect',
+        title: 'True simulation (LHS)',
+        subs: ['slider evaluator → GH canvas', 'expensive · main thread', 'cost: N₀ × t_sim'],
+        accentSub: 2,
+        modes: ['offline', 'online'] },
+      { id: '02c', phase: 2, row: 4, kind: 'data',
+        title: 'Initial training set',
+        subs: ['(X₀, Y₀) · n×d, n×m', 'samples.json'],
+        modes: ['offline', 'online'] },
+
+      { id: '03a', phase: 3, row: 0, kind: 'model',
+        title: 'Surrogate model fit',
+        subs: ['Kriging · ELM · SSGP', 'μ(x), σ²(x) per objective'],
+        modes: ['offline', 'online'] },
+      { id: '03b', phase: 3, row: 1, kind: 'decision',
+        title: 'CV adequate?',
+        subs: ['leave-one-out · PRESS', 'τ-cal · R² threshold'],
+        modes: ['offline', 'online'] },
+      { id: '03c', phase: 3, row: 4, kind: 'model',
+        title: 'Trained surrogate M₀',
+        subs: ['.pkl / .json on disk', 'batch predict ready', 'replaces true sim'],
+        tealSub: 2,
+        modes: ['offline', 'online'] },
+
+      { id: '04a', phase: 4, row: 0, kind: 'rect',
+        title: 'MOO algorithm initialise',
+        subs: ['e.g. NSGA-II/III · RVEA · MOEA/D · PSO', 'random population within bounds'] },
+      { id: '04b', phase: 4, row: 1, kind: 'rect', dynamic: 'eval' },
+      { id: '04c', phase: 4, row: 2, kind: 'rect',
+        title: 'Infill + retrain',
+        subs: ['every K gens · top candidates → true sim', 'M₀ → Mₖ surrogate update'],
+        accentBorder: true,
+        accentTitle: true,
+        modes: ['online'],
+        hideWhenOff: true },
+      { id: '04d', phase: 4,
+        rowByMode: { online: 3, offline: 4, pure: 4 },
+        tagByMode: { online: '04·D', offline: '04·C', pure: '04·C' },
+        kind: 'rect',
+        title: 'EA advance generation',
+        subs: ['non-dominated sort · crowding', 'selection · SBX · polynomial mut.'] },
+
+      { id: '05a', phase: 5, row: 0, kind: 'data',
+        title: 'Per-seed Pareto front',
+        subs: ['tree path = {seed; sol}', 'Pareto Genes + Objectives'] },
+      { id: '05b', phase: 5, row: 1, kind: 'rect',
+        title: 'Post-hoc verification',
+        subs: ['Pareto X → slider eval → Y_true', 'Ŷ vs Y_true · R² · RMSE · MAE', 'surrogate-only modes'],
+        modes: ['offline', 'online'] },
+      { id: '05c', phase: 5, row: 4, kind: 'rect',
+        title: 'Hypervolume + IGD',
+        subs: ['per-seed local · global ref', 'HV(P,R), HV(T,R)', 'T/R · P/T ratios', 'IGD vs reference Pareto'] },
+
+      { id: '06a', phase: 6, row: 0, kind: 'rect',
+        title: 'Aggregate & test',
+        subs: ['mean ± std across N seeds', 'Mann–Whitney · Cliff’s δ', 'median · range'] },
+      { id: '06b', phase: 6, row: 1, kind: 'output',
+        title: 'SeedXX/ artefacts',
+        subs: ['pareto · pareto_x', 'convergence · hypervolume', 'population · population_x', 'Setting.txt · Report.txt'] },
+      { id: '06c', phase: 6, row: 4, kind: 'output',
+        title: 'folder/ aggregate',
+        subs: ['global Setting / Report.txt', 'reference_pareto.csv', 'paper-ready CSVs'],
+        accentSub: 2 },
+    ];
+
+    const DYNAMIC = {
+      eval: {
+        pure:    { title: 'True simulation evaluation',
+                   subs: ['every individual evaluated by GH canvas',
+                          'expensive · main thread',
+                          'cost: pop × gen × t_sim',
+                          '— no surrogate —'] },
+        offline: { title: 'Surrogate predict (frozen)',
+                   subs: ['batch μ(x) on every individual',
+                          'no retraining during optimisation',
+                          'cost: O(predict) per individual',
+                          '— frozen M₀ —'] },
+        online:  { title: 'Surrogate predict + acquisition',
+                   subs: ['μ(x), σ²(x) per objective',
+                          'acquisition: EI · UCB · EHVI · ParEGO',
+                          'cost: ~0 per individual',
+                          'M₀ → M₁ → M₂ … evolving model'] },
+      },
+    };
+
+const EDGES = [
+      { from: '01a', to: '01b', kind: 'main' },
+      { from: '01b', to: '01c', kind: 'main' },
+
+      { from: '01c', to: '02a', kind: 'main', via: 'top-corridor', modes: ['offline', 'online'] },
+
+      { from: '02a', to: '02b', kind: 'main', modes: ['offline', 'online'] },
+      { from: '02b', to: '02c', kind: 'main', modes: ['offline', 'online'] },
+
+      { from: '02c', to: '03a', kind: 'main', via: 'top-corridor', modes: ['offline', 'online'] },
+
+      { from: '03a', to: '03b', kind: 'main', modes: ['offline', 'online'] },
+      { from: '03b', to: '03c', kind: 'main', modes: ['offline', 'online'] },
+      { from: '03b', to: '03a', kind: 'loop', fromSide: 'left', toSide: 'left',
+        gapLane: 'left', label: 'tune', labelRotate: true, modes: ['offline', 'online'] },
+
+      { from: '03c', to: '04a', kind: 'main', via: 'top-corridor', modes: ['offline', 'online'] },
+      { from: '01c', to: '04a', kind: 'main', via: 'top-corridor', modes: ['pure'] },
+
+      { from: '04a', to: '04b', kind: 'main' },
+
+      { from: '04b', to: '04c', kind: 'main', sideOffset: -56, modes: ['online'] },
+      { from: '04c', to: '04b', kind: 'online', sideOffset: 56, label: 'Mₖ', modes: ['online'] },
+
+      { from: '04c', to: '04d', kind: 'main', sideOffset: -56, modes: ['online'] },
+      { from: '04d', to: '04c', kind: 'online', sideOffset: 56, label: 'infill', modes: ['online'] },
+
+      { from: '04b', to: '04d', kind: 'main', modes: ['pure', 'offline'] },
+      { from: '04d', to: '04b', kind: 'loop', fromSide: 'left', toSide: 'left',
+        gapLane: 'left', label: 'until gen ≥ Gmax', labelRotate: true, modes: ['pure', 'offline'] },
+      { from: '04d', to: '04b', kind: 'loop', fromSide: 'left', toSide: 'left',
+        gapLane: 'left', label: 'until gen ≥ Gmax', labelRotate: true, modes: ['online'] },
+
+      { from: '04d', to: '05a', kind: 'main', via: 'top-corridor' },
+
+      { from: '05a', to: '05b', kind: 'main', modes: ['offline', 'online'] },
+      { from: '05b', to: '05c', kind: 'main', modes: ['offline', 'online'] },
+      { from: '05a', to: '05c', kind: 'main', modes: ['pure'] },
+
+      { from: '05a', to: '06a', kind: 'main', via: 'top-corridor' },
+      { from: '06a', to: '06b', kind: 'main' },
+      { from: '06b', to: '06c', kind: 'main' },
+    ];
+
+    const ns = 'http://www.w3.org/2000/svg';
+    const el = (name, attrs = {}, parent = null) => {
+      const e = document.createElementNS(ns, name);
+      for (const [k, v] of Object.entries(attrs)) {
+        if (v !== undefined && v !== null) e.setAttribute(k, v);
+      }
+      if (parent) parent.appendChild(e);
+      return e;
+    };
+    const text = (parent, x, y, str, cls, extra = {}) => {
+      const t = el('text', { x, y, class: cls, ...extra }, parent);
+      t.textContent = str;
+      return t;
+    };
+
+    function getPhase(id) { return PHASES.find(p => p.id === id); }
+    function nodeById(id) { return NODES.find(n => n.id === id); }
+
+    function autoHeight(n) {
+      // Title baseline at y=22; subs from y=40 stepping 14; pad bottom 12.
+      // 2 subs → 80, 3 subs → 94, 4 subs → 108, 5 subs → 122.
+      const mode = (stage && stage.dataset.mode) || 'online';
+      let subs = n.subs || [];
+      if (n.dynamic && DYNAMIC[n.dynamic][mode]) {
+        subs = DYNAMIC[n.dynamic][mode].subs;
+      }
+      const nSubs = subs.length;
+      return Math.max(NODE_H, 40 + nSubs * 14 + 12);
+    }
+
+    function nodeRect(n) {
+      const phase = getPhase(n.phase);
+      const w = NODE_W[n.phase];
+      let h = n.height || autoHeight(n);
+      const cx = phase.x + phase.width / 2;
+      const x = cx - w / 2;
+      const mode = (stage && stage.dataset.mode) || 'online';
+      const row = (n.rowByMode && n.rowByMode[mode] !== undefined) ? n.rowByMode[mode] : n.row;
+      const y = rowY(n.phase, row, mode);
+      return { x, y, w, h, cx, cy: y + h / 2 };
+    }
+
+    function attachPoint(n, side, offset = 0) {
+      const r = nodeRect(n);
+      switch (side) {
+        case 'top':    return { x: r.cx + offset, y: r.y };
+        case 'bottom': return { x: r.cx + offset, y: r.y + r.h };
+        case 'left':   return { x: r.x,           y: r.cy + offset };
+        case 'right':  return { x: r.x + r.w,     y: r.cy + offset };
+      }
+    }
+
+    function defaultSides(from, to) {
+      const a = nodeRect(from), b = nodeRect(to);
+      const dy = b.cy - a.cy, dx = b.cx - a.cx;
+      if (Math.abs(dx) < 1) {
+        return dy > 0 ? ['bottom', 'top'] : ['top', 'bottom'];
+      }
+      if (dy > 0) return ['bottom', 'top'];
+      if (dy < 0) return ['top', 'bottom'];
+      return dx > 0 ? ['right', 'left'] : ['left', 'right'];
+    }
+
+    function phaseGapX(phaseId, side, lane = side) {
+      const phase = getPhase(phaseId);
+      if (!phase) return null;
+      const index = PHASES.findIndex(p => p.id === phaseId);
+      const fraction = lane === 'left' ? 1 / 3
+                     : lane === 'right' ? 2 / 3
+                     : Number(lane);
+
+      if (!Number.isFinite(fraction)) return null;
+
+      if (side === 'left' && index > 0) {
+        const prev = PHASES[index - 1];
+        const gapStart = prev.x + prev.width;
+        const gapEnd = phase.x;
+        return gapStart + (gapEnd - gapStart) * fraction;
+      }
+
+      if (side === 'right' && index < PHASES.length - 1) {
+        const next = PHASES[index + 1];
+        const gapStart = phase.x + phase.width;
+        const gapEnd = next.x;
+        return gapStart + (gapEnd - gapStart) * fraction;
+      }
+
+      return null;
+    }
+
+    function betweenPhaseGapX(from, to, lane = 'right') {
+      const a = nodeRect(from);
+      const b = nodeRect(to);
+      const gapStart = a.x + a.w;
+      const gapEnd = b.x;
+      const fraction = lane === 'left' ? 1 / 3
+                     : lane === 'right' ? 2 / 3
+                     : Number(lane);
+      if (!Number.isFinite(fraction) || gapEnd <= gapStart) return gapStart + 18;
+      return gapStart + (gapEnd - gapStart) * fraction;
+    }
+
+    function routePath(from, to, e) {
+      const offset = e.sideOffset || 0;
+      const [defA, defB] = defaultSides(from, to);
+      const sideA = e.fromSide || defA;
+      const sideB = e.toSide   || defB;
+      const a = attachPoint(from, sideA, sideA === 'top' || sideA === 'bottom' ? offset : 0);
+      const b = attachPoint(to,   sideB, sideB === 'top' || sideB === 'bottom' ? offset : 0);
+
+      if ((sideA === 'bottom' && sideB === 'top') || (sideA === 'top' && sideB === 'bottom')) {
+        if (Math.abs(a.x - b.x) < 1) {
+          return `M ${a.x} ${a.y} L ${b.x} ${b.y}`;
+        }
+      }
+
+      if (e.via === 'top-corridor') {
+        const exitX = nodeRect(from).x + nodeRect(from).w;
+        const entryX = nodeRect(to).x + nodeRect(to).w / 2;
+        const corridorY = 50;
+        const exitY = nodeRect(from).cy;
+        const entryYBottom = nodeRect(to).y;
+        const stubX = betweenPhaseGapX(from, to, e.gapLane || 'right');
+        return `M ${exitX} ${exitY} L ${stubX} ${exitY} L ${stubX} ${corridorY} L ${entryX} ${corridorY} L ${entryX} ${entryYBottom}`;
+      }
+
+      if (sideA === sideB) {
+        const gapCorridor = e.gapLane ? phaseGapX(from.phase, sideA, e.gapLane) : null;
+        const corridor = gapCorridor || e.corridor || (sideA === 'right'
+          ? Math.max(a.x, b.x) + 60
+          : Math.min(a.x, b.x) - 30);
+        return `M ${a.x} ${a.y} L ${corridor} ${a.y} L ${corridor} ${b.y} L ${b.x} ${b.y}`;
+      }
+
+      const midX = (a.x + b.x) / 2;
+      return `M ${a.x} ${a.y} L ${midX} ${a.y} L ${midX} ${b.y} L ${b.x} ${b.y}`;
+    }
+
+    function renderRules() {
+      const layer = document.getElementById('layer-rules');
+      layer.innerHTML = '';
+      for (let i = 1; i < PHASES.length; i++) {
+        const x = (PHASES[i - 1].x + PHASES[i - 1].width + PHASES[i].x) / 2;
+        el('line', { class: 'phase-rule', x1: x, y1: 0, x2: x, y2: VIEW_H }, layer);
+      }
+    }
+
+    function renderHeaders() {
+      const layer = document.getElementById('layer-headers');
+      layer.innerHTML = '';
+      const g = el('g', { transform: 'translate(0, 18)' }, layer);
+      for (const p of PHASES) {
+        text(g, p.x, 0,  p.label, 'phase-label');
+        text(g, p.x, 22, p.name,  'phase-label-name');
+      }
+    }
+
+    /* All nodes render as the same paper-card rect.
+       Type (data / decision / output / model / process) is shown
+       only via a 4px left accent stripe + a small mono tag in the
+       top-right corner. This brings the diagram into the same
+       visual language as every other slide in the deck. */
+    const KIND_LABEL = {
+      rect:     'process',
+      data:     'data',
+      decision: 'decision',
+      output:   'output',
+      model:    'model',
+    };
+
+    function renderNode(n, layer) {
+      const r = nodeRect(n);
+      const mode = (stage && stage.dataset.mode) || 'online';
+      const g = el('g', {
+        transform: `translate(${r.x}, ${r.y})`,
+        'data-node-id': n.id,
+        'data-modes': (n.modes || ['pure', 'offline', 'online']).join(' '),
+        'data-hide-when-off': n.hideWhenOff ? 'true' : null,
+      }, layer);
+
+      const tagId = (n.tagByMode && n.tagByMode[mode])
+        || (n.id.slice(0, 2) + '·' + n.id.slice(2).toUpperCase());
+      text(g, 0, -8, tagId, 'node-tag');
+
+      const kind = n.kind || 'rect';
+      const accentClass = n.accentBorder ? 'decision'
+                        : kind === 'rect' ? 'process' : kind;
+      const bodyAttrs = { class: 'node-body', x: 0, y: 0, width: r.w, height: r.h };
+      if (n.accentBorder) {
+        bodyAttrs.stroke = 'var(--accent)';
+        bodyAttrs['stroke-width'] = 1.4;
+      }
+      el('rect', bodyAttrs, g);
+      el('rect', {
+        class: `node-accent ${accentClass}`,
+        x: 0, y: 0, width: 4, height: r.h,
+      }, g);
+
+      const padX = 14;
+      const titleStyle = n.accentTitle ? 'fill: var(--accent);' : '';
+      let title = n.title;
+      let subs = n.subs || [];
+      if (n.dynamic) {
+        const m = stage.dataset.mode || 'online';
+        const dyn = DYNAMIC[n.dynamic][m];
+        title = dyn.title;
+        subs = dyn.subs;
+      }
+
+      if (kind !== 'rect') {
+        text(g, r.w - 12, 16, KIND_LABEL[kind], 'node-typetag');
+      }
+      text(g, padX, 22, title, 'node-title', { style: titleStyle });
+
+      const subStartY = 40;
+      const subStep = 14;
+      subs.forEach((s, i) => {
+        const subStyle = (i === n.accentSub) ? 'fill: var(--accent); font-weight: 600;'
+                       : (i === n.tealSub)   ? 'fill: var(--teal); font-weight: 600;'
+                       : '';
+        text(g, padX, subStartY + i * subStep, s, 'node-sub',
+             { style: subStyle });
+      });
+    }
+
+    function renderNodes() {
+      const layer = document.getElementById('layer-nodes');
+      layer.innerHTML = '';
+      for (const n of NODES) renderNode(n, layer);
+    }
+
+    function renderEdges() {
+      const edgeLayer = document.getElementById('layer-edges');
+      const labelLayer = document.getElementById('layer-labels');
+      edgeLayer.innerHTML = '';
+      labelLayer.innerHTML = '';
+
+      for (const e of EDGES) {
+        const from = nodeById(e.from);
+        const to   = nodeById(e.to);
+        if (!from || !to) continue;
+
+        const cls = ({
+          main:   'arrow',
+          loop:   'arrow-loop',
+          online: 'arrow-online',
+        })[e.kind] || 'arrow';
+
+        const path = el('path', {
+          class: cls,
+          d: routePath(from, to, e),
+          'data-modes': (e.modes || ['pure', 'offline', 'online']).join(' '),
+        }, edgeLayer);
+
+        if (e.label) {
+          const d = path.getAttribute('d');
+          const pts = parsePathPoints(d);
+          const start = pts[0], end = pts[pts.length - 1];
+          let lx, ly, anchor = 'middle';
+          if (pts.length === 4 && Math.abs(start.x - end.x) < 1
+              && Math.abs(pts[1].x - pts[2].x) < 1) {
+            const corridorX = pts[1].x;
+            const onLeft = corridorX < start.x;
+            lx = corridorX + (onLeft ? -8 : 8);
+            ly = (pts[1].y + pts[2].y) / 2 + 4;
+            anchor = onLeft ? 'end' : 'start';
+          } else if (Math.abs(start.x - end.x) < 1) {
+            lx = start.x + 22;
+            ly = (start.y + end.y) / 2 + 4;
+            anchor = 'start';
+          } else if (Math.abs(start.y - end.y) < 1 && pts.length === 2) {
+            lx = (start.x + end.x) / 2;
+            ly = start.y - 8;
+          } else {
+            const minY = Math.min(...pts.map(p => p.y));
+            const corridorPts = pts.filter(p => p.y === minY);
+            lx = (corridorPts[0].x + corridorPts[corridorPts.length - 1].x) / 2;
+            ly = minY - 8;
+          }
+          const labelStyle =
+            e.kind === 'online' ? 'fill: var(--accent); font-weight: 600;' :
+            e.kind === 'loop'   ? 'fill: var(--ochre);' : '';
+          const attrs = { style: labelStyle, 'text-anchor': anchor,
+              'data-modes': (e.modes || ['pure', 'offline', 'online']).join(' ') };
+          if (e.labelRotate) {
+            let lineX, lineYMid;
+            if (pts.length === 4 && Math.abs(pts[1].x - pts[2].x) < 1) {
+              lineX = pts[1].x;
+              lineYMid = (pts[1].y + pts[2].y) / 2;
+            } else {
+              lineX = start.x;
+              lineYMid = (start.y + end.y) / 2;
+            }
+            const labelX = lineX - 6;
+            attrs.transform = `rotate(-90 ${labelX} ${lineYMid})`;
+            attrs['text-anchor'] = 'middle';
+            lx = labelX;
+            ly = lineYMid + 4;
+          }
+          text(labelLayer, lx, ly, e.label, 'edge-label', attrs);
+        }
+      }
+    }
+
+    function parsePathPoints(d) {
+      return d.split(/[ML]\s*/).filter(Boolean).map(seg => {
+        const [x, y] = seg.trim().split(/\s+/).map(Number);
+        return { x, y };
+      });
+    }
+
+    const MODE_HIDE_CSS_ID = 'mode-hide-css';
+
+    function applyMode(mode) {
+      stage.dataset.mode = mode;
+      buttons.forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === mode));
+
+      let css = `
+        #flowchart #layer-nodes [data-modes]:not([data-modes~="${mode}"]) {
+          opacity: 0.18;
+          filter: grayscale(0.85);
+        }
+        #flowchart #layer-nodes [data-hide-when-off="true"]:not([data-modes~="${mode}"]) {
+          display: none;
+        }
+        #flowchart #layer-edges [data-modes]:not([data-modes~="${mode}"]),
+        #flowchart #layer-labels [data-modes]:not([data-modes~="${mode}"]) {
+          display: none;
+        }
+      `;
+      let style = document.getElementById(MODE_HIDE_CSS_ID);
+      if (!style) {
+        style = document.createElement('style');
+        style.id = MODE_HIDE_CSS_ID;
+        document.head.appendChild(style);
+      }
+      style.textContent = css;
+      renderNodes();
+      renderEdges();
+      style.textContent = css;
+    }
+
+    const stage = document.getElementById('stage');
+    const buttons = document.querySelectorAll('.mode-btn');
+
+    function fitStage() {
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+      const s = Math.min(W / 1920, H / 1080) * 0.9;
+      stage.style.transform = `scale(${s})`;
+    }
+    window.addEventListener('resize', fitStage);
+    fitStage();
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => applyMode(btn.dataset.mode));
+    });
+
+    renderRules();
+    renderHeaders();
+    renderNodes();
+    renderEdges();
+    applyMode('pure');
+  </script>
+</body>
+</html>

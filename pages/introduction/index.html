@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Introduction — placeholder</title>
+  <link rel="stylesheet" href="../../assets/slide-base.css">
+  <style>
+    .uc-wrap {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+    .uc {
+      text-align: center;
+    }
+    .uc .tag {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .uc .tag::before,
+    .uc .tag::after {
+      content: "";
+      width: 32px;
+      height: 1px;
+      background: var(--accent);
+    }
+    .uc .line {
+      font-family: var(--display);
+      font-style: italic;
+      font-weight: 500;
+      font-size: 96px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 0;
+    }
+    .uc .line em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .uc .sub {
+      margin: 22px 0 0;
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <main class="slide">
+      <span class="corner-mark corner-tl">INTRODUCTION</span>
+      <span class="corner-mark corner-tr">CHAPTER 1 &nbsp;·&nbsp; INTRODUCTION</span>
+
+      <div class="uc-wrap">
+        <div class="uc">
+          <p class="tag">Placeholder</p>
+          <p class="line"><em>Under</em> construction.</p>
+          <p class="sub">section to be drafted</p>
+        </div>
+      </div>
+
+      <footer class="slide-footer">
+        <span><span class="ref">Chapter 1</span> &nbsp;·&nbsp; introduction &nbsp;·&nbsp; placeholder</span>
+        <span class="pageno">&mdash; 03 &mdash;</span>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../../assets/slide-base.js"></script>
+  <script>SlideBase.fit('stage');</script>
+</body>
+</html>

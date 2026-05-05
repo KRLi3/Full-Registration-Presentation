@@ -1,0 +1,395 @@
+/* ============================================================
+   slide-base.css — shared design system for the registration deck
+   1920 × 1080 fixed canvas, scale-to-fit (reveal.js pattern).
+   Imported once per slide; per-slide stylesheet only adds layout.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Paper / ink palette */
+  --bg:        #f3efe5;
+  --paper:     #faf7ee;
+  --ink:       #1a2942;
+  --ink-soft:  #44546c;
+  --rule:      #c7bfa9;
+  --rule-soft: #d9d0b8;
+
+  /* Accents (used semantically, not decoratively) */
+  --accent: #8b2727;   /* burgundy — burgundy = "online" / emphasis  */
+  --ochre:  #b07d2c;   /* ochre    — iteration / loop / second voice */
+  --sage:   #5e7458;   /* sage     — outcome / output                */
+  --teal:   #2f5d6e;   /* teal     — model / surrogate               */
+
+  /* Node fills (flowchart palette) */
+  --node-process:  #faf7ee;
+  --node-data:     #f0e9d3;
+  --node-decision: #f5e3df;
+  --node-output:   #e6ece2;
+  --node-model:    #dde6e9;
+
+  /* Type stack */
+  --display: "Cormorant Garamond", "Times New Roman", serif;
+  --body:    "Inter Tight", "Helvetica Neue", sans-serif;
+  --mono:    "JetBrains Mono", "SF Mono", "Consolas", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  background: #d9d2c1;
+  color: var(--ink);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 18px;
+}
+
+/* ---- Stage: fixed canvas, scaled by JS ---- */
+.stage {
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  position: relative;
+}
+
+.slide {
+  width: 1920px;
+  height: 1080px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(26, 41, 66, 0.06),
+    0 30px 80px -30px rgba(26, 41, 66, 0.25);
+}
+
+/* Paper grain — two overlaid dot grids at different scales */
+.slide::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(rgba(26, 41, 66, 0.04) 1px, transparent 1px),
+    radial-gradient(rgba(176, 125, 44, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px, 73px 73px;
+  background-position: 0 0, 12px 18px;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.slide::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, transparent 0, transparent 92%, rgba(26, 41, 66, 0.04) 100%),
+    linear-gradient(0deg, transparent 0, transparent 92%, rgba(26, 41, 66, 0.04) 100%);
+  pointer-events: none;
+}
+
+/* ============================================================
+   Frame chrome — corner marks, header, footer.
+   Content area: 96px gutters → 1728 × 888 working area.
+   ============================================================ */
+
+.corner-mark {
+  position: absolute;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  top: 28px;
+}
+.corner-tl { left: 96px; }
+.corner-tr { right: 96px; text-align: right; }
+
+header.slide-header {
+  position: absolute;
+  top: 64px;
+  left: 96px;
+  right: 96px;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 64px;
+  align-items: end;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 12px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.eyebrow::before {
+  content: "";
+  width: 32px; height: 1px;
+  background: var(--accent);
+}
+
+h1.slide-title {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 56px;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--ink);
+}
+h1.slide-title em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.subtitle {
+  margin: 14px 0 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  max-width: 1180px;
+}
+
+footer.slide-footer {
+  position: absolute;
+  bottom: 36px;
+  left: 96px;
+  right: 96px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--rule-soft);
+  padding-top: 14px;
+}
+footer.slide-footer .ref { color: var(--ink); font-weight: 600; }
+footer.slide-footer .pageno {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--ink);
+}
+
+/* ============================================================
+   Generic atoms reused across slides
+   ============================================================ */
+
+/* — Legend block (paper card, mono caption rows) — */
+.legend {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 10px 28px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  padding: 14px 18px;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  align-self: end;
+}
+.legend-item { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.legend-shape {
+  width: 26px; height: 16px;
+  border: 1px solid var(--ink);
+  background: var(--node-process);
+  flex-shrink: 0;
+}
+.legend-shape.data     { background: var(--node-data);     transform: skew(-16deg); }
+.legend-shape.decision { width: 16px; height: 16px; transform: rotate(45deg);
+                          background: var(--node-decision); border-color: var(--accent); }
+.legend-shape.output   { background: var(--node-output);   border-radius: 8px; }
+.legend-shape.model    { background: var(--node-model);    border-style: double; border-width: 3px; }
+
+/* — Phase / section headers used inside SVG diagrams — */
+.phase-rule { stroke: var(--rule-soft); stroke-width: 1; stroke-dasharray: 1 6; }
+.phase-label {
+  fill: var(--accent);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-anchor: start;
+  text-transform: uppercase;
+}
+.phase-label-name {
+  fill: var(--ink);
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 500;
+  text-anchor: start;
+}
+
+/* — SVG node primitives (used by 01-research-workflow) — */
+.node-rect     { fill: var(--node-process);  stroke: var(--ink); stroke-width: 1.4; }
+.node-data     { fill: var(--node-data);     stroke: var(--ink); stroke-width: 1.4; }
+.node-decision { fill: var(--node-decision); stroke: var(--accent); stroke-width: 1.6; }
+.node-output   { fill: var(--node-output);   stroke: var(--ink); stroke-width: 1.4; }
+.node-model    { fill: var(--node-model);    stroke: var(--ink); stroke-width: 1.4; }
+.node-model-inner { fill: none; stroke: var(--ink); stroke-width: 0.8; }
+
+.node-title {
+  fill: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+.node-sub {
+  fill: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-anchor: middle;
+}
+.node-tag {
+  fill: var(--accent);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* — Arrow primitives used by SVG flowcharts — */
+.arrow {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  marker-end: url(#arrowMain);
+}
+.arrow-loop {
+  fill: none;
+  stroke: var(--ochre);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 6 4;
+  marker-end: url(#arrowLoop);
+}
+.arrow-online {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-dasharray: 8 5;
+  marker-end: url(#arrowOnline);
+}
+.arrow-soft {
+  fill: none;
+  stroke: var(--ink-soft);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-dasharray: 3 4;
+  marker-end: url(#arrowSoft);
+}
+.edge-label {
+  fill: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-anchor: middle;
+}
+.edge-label.online { fill: var(--accent); font-weight: 600; }
+
+/* ============================================================
+   Synthesis block — the closing one-liner ("claim bar") used by
+   most slides. Anchored to bottom so multi-line claims grow up
+   instead of sliding the whole bar around: visually the bar is
+   always pinned to the same line above the footer.
+
+   Geometry: footer top sits at ~1020px (bottom 36 + ~24 self).
+   synthesis bottom = 85  →  bar baseline rests at y ≈ 995,
+   leaving a ~25px gap before the footer rule — close enough to
+   read as the page's closing line, not so close it crowds.
+   ============================================================ */
+.synthesis {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  bottom: 85px;
+  padding-left: 22px;
+  border-left: 3px solid var(--accent);
+}
+.synthesis .label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 4px;
+}
+.synthesis blockquote {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.35;
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -0.005em;
+  max-width: 1640px;
+}
+.synthesis blockquote em {
+  color: var(--accent);
+  font-style: italic;
+}
+.synthesis blockquote .ins {
+  background: rgba(176, 125, 44, 0.18);
+  padding: 0 4px;
+  font-style: italic;
+}
+
+/* ============================================================
+   Universal card hover — every paper-card across the deck gets a
+   subtle scale + lift on pointer hover. This is purely cosmetic
+   feedback. Excluded:
+     · .panel        (page 06 diptych — has its own 2× zoom)
+     · .lineage-card (page 06 prior-art strip — kept static so the
+                       hover focus stays on the diptych panels)
+   ============================================================ */
+.axis-card,
+.premise-card,
+.reg-card,
+.acq-card,
+.var-card,
+.knob-col,
+.alg-card,
+.year-card,
+.demo-card,
+.cluster,
+.branch,
+.trait {
+  transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.2, 1),
+              box-shadow 0.22s ease;
+}
+.axis-card:hover,
+.premise-card:hover,
+.reg-card:hover,
+.acq-card:hover,
+.var-card:hover,
+.knob-col:hover,
+.alg-card:hover,
+.year-card:hover,
+.demo-card:hover,
+.cluster:hover,
+.branch:hover,
+.trait:hover {
+  transform: scale(1.05);
+  box-shadow: 0 14px 32px -14px rgba(26, 41, 66, 0.25);
+  z-index: 2;
+}

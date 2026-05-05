@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demonstrations — How a surrogate works</title>
+  <link rel="stylesheet" href="../../assets/slide-base.css">
+  <style>
+
+.demo-grid {
+      position: absolute;
+      top: 270px;
+      left: 96px;
+      right: 96px;
+      bottom: 153px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 22px;
+    }
+
+    .demo-card {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 18px 22px 16px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 10px;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .demo-card.m1 { border-top: 3px solid var(--ink-soft); }
+    .demo-card.m2 { border-top: 3px solid var(--accent);   }
+    .demo-card.m3 { border-top: 3px solid var(--teal);     }
+    .demo-card.m4 { border-top: 3px solid var(--ochre);    }
+
+    .demo-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+    .demo-tag .num { color: var(--accent); font-weight: 600; }
+    .demo-card.m1 .demo-tag .num { color: var(--ink-soft); }
+    .demo-card.m2 .demo-tag .num { color: var(--accent);   }
+    .demo-card.m3 .demo-tag .num { color: var(--teal);     }
+    .demo-card.m4 .demo-tag .num { color: var(--ochre);    }
+
+    .demo-card h3 {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 26px;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      margin: 0;
+      color: var(--ink);
+      font-weight: 500;
+    }
+    .demo-card.m1 h3 em { color: var(--ink-soft); font-style: italic; }
+    .demo-card.m2 h3 em { color: var(--accent);   font-style: italic; }
+    .demo-card.m3 h3 em { color: var(--teal);     font-style: italic; }
+    .demo-card.m4 h3 em { color: var(--ochre);    font-style: italic; }
+
+    .demo-stage {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      overflow: hidden;
+      background: var(--bg);
+      border: 1px solid var(--rule-soft);
+    }
+    .demo-stage svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .demo-caption {
+      font-family: var(--body);
+      font-size: 11.5px;
+      line-height: 1.45;
+      color: var(--ink-soft);
+      margin: 0;
+      padding-top: 8px;
+      border-top: 1px dashed var(--rule);
+    }
+    .demo-caption strong { color: var(--ink); font-weight: 600; }
+    .demo-caption em { color: var(--accent); font-style: italic; }
+
+.ax-line  { stroke: var(--ink-soft); stroke-width: 0.8; }
+    .ax-arrow { stroke: var(--ink-soft); stroke-width: 0.8; fill: none; marker-end: url(#axArrow); }
+    .ax-text  { fill: var(--ink-soft); font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em; }
+    .ax-text.italic { font-family: var(--display); font-style: italic; font-size: 12px; }
+
+.true-fn {
+      stroke: var(--ink-soft);
+      stroke-width: 1;
+      stroke-dasharray: 3 4;
+      fill: none;
+      opacity: 0.4;
+    }
+
+.m1-sample {
+      fill: var(--accent);
+      stroke: var(--accent);
+      opacity: 0;
+      animation: m1-fade 6s linear infinite;
+    }
+    @keyframes m1-fade {
+      0%   { opacity: 0; r: 1; }
+      30%  { opacity: 1; r: 5; }
+      90%  { opacity: 1; r: 5; }
+      100% { opacity: 0; r: 1; }
+    }
+    .m1-sample[data-i="0"] { animation-delay: 0.0s; }
+    .m1-sample[data-i="1"] { animation-delay: 0.6s; }
+    .m1-sample[data-i="2"] { animation-delay: 1.2s; }
+    .m1-sample[data-i="3"] { animation-delay: 1.8s; }
+    .m1-sample[data-i="4"] { animation-delay: 2.4s; }
+
+.m1-guide {
+      stroke: var(--accent);
+      stroke-width: 0.6;
+      stroke-dasharray: 2 3;
+      opacity: 0;
+      animation: m1-guide 6s linear infinite;
+    }
+    @keyframes m1-guide {
+      0%   { opacity: 0; }
+      30%  { opacity: 0.4; }
+      90%  { opacity: 0.4; }
+      100% { opacity: 0; }
+    }
+    .m1-guide[data-i="0"] { animation-delay: 0.0s; }
+    .m1-guide[data-i="1"] { animation-delay: 0.6s; }
+    .m1-guide[data-i="2"] { animation-delay: 1.2s; }
+    .m1-guide[data-i="3"] { animation-delay: 1.8s; }
+    .m1-guide[data-i="4"] { animation-delay: 2.4s; }
+
+.m2-sample {
+      fill: var(--accent);
+      stroke: var(--accent);
+      opacity: 0.85;
+    }
+    .m2-fit {
+      stroke: var(--accent);
+      stroke-width: 1.8;
+      fill: none;
+      stroke-dasharray: 700;
+      stroke-dashoffset: 700;
+      animation: m2-draw 6s ease-in-out infinite;
+    }
+    @keyframes m2-draw {
+      0%, 15%   { stroke-dashoffset: 700; }
+      55%, 100% { stroke-dashoffset: 0;   }
+    }
+
+.m3-sample {
+      fill: var(--teal);
+      stroke: var(--teal);
+      opacity: 0.85;
+    }
+    .m3-fit {
+      stroke: var(--teal);
+      stroke-width: 1.8;
+      fill: none;
+    }
+    .m3-band {
+      fill: var(--teal);
+      stroke: none;
+      opacity: 0;
+      animation: m3-band 7s ease-in-out infinite;
+    }
+    @keyframes m3-band {
+      0%, 15%   { opacity: 0; }
+      30%, 100% { opacity: 0.18; }
+    }
+    
+    .m3-query-x {
+      stroke: var(--accent);
+      stroke-width: 1;
+      stroke-dasharray: 3 3;
+      opacity: 0;
+      animation: m3-query 7s ease-in-out infinite;
+    }
+    @keyframes m3-query {
+      0%, 35%   { opacity: 0; }
+      45%, 100% { opacity: 0.7; }
+    }
+    .m3-query-pt {
+      fill: var(--accent);
+      stroke: var(--paper);
+      stroke-width: 1.5;
+      opacity: 0;
+      animation: m3-query-pt 7s ease-in-out infinite;
+    }
+    @keyframes m3-query-pt {
+      0%, 50%   { opacity: 0; r: 0; }
+      62%, 100% { opacity: 1; r: 6; }
+    }
+    .m3-query-label {
+      fill: var(--accent);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      animation: m3-query-pt 7s ease-in-out infinite;
+    }
+
+.m4-sample {
+      fill: var(--ink-soft);
+      stroke: var(--ink-soft);
+      opacity: 0.7;
+    }
+    .m4-fit-old {
+      stroke: var(--ink-soft);
+      stroke-width: 1.4;
+      fill: none;
+      opacity: 0.5;
+      animation: m4-old-fade 8s ease-in-out infinite;
+    }
+    @keyframes m4-old-fade {
+      0%, 35%   { opacity: 0.6; }
+      55%, 100% { opacity: 0.2; }
+    }
+    .m4-band-old {
+      fill: var(--ink-soft);
+      stroke: none;
+      opacity: 0.18;
+      animation: m4-band-old 8s ease-in-out infinite;
+    }
+    @keyframes m4-band-old {
+      0%, 35%   { opacity: 0.18; }
+      55%, 100% { opacity: 0;    }
+    }
+
+.m4-new-sample {
+      fill: var(--ochre);
+      stroke: var(--ochre);
+      opacity: 0;
+      animation: m4-new-pt 8s ease-in-out infinite;
+    }
+    @keyframes m4-new-pt {
+      0%, 18%   { opacity: 0; r: 0; }
+      28%       { opacity: 1; r: 7; }
+      35%, 100% { opacity: 1; r: 6; }
+    }
+    
+    .m4-new-guide {
+      stroke: var(--ochre);
+      stroke-width: 0.8;
+      stroke-dasharray: 3 3;
+      opacity: 0;
+      animation: m4-new-guide 8s ease-in-out infinite;
+    }
+    @keyframes m4-new-guide {
+      0%, 15%   { opacity: 0; }
+      25%, 60%  { opacity: 0.7; }
+      75%, 100% { opacity: 0; }
+    }
+
+.m4-fit-new {
+      stroke: var(--ochre);
+      stroke-width: 1.8;
+      fill: none;
+      stroke-dasharray: 700;
+      stroke-dashoffset: 700;
+      animation: m4-new-draw 8s ease-in-out infinite;
+    }
+    @keyframes m4-new-draw {
+      0%, 35%   { stroke-dashoffset: 700; }
+      70%, 100% { stroke-dashoffset: 0;   }
+    }
+    .m4-band-new {
+      fill: var(--ochre);
+      stroke: none;
+      opacity: 0;
+      animation: m4-band-new 8s ease-in-out infinite;
+    }
+    @keyframes m4-band-new {
+      0%, 50%   { opacity: 0; }
+      70%, 100% { opacity: 0.2; }
+    }
+
+.m4-phase {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      fill: var(--ochre);
+      font-weight: 600;
+      text-anchor: middle;
+      opacity: 0;
+    }
+    .m4-phase.p1 { animation: m4-p1 8s ease-in-out infinite; }
+    .m4-phase.p2 { animation: m4-p2 8s ease-in-out infinite; }
+    .m4-phase.p3 { animation: m4-p3 8s ease-in-out infinite; }
+    @keyframes m4-p1 { 0%,2% {opacity:0;} 5%,18% {opacity:1;} 22%,100% {opacity:0;} }
+    @keyframes m4-p2 { 0%,22% {opacity:0;} 26%,42% {opacity:1;} 46%,100% {opacity:0;} }
+    @keyframes m4-p3 { 0%,55% {opacity:0;} 60%,98% {opacity:1;} 100% {opacity:0;} }
+
+@media (prefers-reduced-motion: reduce) {
+      .m1-sample, .m1-guide, .m2-fit, .m3-band, .m3-query-x, .m3-query-pt,
+      .m3-query-label, .m4-fit-old, .m4-band-old, .m4-new-sample,
+      .m4-new-guide, .m4-fit-new, .m4-band-new, .m4-phase {
+        animation: none !important;
+        opacity: 1 !important;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <main class="slide">
+      <span class="corner-mark corner-tl">DEMONSTRATIONS</span>
+      <span class="corner-mark corner-tr">CHAPTER 2 &nbsp;·&nbsp; PRIMER &nbsp;·&nbsp; HOW A SURROGATE WORKS</span>
+
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">primer &nbsp;·&nbsp; building intuition for the cognition layer</p>
+          <h1 class="slide-title">A <em>surrogate</em> learns from a few expensive points.</h1>
+          <p class="subtitle">
+            Four loops to make machine-learning–assisted optimisation concrete: data appears, a curve fits,
+            the model predicts with uncertainty, and it retrains when fresh ground truth arrives.
+            The dashed grey curve in every panel is the <em>true</em> function the simulator is computing —
+            the surrogate is trying to recover it from samples.
+          </p>
+        </div>
+      </header>
+
+<svg width="0" height="0" style="position:absolute;">
+        <defs>
+          <marker id="axArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+            <path d="M1,1 L7,4 L1,7 Z" fill="var(--ink-soft)"/>
+          </marker>
+        </defs>
+      </svg>
+
+<section class="demo-grid" aria-label="Four animated ML demos">
+
+<article class="demo-card m1">
+          <p class="demo-tag"><span class="num">01</span> &nbsp;·&nbsp; expensive ground truth</p>
+          <h3>A few <em>real</em> samples.</h3>
+          <div class="demo-stage">
+            <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid meet">
+              <path class="ax-arrow" d="M 30 195 L 340 195"/>
+              <path class="ax-arrow" d="M 30 195 L 30 20"/>
+              <text class="ax-text italic" x="338" y="212" text-anchor="end">x  →  design variable</text>
+              <text class="ax-text italic" x="22"  y="32"  text-anchor="end" transform="rotate(-90 22 32)">y  →  performance</text>
+
+<path class="true-fn"
+                    d="M 30 130 Q 90 50, 150 80 T 270 130 T 340 90"/>
+
+<line class="m1-guide" data-i="0" x1="60"  y1="40"  x2="60"  y2="116"/>
+              <circle class="m1-sample" data-i="0" cx="60"  cy="116"/>
+
+              <line class="m1-guide" data-i="1" x1="120" y1="40"  x2="120" y2="65"/>
+              <circle class="m1-sample" data-i="1" cx="120" cy="65"/>
+
+              <line class="m1-guide" data-i="2" x1="180" y1="40"  x2="180" y2="100"/>
+              <circle class="m1-sample" data-i="2" cx="180" cy="100"/>
+
+              <line class="m1-guide" data-i="3" x1="240" y1="40"  x2="240" y2="135"/>
+              <circle class="m1-sample" data-i="3" cx="240" cy="135"/>
+
+              <line class="m1-guide" data-i="4" x1="310" y1="40"  x2="310" y2="105"/>
+              <circle class="m1-sample" data-i="4" cx="310" cy="105"/>
+            </svg>
+          </div>
+          <p class="demo-caption">
+            Each <strong>real simulation</strong> is expensive — minutes of EnergyPlus, Radiance, CFD.
+            We can afford only a handful: each crosshair below marks one (x, y) pair we paid for.
+            <em>The dashed curve is the truth we don't know.</em>
+          </p>
+        </article>
+
+<article class="demo-card m2">
+          <p class="demo-tag"><span class="num">02</span> &nbsp;·&nbsp; learn from data</p>
+          <h3>Fit a <em>curve</em>.</h3>
+          <div class="demo-stage">
+            <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid meet">
+              <path class="ax-arrow" d="M 30 195 L 340 195"/>
+              <path class="ax-arrow" d="M 30 195 L 30 20"/>
+              <text class="ax-text italic" x="338" y="212" text-anchor="end">x</text>
+              <text class="ax-text italic" x="22"  y="32"  text-anchor="end" transform="rotate(-90 22 32)">y</text>
+
+<path class="true-fn"
+                    d="M 30 130 Q 90 50, 150 80 T 270 130 T 340 90"/>
+
+<path class="m2-fit"
+                    d="M 30 135 Q 90 55, 150 78 T 270 132 T 340 95"/>
+
+<circle class="m2-sample" cx="60"  cy="116" r="5"/>
+              <circle class="m2-sample" cx="120" cy="65"  r="5"/>
+              <circle class="m2-sample" cx="180" cy="100" r="5"/>
+              <circle class="m2-sample" cx="240" cy="135" r="5"/>
+              <circle class="m2-sample" cx="310" cy="105" r="5"/>
+            </svg>
+          </div>
+          <p class="demo-caption">
+            The model — Kriging, ELM, neural net, whichever — finds a <strong>smooth curve</strong>
+            consistent with the samples. It approximates the truth without paying for every x.
+            <em>This is "machine learning" in one sentence.</em>
+          </p>
+        </article>
+
+<article class="demo-card m3">
+          <p class="demo-tag"><span class="num">03</span> &nbsp;·&nbsp; with uncertainty</p>
+          <h3>Predict <em>and σ²</em>.</h3>
+          <div class="demo-stage">
+            <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid meet">
+              <path class="ax-arrow" d="M 30 195 L 340 195"/>
+              <path class="ax-arrow" d="M 30 195 L 30 20"/>
+              <text class="ax-text italic" x="338" y="212" text-anchor="end">x</text>
+              <text class="ax-text italic" x="22"  y="32"  text-anchor="end" transform="rotate(-90 22 32)">y</text>
+
+<path class="true-fn"
+                    d="M 30 130 Q 90 50, 150 80 T 270 130 T 340 90"/>
+
+<path class="m3-band"
+                    d="M 30 165 L 60 121 L 95 73 L 120 70 L 150 60 L 180 95 L 210 110 L 240 130 L 275 125 L 310 100 L 340 80
+                       L 340 110 L 310 110 L 275 145 L 240 140 L 210 145 L 180 105 L 150 100 L 120 60 L 95 50 L 60 111 L 30 105 Z"/>
+
+<path class="m3-fit"
+                    d="M 30 135 Q 90 55, 150 78 T 270 132 T 340 95"/>
+
+<circle class="m3-sample" cx="60"  cy="116" r="5"/>
+              <circle class="m3-sample" cx="120" cy="65"  r="5"/>
+              <circle class="m3-sample" cx="180" cy="100" r="5"/>
+              <circle class="m3-sample" cx="240" cy="135" r="5"/>
+              <circle class="m3-sample" cx="310" cy="105" r="5"/>
+
+<line class="m3-query-x" x1="210" y1="20" x2="210" y2="195"/>
+              <text class="m3-query-label" x="216" y="32">x* &nbsp;·&nbsp; new query</text>
+              <circle class="m3-query-pt" cx="210" cy="125" r="6"/>
+              <text class="m3-query-label" x="220" y="120">ŷ ± σ</text>
+            </svg>
+          </div>
+          <p class="demo-caption">
+            For any new x* the model returns <strong>both</strong> a prediction ŷ and an uncertainty σ.
+            The teal band is widest <em>where samples are sparse</em> — the model knows what it doesn't know.
+            <strong>This is what makes it a surrogate, not just a regression.</strong>
+          </p>
+        </article>
+
+<article class="demo-card m4">
+          <p class="demo-tag"><span class="num">04</span> &nbsp;·&nbsp; new ground truth</p>
+          <h3>Retrain when <em>data arrives</em>.</h3>
+          <div class="demo-stage">
+            <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid meet">
+              <path class="ax-arrow" d="M 30 195 L 340 195"/>
+              <path class="ax-arrow" d="M 30 195 L 30 20"/>
+              <text class="ax-text italic" x="338" y="212" text-anchor="end">x</text>
+              <text class="ax-text italic" x="22"  y="32"  text-anchor="end" transform="rotate(-90 22 32)">y</text>
+
+<text class="m4-phase p1" x="180" y="35">1 · old fit + uncertain region</text>
+              <text class="m4-phase p2" x="180" y="35">2 · run a real simulation at x*</text>
+              <text class="m4-phase p3" x="180" y="35">3 · refit · uncertainty drops here</text>
+
+<path class="true-fn"
+                    d="M 30 130 Q 90 50, 150 80 T 270 130 T 340 90"/>
+
+<path class="m4-band-old"
+                    d="M 30 165 L 60 121 L 95 73 L 120 70 L 150 60 L 180 95 L 210 110 L 240 130 L 275 125 L 310 100 L 340 80
+                       L 340 110 L 310 110 L 275 145 L 240 140 L 210 145 L 180 105 L 150 100 L 120 60 L 95 50 L 60 111 L 30 105 Z"/>
+
+<path class="m4-fit-old"
+                    d="M 30 135 Q 90 55, 150 78 T 270 132 T 340 95"/>
+
+<circle class="m4-sample" cx="60"  cy="116" r="5"/>
+              <circle class="m4-sample" cx="120" cy="65"  r="5"/>
+              <circle class="m4-sample" cx="180" cy="100" r="5"/>
+              <circle class="m4-sample" cx="240" cy="135" r="5"/>
+              <circle class="m4-sample" cx="310" cy="105" r="5"/>
+
+<line class="m4-new-guide" x1="210" y1="20" x2="210" y2="135"/>
+              <circle class="m4-new-sample" cx="210" cy="135" r="6"/>
+
+<path class="m4-band-new"
+                    d="M 30 162 L 60 121 L 95 75 L 120 71 L 150 65 L 180 100 L 210 130 L 240 132 L 275 124 L 310 102 L 340 82
+                       L 340 105 L 310 108 L 275 142 L 240 138 L 210 138 L 180 112 L 150 90 L 120 59 L 95 55 L 60 110 L 30 110 Z"/>
+
+<path class="m4-fit-new"
+                    d="M 30 132 Q 90 58, 150 80 Q 195 115, 220 132 Q 270 130, 340 95"/>
+            </svg>
+          </div>
+          <p class="demo-caption">
+            When the surrogate is most uncertain, infill <strong>spends real-sim budget</strong> there.
+            That new ground truth is added to the training set and the model <em>retrains</em>:
+            the curve adjusts, σ collapses where data just arrived. <strong>Online learning, in one loop.</strong>
+          </p>
+        </article>
+
+      </section>
+
+<aside class="synthesis" aria-label="Synthesis claim">
+        <span class="label">claim</span>
+        <blockquote>
+          A surrogate is <em>cheap where the simulator is expensive</em>, and
+          <em>honest about its own ignorance</em> — that uncertainty
+          <span class="ins">turns infill into a learning loop</span>,
+          not just a sampling routine.
+        </blockquote>
+      </aside>
+
+      <footer class="slide-footer">
+        <span><span class="ref">Chapter 2</span> &nbsp;·&nbsp; primer &nbsp;·&nbsp; how a surrogate works</span>
+        <span class="pageno">— 06 —</span>
+      </footer>
+
+    </main>
+  </div>
+
+  <script src="../../assets/slide-base.js"></script>
+  <script>SlideBase.fit('stage');</script>
+</body>
+</html>

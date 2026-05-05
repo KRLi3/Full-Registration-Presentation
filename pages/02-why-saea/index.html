@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why surrogate-assisted MOO — and not BO/TPE</title>
+  <link rel="stylesheet" href="../../assets/slide-base.css">
+  <style>
+
+.premise {
+      position: absolute;
+      top: 290px;
+      left: 96px;
+      right: 96px;
+      height: 190px;
+      display: grid;
+      grid-template-columns: 300px 1fr 300px;
+      gap: 36px;
+      align-items: stretch;
+    }
+
+.premise-card {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 20px 22px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      position: relative;
+    }
+    .premise-card.left  { border-left: 3px solid var(--teal); }
+    .premise-card.right { border-right: 3px solid var(--accent); }
+    .premise-card .eb {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0 0 6px;
+    }
+    .premise-card .head {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 22px;
+      line-height: 1.15;
+      color: var(--ink);
+      margin: 0 0 6px;
+    }
+    .premise-card .head em { color: var(--accent); font-style: italic; }
+    .premise-card .head em.teal { color: var(--teal); }
+    .premise-card .body {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+.premise-axis {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .premise-axis svg {
+      width: 100%;
+      height: auto;
+      overflow: visible;
+      display: block;
+    }
+    .axis-line { stroke: var(--ink); stroke-width: 1.2; }
+    .axis-tick { stroke: var(--ink); stroke-width: 1.2; }
+    .axis-label-top {
+      fill: var(--ink);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-anchor: middle;
+    }
+    .axis-label-bot {
+      fill: var(--ink-soft);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+    }
+    .axis-label-bot.center { text-anchor: middle; }
+    .axis-label-bot.start  { text-anchor: start; }
+    .axis-label-bot.end    { text-anchor: end; }
+    .axis-region-bo  { fill: rgba(47, 93, 110, 0.10); }
+    .axis-region-saea{ fill: rgba(139, 39, 39, 0.10); }
+    .axis-region-label-bo {
+      fill: var(--teal);
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 18px;
+      text-anchor: middle;
+      font-weight: 500;
+    }
+    .axis-region-label-saea {
+      fill: var(--accent);
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 18px;
+      text-anchor: middle;
+      font-weight: 500;
+    }
+
+.failures {
+      position: absolute;
+      top: 510px;
+      left: 96px;
+      right: 96px;
+      height: 360px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 28px;
+    }
+
+    .axis-card {
+      position: relative;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 26px 28px 22px;
+      display: grid;
+      
+      grid-template-rows: auto auto auto 1fr auto;
+      row-gap: 0;
+    }
+    .axis-card::before {
+      
+      content: counter(axis-counter, decimal-leading-zero);
+      counter-increment: axis-counter;
+      position: absolute;
+      top: 22px;
+      right: 24px;
+      font-family: var(--display);
+      font-style: italic;
+      font-size: 36px;
+      color: var(--rule);
+      line-height: 1;
+    }
+    .failures { counter-reset: axis-counter; }
+
+    .axis-card .axis-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 10px;
+    }
+    .axis-card h3 {
+      font-family: var(--display);
+      font-weight: 500;
+      font-size: 26px;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin: 0 0 4px;
+      color: var(--ink);
+    }
+    .axis-card h3 em { font-style: italic; color: var(--accent); }
+    .axis-card .glyph {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+      letter-spacing: 0.04em;
+      margin: 0 0 18px;
+    }
+
+.vs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 10px 0 14px;
+    }
+    .vs .col {
+      border-top: 1px solid var(--rule);
+      padding-top: 10px;
+    }
+    .vs .col-head {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0 0 6px;
+    }
+    .vs .col.bo   .col-head { color: var(--teal); }
+    .vs .col.saea .col-head { color: var(--accent); }
+    .vs .verdict {
+      font-family: var(--body);
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--ink);
+      margin: 0;
+    }
+    .vs .verdict strong { font-weight: 600; color: var(--ink); }
+    .vs .verdict .stat {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      padding: 1px 6px;
+      background: rgba(139, 39, 39, 0.07);
+      border-bottom: 1px solid rgba(139, 39, 39, 0.4);
+      margin: 0 1px;
+    }
+
+.cite {
+      padding-top: 12px;
+      border-top: 1px dashed var(--rule);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .cite-row { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cite .src { color: var(--ink); font-weight: 600; }
+    
+    .cite a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.18s ease, border-color 0.18s ease;
+    }
+    .cite a:hover,
+    .cite a:focus-visible {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      outline: none;
+    }
+    .cite a:visited { color: inherit; }
+    .cite a:hover:visited { color: var(--accent); }
+    
+    .cite .pdf {
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ochre);
+      border-bottom: 1px solid transparent;
+      padding: 0 2px;
+      margin-left: 2px;
+      transition: color 0.18s ease, border-color 0.18s ease;
+    }
+    .cite a.pdf:hover,
+    .cite a.pdf:focus-visible {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <main class="slide">
+      <span class="corner-mark corner-tl">WHY SAEA</span>
+      <span class="corner-mark corner-tr">CHAPTER 3 &nbsp;·&nbsp; MOTIVATION</span>
+
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">motivation &nbsp;·&nbsp; surrogate-assisted MOO vs Bayesian optimisation</p>
+          <h1 class="slide-title">Why <em>surrogate&#8209;assisted&nbsp;MOO</em>, and not BO&nbsp;/&nbsp;TPE.</h1>
+          <p class="subtitle">
+            Bayesian optimisation already bundles surrogate&nbsp;+&nbsp;acquisition&nbsp;+&nbsp;search into a
+            self-closed loop, so the question is not <em>does the surrogate need updating</em> — BO updates too.
+            The question is which <em>search engine</em> drives the loop, and where each engine collapses.
+          </p>
+        </div>
+      </header>
+
+<section class="premise" aria-label="Premise: two scarcities, two search engines">
+        <article class="premise-card left">
+          <p class="eb">premise A — evaluation</p>
+          <p class="head">A single simulation is <em class="teal">expensive</em>.</p>
+          <p class="body">
+            EnergyPlus, Radiance, CFD, FEM: minutes to hours per call.
+            Both BO and SAEA exist because of this.
+          </p>
+        </article>
+
+        <div class="premise-axis" aria-hidden="true">
+          <svg viewBox="0 0 720 150" preserveAspectRatio="xMidYMid meet">
+            
+            <text class="axis-label-top" x="360" y="14">SEARCH&nbsp;COMPLEXITY&nbsp;→</text>
+
+<rect class="axis-region-bo"   x="0"   y="32" width="320" height="42"/>
+            <rect class="axis-region-saea" x="400" y="32" width="320" height="42"/>
+
+<text class="axis-region-label-bo"   x="160" y="60">BO / TPE wins</text>
+            <text class="axis-region-label-saea" x="560" y="60">SAEA territory</text>
+
+<line class="axis-line" x1="0"   y1="96" x2="720" y2="96"/>
+            <line class="axis-tick" x1="0"   y1="88" x2="0"   y2="104"/>
+            <line class="axis-tick" x1="360" y1="84" x2="360" y2="108"/>
+            <line class="axis-tick" x1="720" y1="88" x2="720" y2="104"/>
+
+<text class="axis-label-bot start"  x="0"   y="126">d≤20  ·  m≤2  ·  q=1  ·  continuous</text>
+            <text class="axis-label-bot center" x="360" y="124">collapse threshold</text>
+            <text class="axis-label-bot end"    x="720" y="126">d&gt;20  ·  m≥3  ·  q≫1  ·  mixed</text>
+          </svg>
+        </div>
+
+        <article class="premise-card right">
+          <p class="eb">premise B — search</p>
+          <p class="head">Engineering search is <em>high&#8209;d, many&#8209;m, batched, mixed</em>.</p>
+          <p class="body">
+            HPC farms parallelise; performance objectives stack to 4–6;
+            sliders are quantised. BO's acquisition optimiser breaks here.
+          </p>
+        </article>
+      </section>
+
+<section class="failures" aria-label="Three axes where BO collapses while SAEA does not">
+
+        <article class="axis-card">
+          <p class="axis-tag">axis 01 &nbsp;/&nbsp; batch size</p>
+          <h3>The <em>q</em> wall.</h3>
+          <p class="glyph">q = candidates per real-sim batch</p>
+
+          <div class="vs">
+            <div class="col bo">
+              <p class="col-head">BO / TPE</p>
+              <p class="verdict">
+                Standard EI emits <strong>q&nbsp;=&nbsp;1</strong>. q-EHVI
+                <span class="stat">O(q!)</span> in the integrand;
+                BoTorch concedes &gt;<strong>q&nbsp;≈&nbsp;10</strong> already
+                stretches a single acquisition call.
+              </p>
+            </div>
+            <div class="col saea">
+              <p class="col-head">SAEA (this work)</p>
+              <p class="verdict">
+                A GA generation <strong>is</strong> a batch.
+                <span class="stat">N=100</span> evaluated in parallel,
+                infill <span class="stat">K=5–20</span> selected from the
+                live population — no batch-aware acquisition needed.
+              </p>
+            </div>
+          </div>
+
+          <p class="cite">
+            <span class="cite-row">
+              <a href="https://doi.org/10.5555/3495724.3496550" target="_blank" rel="noopener"><span class="src">Daulton 2020</span></a>
+              q-EHVI, NeurIPS<a class="pdf" href="https://arxiv.org/abs/2006.05078" target="_blank" rel="noopener" title="arXiv preprint">[pdf]</a>
+            </span>
+            <span class="cite-row">
+              <a href="https://botorch.org/docs/optimization" target="_blank" rel="noopener"><span class="src">BoTorch docs</span></a> on q-EI scaling
+            </span>
+            <span class="cite-row">cf. <span class="src">InfillStrategy.cs</span> mixed 60/20/20</span>
+          </p>
+        </article>
+
+        <article class="axis-card">
+          <p class="axis-tag">axis 02 &nbsp;/&nbsp; objective count</p>
+          <h3>The <em>m</em> wall.</h3>
+          <p class="glyph">m = number of objectives</p>
+
+          <div class="vs">
+            <div class="col bo">
+              <p class="col-head">BO / TPE</p>
+              <p class="verdict">
+                EHVI closed-form <strong>only at m=2</strong>;
+                m=3 needs O(N²) box decomp.;
+                <span class="stat">m≥4</span> falls to Monte&nbsp;Carlo,
+                noisy acquisition surface, L-BFGS unstable.
+              </p>
+            </div>
+            <div class="col saea">
+              <p class="col-head">SAEA (this work)</p>
+              <p class="verdict">
+                <strong>NSGA-III, MOEA/D, RVEA</strong> documented up to
+                <span class="stat">m=15</span>. Reference vectors and
+                niche-decomposition replace the integral entirely.
+              </p>
+            </div>
+          </div>
+
+          <p class="cite">
+            <span class="cite-row">
+              <a href="https://doi.org/10.1007/978-3-540-31880-4_5" target="_blank" rel="noopener"><span class="src">Emmerich 2005</span></a> EHVI
+            </span>
+            <span class="cite-row">
+              <a href="https://doi.org/10.1109/TEVC.2013.2281535" target="_blank" rel="noopener"><span class="src">Deb &amp; Jain 2014</span></a>
+              NSGA-III<a class="pdf" href="https://www.egr.msu.edu/~kdeb/papers/k2012009.pdf" target="_blank" rel="noopener" title="Author copy on Deb's MSU page">[pdf]</a>
+            </span>
+          </p>
+        </article>
+
+        <article class="axis-card">
+          <p class="axis-tag">axis 03 &nbsp;/&nbsp; variable space</p>
+          <h3>The <em>mixed-variable</em> wall.</h3>
+          <p class="glyph">d quantised, discrete, conditional</p>
+
+          <div class="vs">
+            <div class="col bo">
+              <p class="col-head">BO / TPE</p>
+              <p class="verdict">
+                Acquisition optimised by L-BFGS&nbsp;+&nbsp;multi-start —
+                <strong>assumes continuity</strong>. TPE's KDE
+                degrades past <span class="stat">d&nbsp;≈&nbsp;30</span>.
+              </p>
+            </div>
+            <div class="col saea">
+              <p class="col-head">SAEA (this work)</p>
+              <p class="verdict">
+                SBX&nbsp;+&nbsp;polynomial mutation handle
+                <strong>continuous, integer, categorical</strong> in
+                one operator family. Slider quantisation is a
+                <span class="stat">post-hoc projection</span>, not a constraint.
+              </p>
+            </div>
+          </div>
+
+          <p class="cite">
+            <span class="cite-row">
+              <a href="https://proceedings.neurips.cc/paper/2011/hash/86e8f7ab32cfd12577bc2619bc635690-Abstract.html" target="_blank" rel="noopener"><span class="src">Bergstra 2011</span></a> TPE limits
+            </span>
+            <span class="cite-row">
+              <a href="https://doi.org/10.1109/4235.996017" target="_blank" rel="noopener"><span class="src">Deb 2002</span></a>
+              SBX<a class="pdf" href="https://content.wolfram.com/sites/13/2018/02/09-2-2.pdf" target="_blank" rel="noopener" title="Deb &amp; Agrawal 1995 SBX original — Complex Systems">[orig]</a>
+            </span>
+            <span class="cite-row">cf. <span class="src">OptimizerComponentBase.Online.cs</span>:130</span>
+          </p>
+        </article>
+
+      </section>
+
+<aside class="synthesis" aria-label="Synthesis claim">
+        <span class="label">claim</span>
+        <blockquote>
+          Surrogates solve <em>evaluation scarcity</em>; MOO operators with non-dominated
+          ranking solve <em>search scarcity</em>.
+          BO bundles <em>both</em> jobs into one engine — and that engine
+          <span class="ins">breaks at the q, m, and mixed-variable thresholds</span>
+          that engineering optimisation crosses on day&nbsp;one.
+        </blockquote>
+      </aside>
+
+      <footer class="slide-footer">
+        <span><span class="ref">Chapter 3</span> &nbsp;·&nbsp; motivation</span>
+        <span class="pageno">— 07 —</span>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../../assets/slide-base.js"></script>
+  <script>SlideBase.fit('stage');</script>
+</body>
+</html>

@@ -1,15 +1,13 @@
 {
   "name": "full-registration-presentation",
   "version": "1.0.0",
-  "description": "Full Registration Presentation - Keran Li",
+  "description": "PhD Full Registration Presentation — Keran Li · CAS Framework for Multi-Objective Generative Design",
   "main": "index.html",
   "scripts": {
-    "start": "npx serve ."
+    "start": "npx serve .",
+    "dev": "npx serve ."
   },
-  "keywords": [],
+  "keywords": ["phd", "viva", "presentation"],
   "author": "Keran Li",
-  "license": "ISC",
-  "dependencies": {
-    "reveal.js": "^6.0.0"
-  }
+  "license": "ISC"
 }
