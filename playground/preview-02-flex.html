@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preview · 02-why-saea · gap-as-min-value</title>
+  <link rel="stylesheet" href="../assets/slide-base.css">
+
+  <style>
+    /* ════════════════════════════════════════════════════════════
+       PROVISIONAL CONTAINER + ATOM SYSTEM
+       ════════════════════════════════════════════════════════════ */
+
+    .tag {
+      display: inline-flex; align-items: center; gap: var(--sp-2);
+      font-family: var(--mono); font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow); text-transform: uppercase;
+      color: var(--accent); font-weight: var(--fw-semibold);
+      padding: 3px 8px; border: 1px solid var(--accent);
+      border-radius: var(--radius-sm); align-self: flex-start;
+      white-space: nowrap;
+    }
+    .tag.is-soft  { color: var(--ink-soft); border-color: var(--rule); }
+    .tag.is-teal  { color: var(--teal); border-color: var(--teal); }
+    .tag.is-bare  { border: none; padding: 0; }
+
+    .headline {
+      font-family: var(--display); font-style: italic;
+      font-weight: var(--fw-medium); font-size: var(--fs-h3);
+      line-height: var(--lh-tight); letter-spacing: var(--ls-headline);
+      color: var(--ink); margin: 0;
+    }
+    .headline em { color: var(--accent); font-style: italic; }
+    .headline em.is-teal { color: var(--teal); }
+    .headline.is-card { font-size: var(--fs-card); }
+
+    .body-text {
+      font-family: var(--body); font-size: var(--fs-body);
+      line-height: var(--lh-body); color: var(--ink); margin: 0;
+    }
+    .body-text.is-soft { color: var(--ink-soft); }
+    .body-text.is-caption { font-size: var(--fs-caption); }
+    .body-text strong { font-weight: var(--fw-semibold); }
+    .body-text em { font-style: italic; color: var(--accent); }
+
+    .cite {
+      font-family: var(--mono); font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono); color: var(--ink-soft);
+      line-height: var(--lh-body); margin: 0; display: block;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cite .src { color: var(--ink); font-weight: var(--fw-semibold); }
+    .cite a { color: inherit; text-decoration: none;
+              border-bottom: 1px solid transparent;
+              transition: color 0.18s, border-color 0.18s; }
+    .cite a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+    .cite a.pdf {
+      font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--ochre); padding: 0 2px; margin-left: 2px;
+    }
+    .cite a.pdf:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .stat {
+      display: inline-block; font-family: var(--mono); font-size: 14px;
+      color: var(--accent); letter-spacing: var(--ls-mono);
+      padding: 1px 6px; background: rgba(139, 39, 39, 0.07);
+      border-bottom: 1px solid rgba(139, 39, 39, 0.4); margin: 0 1px;
+    }
+
+    .panel {
+      background: var(--card-bg); border: 1px solid var(--rule);
+      border-radius: var(--radius-md); padding: var(--sp-5);
+      box-shadow: var(--shadow-card-rest);
+      display: flex; flex-direction: column; gap: var(--sp-3);
+      position: relative;
+      transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.2, 1),
+                  box-shadow 0.22s ease;
+    }
+    .panel:hover {
+      transform: translateY(-2px); box-shadow: var(--shadow-card-hover);
+      z-index: 2;
+    }
+
+    .panel.is-premise.is-left  { border-left: 3px solid var(--teal); }
+    .panel.is-premise.is-right { border-right: 3px solid var(--accent); }
+
+    .panel.is-axis { counter-increment: axis-counter; padding: var(--sp-6); gap: var(--sp-3); }
+    .panel.is-axis::before {
+      content: counter(axis-counter, decimal-leading-zero);
+      position: absolute; top: var(--sp-5); right: var(--sp-5);
+      font-family: var(--display); font-style: italic;
+      font-size: var(--fs-h2); color: var(--rule);
+      line-height: 1; pointer-events: none;
+    }
+    .panel.is-axis .axis-glyph {
+      font-family: var(--mono); font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono); color: var(--ink-soft); margin: 0;
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       GAP-AS-MIN-VALUE LAYOUT
+       ────────────────────────────────────────────────────────────
+       Two design constants:
+         IDEAL  — the gap we want when content has room  (sp-7 = 48)
+         MIN    — the gap floor below which we don't go  (sp-2 = 8)
+
+       Three gap roles:
+         --gap-edge  head→body and body→claim
+         --gap-body  inside body, between sections
+         --gap-row   inside a section, between cards in a row
+
+       JS measures actual head/claim heights, computes available body
+       region, then picks per-gap values such that:
+         - if there's slack → edge=IDEAL, body+row absorb the rest
+         - if there's not   → edge collapses to MIN first, then body,
+                              then row. If everything is at MIN and
+                              still doesn't fit → overflow class.
+       ════════════════════════════════════════════════════════════ */
+
+    .slide-body {
+      position: absolute;
+      left: var(--sp-gutter);
+      right: var(--sp-gutter);
+
+      /* These get set by JS each time. Defaults are placeholder. */
+      top:    270px;
+      bottom: 156px;
+
+      --gap-body: 32px;
+      --gap-row:  22px;
+
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-body);
+      overflow: visible;
+    }
+
+    /* Visual warning if even MIN gaps can't contain the content */
+    .slide-body.overflow {
+      outline: 2px dashed var(--accent);
+      outline-offset: 4px;
+    }
+    .slide-body.overflow::after {
+      content: "content overflows · please trim";
+      position: absolute;
+      top: -28px;
+      right: 0;
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--paper);
+      background: var(--accent);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-weight: var(--fw-semibold);
+    }
+
+    .gap-stamp {
+      position: absolute;
+      top: -28px;
+      left: 0;
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ochre);
+      font-weight: var(--fw-semibold);
+      padding: 4px 10px;
+      background: rgba(176, 125, 44, 0.15);
+      border: 1px solid var(--ochre);
+      border-radius: var(--radius-sm);
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       PAGE-LOCAL LAYOUT
+       ════════════════════════════════════════════════════════════ */
+
+    .premise-row {
+      display: grid;
+      grid-template-columns: 320px 1fr 320px;
+      gap: var(--gap-row);
+      align-items: stretch;
+      flex: 0 0 auto;
+    }
+
+    .premise-axis {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .premise-axis svg { width: 100%; height: auto; overflow: visible; display: block; }
+    .axis-line { stroke: var(--ink); stroke-width: 1.2; }
+    .axis-tick { stroke: var(--ink); stroke-width: 1.2; }
+    .axis-label-top {
+      fill: var(--ink); font-family: var(--mono); font-size: 13px;
+      letter-spacing: 0.16em; text-transform: uppercase; text-anchor: middle;
+    }
+    .axis-label-bot {
+      fill: var(--ink-soft); font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+    .axis-label-bot.center { text-anchor: middle; }
+    .axis-label-bot.start  { text-anchor: start; }
+    .axis-label-bot.end    { text-anchor: end; }
+    .axis-region-bo   { fill: rgba(47, 93, 110, 0.10); }
+    .axis-region-saea { fill: rgba(139, 39, 39, 0.10); }
+    .axis-region-label-bo {
+      fill: var(--teal); font-family: var(--display);
+      font-style: italic; font-size: 22px; text-anchor: middle; font-weight: 500;
+    }
+    .axis-region-label-saea {
+      fill: var(--accent); font-family: var(--display);
+      font-style: italic; font-size: 22px; text-anchor: middle; font-weight: 500;
+    }
+
+    .failures-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--gap-row);
+      counter-reset: axis-counter;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    .vs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+      margin-top: var(--sp-2);
+    }
+    .vs .col {
+      border-top: 1px solid var(--rule);
+      padding-top: var(--sp-3);
+      display: flex; flex-direction: column; gap: var(--sp-2);
+    }
+    .vs .col-head {
+      font-family: var(--mono); font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow); text-transform: uppercase;
+      color: var(--ink-soft); margin: 0; font-weight: var(--fw-semibold);
+    }
+    .vs .col.is-bo   .col-head { color: var(--teal); }
+    .vs .col.is-saea .col-head { color: var(--accent); }
+
+    .cite-list {
+      margin-top: auto;
+      padding-top: var(--sp-3);
+      border-top: 1px dashed var(--rule);
+      display: flex; flex-direction: column; gap: var(--sp-1);
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       Playground chrome
+       ════════════════════════════════════════════════════════════ */
+
+    body.playground { background: #d9d2c1; padding: 32px 24px 80px; }
+    .pg-wrap { max-width: 1600px; margin: 0 auto; }
+    .pg-head { margin-bottom: 24px; }
+    .pg-eyebrow {
+      font-family: var(--mono); font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow); text-transform: uppercase;
+      color: var(--accent); font-weight: var(--fw-semibold); margin: 0 0 var(--sp-2);
+    }
+    .pg-title {
+      font-family: var(--display); font-style: italic; font-weight: var(--fw-medium);
+      font-size: 36px; margin: 0 0 var(--sp-3); color: var(--ink);
+    }
+    .pg-title em { color: var(--accent); }
+    .pg-sub {
+      font-family: var(--body); font-size: var(--fs-caption); color: var(--ink-soft);
+      line-height: var(--lh-body); margin: 0; max-width: 1200px;
+    }
+
+    .pg-stage-frame {
+      width: 100%; aspect-ratio: 16 / 9; position: relative;
+      overflow: visible; box-shadow: var(--shadow-card-hover); background: var(--bg);
+      margin-top: 40px;
+    }
+    body.playground .pg-stage-frame { display: block; }
+    .pg-stage-frame .stage {
+      transform-origin: top left; position: absolute; top: 0; left: 0;
+    }
+
+    .pg-note {
+      margin-top: 18px; padding: 14px 18px;
+      background: rgba(176, 125, 44, 0.08); border-left: 3px solid var(--ochre);
+      font-family: var(--body); font-size: var(--fs-caption);
+      line-height: 1.5; color: var(--ink-soft);
+    }
+    .pg-note strong { color: var(--ink); }
+    .pg-note code {
+      font-family: var(--mono); font-size: 12px;
+      background: rgba(250, 247, 238, 0.6); padding: 1px 5px;
+    }
+
+    .pg-tools {
+      margin: 18px 0 4px;
+      padding: 12px 16px;
+      background: rgba(26, 41, 66, 0.06);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
+      font-family: var(--mono); font-size: var(--fs-micro);
+      color: var(--ink-soft);
+    }
+    .pg-tools label { display: flex; gap: 8px; align-items: center; }
+    .pg-tools .tool-tag {
+      color: var(--accent); font-weight: 600; letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .pg-tools .live-readout {
+      margin-left: auto;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .pg-tools .live-readout .v {
+      color: var(--ochre);
+      background: rgba(176, 125, 44, 0.15);
+      border: 1px solid var(--ochre);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+    }
+    .pg-tools .live-readout .v.is-overflow {
+      color: var(--paper);
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .pg-tools .live-readout .label {
+      color: var(--ink-soft);
+      font-weight: normal;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+
+<body class="playground">
+
+  <div class="pg-wrap">
+
+    <header class="pg-head">
+      <p class="pg-eyebrow">Preview · 02-why-saea · gap-as-min-value</p>
+      <h1 class="pg-title">Gaps are <em>variables with floors</em>, not preset tiers.</h1>
+      <p class="pg-sub">
+        Three gap roles — <code>edge</code> (head→body, body→claim),
+        <code>body</code> (between sections inside body),
+        <code>row</code> (between cards inside a section). Each ranges
+        from <code>IDEAL = sp-7 (48px)</code> to <code>MIN = sp-2 (8px)</code>.
+        On render, JS measures real head/claim heights, computes the body
+        region, and assigns gaps continuously: when there's slack, edge gaps
+        sit at IDEAL and the surplus goes to body gaps so sections stay
+        breathable; when content overflows, edge gaps collapse first to MIN,
+        then body, then row. No discrete tiers — every page picks its own
+        gap values to the pixel.
+      </p>
+    </header>
+
+    <div class="pg-tools">
+      <span class="tool-tag">stress test</span>
+      <label><input type="checkbox" id="addCites"> + 2 extra cite rows per axis card</label>
+      <label><input type="checkbox" id="addVerdict"> + extra verdict sentence</label>
+      <label><input type="checkbox" id="hideClaim"> hide synthesis claim</label>
+      <label><input type="checkbox" id="threeLineTitle"> 3-line slide title</label>
+      <span class="live-readout">
+        <span class="label">edge</span><span class="v" id="readoutEdge">—</span>
+        <span class="label">body</span><span class="v" id="readoutBody">—</span>
+        <span class="label">row</span><span class="v" id="readoutRow">—</span>
+      </span>
+    </div>
+
+    <div class="pg-stage-frame" id="stageFrame">
+
+      <div class="stage" id="stage">
+        <main class="slide" id="theSlide">
+
+          <span class="corner-mark corner-tl">WHY SAEA</span>
+          <span class="corner-mark corner-tr">CHAPTER 3 &nbsp;·&nbsp; MOTIVATION</span>
+
+          <header class="slide-header" id="theHeader">
+            <div>
+              <p class="eyebrow">motivation &nbsp;·&nbsp; surrogate-assisted MOO vs Bayesian optimisation</p>
+              <h1 class="slide-title" id="theTitle">Why <em>surrogate&#8209;assisted&nbsp;MOO</em>, and not BO&nbsp;/&nbsp;TPE.</h1>
+              <p class="subtitle">
+                Bayesian optimisation already bundles surrogate&nbsp;+&nbsp;acquisition&nbsp;+&nbsp;search into a
+                self-closed loop, so the question is not <em>does the surrogate need updating</em> — BO updates too.
+                The question is which <em>search engine</em> drives the loop, and where each engine collapses.
+              </p>
+            </div>
+          </header>
+
+          <div class="slide-body" id="theBody">
+
+            <span class="gap-stamp" id="gapStamp">edge — / body — / row —</span>
+
+            <section class="premise-row" aria-label="Premise band">
+              <article class="panel is-premise is-left">
+                <span class="tag is-soft is-bare">premise A — evaluation</span>
+                <h3 class="headline is-card">A single simulation is <em class="is-teal">expensive</em>.</h3>
+                <p class="body-text is-soft is-caption">
+                  EnergyPlus, Radiance, CFD, FEM: minutes to hours per call.
+                  Both BO and SAEA exist because of this.
+                </p>
+              </article>
+              <div class="premise-axis" aria-hidden="true">
+                <svg viewBox="0 0 720 150" preserveAspectRatio="xMidYMid meet">
+                  <text class="axis-label-top" x="360" y="14">SEARCH&nbsp;COMPLEXITY&nbsp;→</text>
+                  <rect class="axis-region-bo"   x="0"   y="32" width="320" height="42"/>
+                  <rect class="axis-region-saea" x="400" y="32" width="320" height="42"/>
+                  <text class="axis-region-label-bo"   x="160" y="60">BO / TPE wins</text>
+                  <text class="axis-region-label-saea" x="560" y="60">SAEA territory</text>
+                  <line class="axis-line" x1="0"   y1="96" x2="720" y2="96"/>
+                  <line class="axis-tick" x1="0"   y1="88" x2="0"   y2="104"/>
+                  <line class="axis-tick" x1="360" y1="84" x2="360" y2="108"/>
+                  <line class="axis-tick" x1="720" y1="88" x2="720" y2="104"/>
+                  <text class="axis-label-bot start"  x="0"   y="126">d≤20  ·  m≤2  ·  q=1  ·  continuous</text>
+                  <text class="axis-label-bot center" x="360" y="124">collapse threshold</text>
+                  <text class="axis-label-bot end"    x="720" y="126">d&gt;20  ·  m≥3  ·  q≫1  ·  mixed</text>
+                </svg>
+              </div>
+              <article class="panel is-premise is-right">
+                <span class="tag is-bare">premise B — search</span>
+                <h3 class="headline is-card">Engineering search is <em>high&#8209;d, many&#8209;m, batched, mixed</em>.</h3>
+                <p class="body-text is-soft is-caption">
+                  HPC farms parallelise; performance objectives stack to 4–6;
+                  sliders are quantised. BO's acquisition optimiser breaks here.
+                </p>
+              </article>
+            </section>
+
+            <section class="failures-row" aria-label="Three axes where BO collapses">
+
+              <article class="panel is-axis">
+                <span class="tag">axis 01 &nbsp;/&nbsp; batch size</span>
+                <h3 class="headline">The <em>q</em> wall.</h3>
+                <p class="axis-glyph">q = candidates per real-sim batch</p>
+                <div class="vs">
+                  <div class="col is-bo">
+                    <p class="col-head">BO / TPE</p>
+                    <p class="body-text is-caption">
+                      Standard EI emits <strong>q&nbsp;=&nbsp;1</strong>. q-EHVI
+                      <span class="stat">O(q!)</span> in the integrand;
+                      BoTorch concedes &gt;<strong>q&nbsp;≈&nbsp;10</strong>
+                      already stretches a single acquisition call.
+                      <span class="extra-verdict" hidden> Even q=4 inflates wall-time per
+                      step beyond the marginal gain over plain EI batching.</span>
+                    </p>
+                  </div>
+                  <div class="col is-saea">
+                    <p class="col-head">SAEA (this work)</p>
+                    <p class="body-text is-caption">
+                      A GA generation <strong>is</strong> a batch.
+                      <span class="stat">N=100</span> evaluated in parallel,
+                      infill <span class="stat">K=5–20</span> selected from
+                      the live population — no batch-aware acquisition needed.
+                      <span class="extra-verdict" hidden> Crossover and mutation
+                      give batch diversity for free.</span>
+                    </p>
+                  </div>
+                </div>
+                <div class="cite-list">
+                  <span class="cite">
+                    <a href="#"><span class="src">Daulton 2020</span></a>
+                    q-EHVI, NeurIPS<a class="pdf" href="#">[pdf]</a>
+                  </span>
+                  <span class="cite">
+                    <a href="#"><span class="src">BoTorch docs</span></a> on q-EI scaling
+                  </span>
+                  <span class="cite">cf. <span class="src">InfillStrategy.cs</span> mixed 60/20/20</span>
+                  <span class="cite extra-cite" hidden>
+                    <a href="#"><span class="src">Wilson 2018</span></a> reparam trick<a class="pdf" href="#">[pdf]</a>
+                  </span>
+                  <span class="cite extra-cite" hidden>
+                    <a href="#"><span class="src">Balandat 2020</span></a> BoTorch arch
+                  </span>
+                </div>
+              </article>
+
+              <article class="panel is-axis">
+                <span class="tag">axis 02 &nbsp;/&nbsp; objective count</span>
+                <h3 class="headline">The <em>m</em> wall.</h3>
+                <p class="axis-glyph">m = number of objectives</p>
+                <div class="vs">
+                  <div class="col is-bo">
+                    <p class="col-head">BO / TPE</p>
+                    <p class="body-text is-caption">
+                      EHVI closed-form <strong>only at m=2</strong>;
+                      m=3 needs O(N²) box decomp.;
+                      <span class="stat">m≥4</span> falls to Monte&nbsp;Carlo,
+                      noisy acquisition surface, L-BFGS unstable.
+                      <span class="extra-verdict" hidden> Acquisition variance dominates
+                      surrogate variance past m=5.</span>
+                    </p>
+                  </div>
+                  <div class="col is-saea">
+                    <p class="col-head">SAEA (this work)</p>
+                    <p class="body-text is-caption">
+                      <strong>NSGA-III, MOEA/D, RVEA</strong> documented up to
+                      <span class="stat">m=15</span>. Reference vectors and
+                      niche-decomposition replace the integral entirely.
+                      <span class="extra-verdict" hidden> Reference vectors enforce diversity
+                      without explicit hypervolume computation.</span>
+                    </p>
+                  </div>
+                </div>
+                <div class="cite-list">
+                  <span class="cite">
+                    <a href="#"><span class="src">Emmerich 2005</span></a> EHVI
+                  </span>
+                  <span class="cite">
+                    <a href="#"><span class="src">Deb &amp; Jain 2014</span></a>
+                    NSGA-III<a class="pdf" href="#">[pdf]</a>
+                  </span>
+                  <span class="cite extra-cite" hidden>
+                    <a href="#"><span class="src">Cheng 2016</span></a> RVEA<a class="pdf" href="#">[pdf]</a>
+                  </span>
+                  <span class="cite extra-cite" hidden>
+                    <a href="#"><span class="src">Q. Zhang 2007</span></a> MOEA/D
+                  </span>
+                </div>
+              </article>
+
+              <article class="panel is-axis">
+                <span class="tag">axis 03 &nbsp;/&nbsp; variable space</span>
+                <h3 class="headline">The <em>mixed-variable</em> wall.</h3>
+                <p class="axis-glyph">d quantised, discrete, conditional</p>
+                <div class="vs">
+                  <div class="col is-bo">
+                    <p class="col-head">BO / TPE</p>
+                    <p class="body-text is-caption">
+                      Acquisition optimised by L-BFGS&nbsp;+&nbsp;multi-start —
+                      <strong>assumes continuity</strong>. TPE's KDE
+                      degrades past <span class="stat">d&nbsp;≈&nbsp;30</span>.
+                      <span class="extra-verdict" hidden> Categorical encodings via one-hot
+                      blow up the KDE bandwidth selection.</span>
+                    </p>
+                  </div>
+                  <div class="col is-saea">
+                    <p class="col-head">SAEA (this work)</p>
+                    <p class="body-text is-caption">
+                      SBX&nbsp;+&nbsp;polynomial mutation handle
+                      <strong>continuous, integer, categorical</strong> in
+                      one operator family. Slider quantisation is a
+                      <span class="stat">post-hoc projection</span>, not a constraint.
+                      <span class="extra-verdict" hidden> Operator family is dim-agnostic.</span>
+                    </p>
+                  </div>
+                </div>
+                <div class="cite-list">
+                  <span class="cite">
+                    <a href="#"><span class="src">Bergstra 2011</span></a> TPE limits
+                  </span>
+                  <span class="cite">
+                    <a href="#"><span class="src">Deb 2002</span></a>
+                    SBX<a class="pdf" href="#">[orig]</a>
+                  </span>
+                  <span class="cite">cf. <span class="src">OptimizerComponentBase.Online.cs</span>:130</span>
+                  <span class="cite extra-cite" hidden>
+                    <a href="#"><span class="src">Hutter 2011</span></a> SMAC mixed types<a class="pdf" href="#">[pdf]</a>
+                  </span>
+                  <span class="cite extra-cite" hidden>
+                    <a href="#"><span class="src">Garrido-Merchán 2020</span></a> categorical BO
+                  </span>
+                </div>
+              </article>
+
+            </section>
+
+          </div>
+
+          <aside class="synthesis" id="theClaim" aria-label="Synthesis claim">
+            <span class="label">claim</span>
+            <blockquote>
+              Surrogates solve <em>evaluation scarcity</em>; MOO operators with non-dominated
+              ranking solve <em>search scarcity</em>.
+              BO bundles <em>both</em> jobs into one engine — and that engine
+              <span class="ins">breaks at the q, m, and mixed-variable thresholds</span>
+              that engineering optimisation crosses on day&nbsp;one.
+            </blockquote>
+          </aside>
+
+          <footer class="slide-footer" id="theFooter">
+            <span><span class="ref">Chapter 3</span> &nbsp;·&nbsp; motivation</span>
+            <span class="pageno">— 07 —</span>
+          </footer>
+
+        </main>
+      </div>
+
+    </div>
+
+    <p class="pg-note">
+      <strong>How the math works.</strong>
+      Available body height = 1080 − (header offset 64 + measured header height) −
+      (measured claim height + footer offset 36 + measured footer height).
+      Try edge=IDEAL, body=IDEAL, row=IDEAL → measure body.scrollHeight.
+      If <code>scrollHeight ≤ available</code>: surplus is split, edge stays IDEAL,
+      body absorbs the surplus (so sections breathe). If
+      <code>scrollHeight &gt; available</code>: shortage is paid down by lowering
+      edge first (toward MIN), then body, then row. If even all-MIN doesn't fit,
+      the overflow class fires.
+    </p>
+
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ── design constants ────────────────────────────────────
+      const IDEAL = 48;         // sp-7 — preferred gap when slack allows
+      const MIN   = 8;          // sp-2 — floor below which we don't go
+      const SLIDE_HEIGHT = 1080;
+      const HEADER_OFFSET = 64; // top of slide-header inside slide
+      const FOOTER_OFFSET = 36; // bottom of slide-footer inside slide
+      const BODY_BOTTOM_PAD = 14; // synthesis ::after / footer breathing
+
+      // ── elements ────────────────────────────────────────────
+      const frame   = document.getElementById('stageFrame');
+      const stage   = document.getElementById('stage');
+      const slide   = document.getElementById('theSlide');
+      const header  = document.getElementById('theHeader');
+      const body    = document.getElementById('theBody');
+      const claim   = document.getElementById('theClaim');
+      const footer  = document.getElementById('theFooter');
+      const title   = document.getElementById('theTitle');
+      const stamp   = document.getElementById('gapStamp');
+      const rOutE   = document.getElementById('readoutEdge');
+      const rOutB   = document.getElementById('readoutBody');
+      const rOutR   = document.getElementById('readoutRow');
+      const titleHTML0 = title.innerHTML;
+
+      // ── stage scaling ───────────────────────────────────────
+      function fitStage() {
+        const w = frame.clientWidth;
+        const scale = w / 1920;
+        stage.style.transform = 'scale(' + scale + ')';
+        frame.style.height = (SLIDE_HEIGHT * scale) + 'px';
+      }
+
+      // ── core layout decision ────────────────────────────────
+      function setGaps(edge, bodyG, row) {
+        // edge gap = top distance from header bottom + bottom distance to claim top.
+        // Implemented by setting body.top / body.bottom to (measured + edge).
+        const headerH = header.offsetHeight;
+        const claimH  = claim.hidden ? 0 : claim.offsetHeight;
+        const footerH = footer.offsetHeight;
+
+        const top = HEADER_OFFSET + headerH + edge;
+        const bottom = FOOTER_OFFSET + footerH + claimH + edge + BODY_BOTTOM_PAD;
+
+        body.style.top = top + 'px';
+        body.style.bottom = bottom + 'px';
+        body.style.setProperty('--gap-body', bodyG + 'px');
+        body.style.setProperty('--gap-row', row + 'px');
+      }
+
+      function measureBodyContent() {
+        // Force a frame so the new gap values are applied
+        body.offsetHeight;
+        return body.scrollHeight;
+      }
+
+      function recompute() {
+        // Clear overflow first
+        body.classList.remove('overflow');
+
+        // Measure available height assuming MIN edge gap (gives the
+        // largest possible body region, used as our worst-case bound)
+        const headerH = header.offsetHeight;
+        const claimH  = claim.hidden ? 0 : claim.offsetHeight;
+        const footerH = footer.offsetHeight;
+        const fixed = HEADER_OFFSET + headerH + footerH + FOOTER_OFFSET + claimH + BODY_BOTTOM_PAD;
+
+        // Try IDEAL gaps first.
+        setGaps(IDEAL, IDEAL, IDEAL);
+        let available = SLIDE_HEIGHT - fixed - 2 * IDEAL;
+        let natural   = measureBodyContent();
+
+        let edge = IDEAL, bodyG = IDEAL, row = IDEAL;
+
+        if (natural <= available) {
+          // Slack case — surplus stays inside body via auto, but we
+          // can't actually grow the gap value beyond IDEAL (that would
+          // look weird). So the body just settles at content height,
+          // anchored top, with the unused space sitting at the bottom
+          // of the body region. That space is never seen because the
+          // body region is bounded by edge gaps which already sit at IDEAL.
+          //
+          // (Per the user's choice: edge stays at IDEAL, body absorbs surplus.)
+          // The "absorbing" happens naturally via flex column align top —
+          // sections sit packed; remaining space is unused white space
+          // between the last section and the body bottom edge.
+          //
+          // If you wanted the surplus to inflate body gap beyond IDEAL,
+          // you'd set bodyG = (available - natural_packed) / numGaps + IDEAL.
+          // We deliberately don't, to keep visual rhythm consistent.
+          finalize(edge, bodyG, row, false);
+          return;
+        }
+
+        // Shortage case — content overflows the IDEAL-gap region.
+        // Pay the shortage down in three steps: edge → body → row.
+        let shortage = natural - available;
+
+        // Step 1: lower edge from IDEAL toward MIN.
+        // Each px less in edge gap saves 2px of body region.
+        const edgeRoom = (IDEAL - MIN) * 2;
+        if (shortage <= edgeRoom) {
+          edge = IDEAL - Math.ceil(shortage / 2);
+          edge = Math.max(MIN, edge);
+          setGaps(edge, bodyG, row);
+          natural = measureBodyContent();
+          // re-check; flex shrink might have moved things slightly
+          if (natural <= SLIDE_HEIGHT - fixed - 2 * edge) {
+            finalize(edge, bodyG, row, false);
+            return;
+          }
+          shortage = natural - (SLIDE_HEIGHT - fixed - 2 * edge);
+        } else {
+          edge = MIN;
+          shortage -= edgeRoom;
+        }
+
+        // Step 2: lower body gap.
+        // body has 1 inter-section gap (flex column with 2 children).
+        // Saving per px of body gap = 1 (since one gap exists).
+        const numBodyGaps = 1;  // premise-row → failures-row
+        const bodyRoom = (IDEAL - MIN) * numBodyGaps;
+        if (shortage <= bodyRoom) {
+          bodyG = IDEAL - Math.ceil(shortage / numBodyGaps);
+          bodyG = Math.max(MIN, bodyG);
+          setGaps(edge, bodyG, row);
+          natural = measureBodyContent();
+          if (natural <= SLIDE_HEIGHT - fixed - 2 * edge) {
+            finalize(edge, bodyG, row, false);
+            return;
+          }
+          shortage = natural - (SLIDE_HEIGHT - fixed - 2 * edge);
+        } else {
+          bodyG = MIN;
+          shortage -= bodyRoom;
+        }
+
+        // Step 3: lower row gap.
+        // row gaps are between cards within a row — they're horizontal,
+        // so they don't help vertical overflow directly. But on
+        // failures-row (3 cards), shorter row gap doesn't change height.
+        // On premise-row (3 columns), same. So row gap doesn't help
+        // vertical overflow at all in this slide. We still record it for
+        // visual consistency, but skip the math.
+        row = MIN;
+        setGaps(edge, bodyG, row);
+        natural = measureBodyContent();
+
+        // Final check
+        const overflowing = natural > SLIDE_HEIGHT - fixed - 2 * edge + 1;
+        finalize(edge, bodyG, row, overflowing);
+      }
+
+      function finalize(edge, bodyG, row, overflowing) {
+        if (overflowing) body.classList.add('overflow');
+        // Update readouts
+        const txt = 'edge ' + edge + ' / body ' + bodyG + ' / row ' + row +
+                    (overflowing ? ' · OVERFLOW' : '');
+        stamp.textContent = txt;
+        rOutE.textContent = edge + 'px';
+        rOutB.textContent = bodyG + 'px';
+        rOutR.textContent = row + 'px';
+        rOutE.classList.toggle('is-overflow', overflowing);
+        rOutB.classList.toggle('is-overflow', overflowing);
+        rOutR.classList.toggle('is-overflow', overflowing);
+      }
+
+      function recomputeAll() {
+        requestAnimationFrame(() => {
+          fitStage();
+          recompute();
+        });
+      }
+
+      window.addEventListener('resize', recomputeAll);
+
+      // ── stress-test toggles ─────────────────────────────────
+      document.getElementById('addCites').addEventListener('change', e => {
+        document.querySelectorAll('.extra-cite').forEach(el => el.hidden = !e.target.checked);
+        recomputeAll();
+      });
+      document.getElementById('addVerdict').addEventListener('change', e => {
+        document.querySelectorAll('.extra-verdict').forEach(el => el.hidden = !e.target.checked);
+        recomputeAll();
+      });
+      document.getElementById('hideClaim').addEventListener('change', e => {
+        claim.hidden = e.target.checked;
+        recomputeAll();
+      });
+      document.getElementById('threeLineTitle').addEventListener('change', e => {
+        if (e.target.checked) {
+          title.innerHTML =
+            'Why <em>surrogate-assisted MOO</em> and not BO/TPE — ' +
+            'a question of which <em>search engine</em> drives the loop, ' +
+            'and where each <em>engine</em> collapses on the day.';
+        } else {
+          title.innerHTML = titleHTML0;
+        }
+        recomputeAll();
+      });
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(recomputeAll);
+      } else {
+        window.addEventListener('load', recomputeAll);
+      }
+      recomputeAll();
+    })();
+  </script>
+
+</body>
+</html>

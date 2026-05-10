@@ -1,0 +1,1134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Container Playground — Full Registration Deck</title>
+  <link rel="stylesheet" href="../assets/slide-base.css">
+  <style>
+    /* ============================================================
+       PROPOSED CONTAINER + ATOM SYSTEM
+       Edit these definitions to live-tune. Once accepted, copy into
+       slide-base.css.
+       ============================================================ */
+
+    /* ──────────────────────────────────────────────
+       ATOMS — small reusable elements
+       ────────────────────────────────────────────── */
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+      padding: 3px 8px;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-sm);
+      align-self: flex-start;
+      white-space: nowrap;
+    }
+    .tag.is-soft {
+      color: var(--ink-soft);
+      border-color: var(--rule);
+    }
+    .tag.is-ochre  { color: var(--ochre);  border-color: var(--ochre); }
+    .tag.is-sage   { color: var(--sage);   border-color: var(--sage); }
+    .tag.is-teal   { color: var(--teal);   border-color: var(--teal); }
+    .tag.is-bare {
+      border: none;
+      padding: 0;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      margin: 0 0 var(--sp-3);
+    }
+    .eyebrow::before {
+      content: "";
+      width: 32px;
+      height: 1px;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .eyebrow.is-bare::before { display: none; }
+
+    .headline {
+      font-family: var(--display);
+      font-style: italic;
+      font-weight: var(--fw-medium);
+      font-size: var(--fs-h3);
+      line-height: var(--lh-tight);
+      letter-spacing: var(--ls-headline);
+      color: var(--ink);
+      margin: 0;
+    }
+    .headline em { color: var(--accent); font-style: italic; }
+    .headline.is-h2 { font-size: var(--fs-h2); }
+    .headline.is-card { font-size: var(--fs-card); }
+
+    .body-text {
+      font-family: var(--body);
+      font-size: var(--fs-body);
+      line-height: var(--lh-body);
+      color: var(--ink);
+      margin: 0;
+    }
+    .body-text.is-soft { color: var(--ink-soft); }
+    .body-text strong { font-weight: var(--fw-semibold); }
+    .body-text em { font-style: italic; color: var(--accent); }
+
+    .meta {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono);
+      color: var(--ink-soft);
+      margin: 0;
+      padding-top: var(--sp-3);
+      border-top: 1px solid var(--rule-soft);
+    }
+    .meta.is-bare {
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-1);
+    }
+    .kpi .kpi-num {
+      font-family: var(--display);
+      font-style: italic;
+      font-weight: var(--fw-medium);
+      font-size: var(--fs-h2);
+      line-height: var(--lh-tight);
+      color: var(--accent);
+    }
+    .kpi .kpi-lab {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      font-weight: var(--fw-semibold);
+    }
+    .kpi.is-large .kpi-num { font-size: var(--fs-h1); }
+    .kpi.is-small .kpi-num { font-size: var(--fs-h3); }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-1);
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      color: var(--ink);
+      background: rgba(176, 125, 44, 0.12);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      letter-spacing: var(--ls-mono);
+      white-space: nowrap;
+    }
+    .chip strong { color: var(--accent); font-weight: var(--fw-semibold); }
+
+    .cite {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      color: var(--ink-soft);
+      letter-spacing: var(--ls-mono);
+      line-height: var(--lh-body);
+      margin: 0;
+    }
+    .cite .src { color: var(--ink); font-weight: var(--fw-semibold); }
+    .cite a { color: var(--accent); text-decoration: none; }
+    .cite a:hover { text-decoration: underline; }
+
+    /* ──────────────────────────────────────────────
+       CONTAINER — .panel and its variants
+       ────────────────────────────────────────────── */
+
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      padding: var(--sp-5);
+      box-shadow: var(--shadow-card-rest);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      position: relative;
+      transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.2, 1),
+                  box-shadow 0.22s ease;
+    }
+    .panel:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card-hover);
+      z-index: 2;
+    }
+
+    /* — Generic state modifiers — */
+    .panel.is-accent     { border-top: 3px solid var(--accent); }
+    .panel.is-accent-l   { border-left: 3px solid var(--accent); }
+    .panel.is-rejected   { background: var(--card-bg-rejected); opacity: 0.85; }
+    .panel.is-current    { border: 2px solid var(--accent); padding: calc(var(--sp-5) - 1px); }
+    .panel.is-soft       { background: var(--card-bg-soft); border-style: dashed; }
+    .panel.is-bare       { border: none; box-shadow: none; padding: 0; background: transparent; }
+    .panel.is-bare:hover { transform: none; box-shadow: none; }
+
+    /* — Per-page semantic variants —
+       Each carries the per-slide "color signature" that distinguishes
+       its category. This is where the audit-mapped renames land:
+         .axis-card     → .panel.is-axis
+         .premise-card  → .panel.is-premise
+         .reg-card      → .panel.is-reg
+         .acq-card      → .panel.is-acq
+         .alg-card      → .panel.is-alg
+         .knob-col      → .panel.is-knob
+         .year-card     → .panel.is-year
+         .demo-card     → .panel.is-demo
+         .branch        → .panel.is-branch
+         .trait         → .panel.is-trait
+         .cluster       → .panel.is-cluster
+         .lineage-card  → .panel.is-lineage
+         .meta-question → .panel.is-meta-q
+       Layouts that stay independent (don't get .panel):
+         .vs .col, .pub, .failures, .matrix
+       And the existing .panel in 06 → renamed to .diptych-panel.
+    */
+    .panel.is-axis    { border-top: 3px solid var(--accent); counter-increment: axis-counter; }
+    .panel.is-premise { border-top: 3px solid var(--teal); }
+    .panel.is-reg     { border-top: 3px solid var(--teal); }
+    .panel.is-acq     { border-top: 3px solid var(--ochre); }
+    .panel.is-alg     { border-top: 3px solid var(--sage); }
+    .panel.is-knob    { border-top: 3px solid var(--accent); }
+    .panel.is-year    { border-top: 3px solid var(--ochre); }
+    .panel.is-demo    { border-top: 3px solid var(--accent); }
+    .panel.is-branch  { border-top: 3px solid var(--teal); }
+    .panel.is-trait   { border-top: 3px solid var(--ochre); }
+    .panel.is-cluster { border-top: 3px solid var(--ochre); border-style: dashed; border-width: 1px; }
+    .panel.is-cluster.is-accent { border-top-style: solid; border-top-width: 3px; }
+    .panel.is-lineage { border-left: 3px solid var(--ochre); border-top: 1px solid var(--rule); }
+    .panel.is-meta-q  { border-top: 3px solid var(--ochre); border-style: dashed; }
+
+    /* ──────────────────────────────────────────────
+       BAND — horizontal banners
+       ────────────────────────────────────────────── */
+
+    .band {
+      padding: var(--sp-5) var(--sp-6);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-6);
+    }
+    .band.is-claim {
+      padding: var(--sp-4) 0 var(--sp-4) var(--sp-5);
+      border-left: 3px solid var(--accent);
+    }
+    .band.is-claim .band-label {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+      flex-shrink: 0;
+    }
+    .band.is-claim .band-text {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: var(--fs-h3);
+      line-height: var(--lh-tight);
+      color: var(--ink);
+      margin: 0;
+    }
+    .band.is-claim .band-text em { color: var(--accent); }
+    .band.is-claim .band-text .ins {
+      background: rgba(176, 125, 44, 0.18);
+      padding: 0 4px;
+    }
+    .band.is-banner {
+      background: var(--card-bg-soft);
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+    .band.is-banner .band-vlabel {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      flex-shrink: 0;
+      padding: 0 var(--sp-2);
+      border-right: 1px solid var(--rule);
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+    }
+
+    /* ──────────────────────────────────────────────
+       LEGEND — small explanatory grid
+       ────────────────────────────────────────────── */
+
+    .legend.is-atom {
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: var(--sp-2) var(--sp-6);
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono);
+      color: var(--ink-soft);
+      padding: var(--sp-4) var(--sp-4);
+      border: 1px solid var(--rule);
+      background: var(--card-bg);
+    }
+    .legend.is-atom .legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      white-space: nowrap;
+    }
+    .legend.is-atom .legend-shape {
+      width: 26px;
+      height: 16px;
+      border: 1px solid var(--ink);
+      background: var(--node-process);
+      flex-shrink: 0;
+    }
+
+    /* ──────────────────────────────────────────────
+       PAGE CHROME — playground only, not part of system
+       ────────────────────────────────────────────── */
+
+    body {
+      display: block;
+      padding: 0;
+      background: #d9d2c1;
+    }
+    .pg-wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 64px 48px 120px;
+    }
+    .pg-head {
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: var(--sp-6);
+      margin-bottom: var(--sp-7);
+    }
+    .pg-eyebrow {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+      margin: 0 0 var(--sp-3);
+    }
+    .pg-title {
+      font-family: var(--display);
+      font-style: italic;
+      font-weight: var(--fw-medium);
+      font-size: 56px;
+      line-height: var(--lh-headline);
+      letter-spacing: var(--ls-headline);
+      margin: 0 0 var(--sp-3);
+    }
+    .pg-title em { color: var(--accent); }
+    .pg-sub {
+      font-family: var(--body);
+      font-size: var(--fs-body);
+      line-height: var(--lh-body);
+      color: var(--ink-soft);
+      margin: 0;
+      max-width: 920px;
+    }
+    .pg-section {
+      margin-bottom: var(--sp-8);
+    }
+    .pg-section-head {
+      display: flex;
+      align-items: baseline;
+      gap: var(--sp-4);
+      margin-bottom: var(--sp-6);
+      border-bottom: 1px dashed var(--rule-soft);
+      padding-bottom: var(--sp-3);
+    }
+    .pg-section-num {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      color: var(--ochre);
+      font-weight: var(--fw-semibold);
+    }
+    .pg-section-title {
+      font-family: var(--display);
+      font-style: italic;
+      font-weight: var(--fw-medium);
+      font-size: 32px;
+      margin: 0;
+      color: var(--ink);
+    }
+    .pg-section-note {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      color: var(--ink-soft);
+      margin-left: auto;
+    }
+
+    .pg-card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-5);
+    }
+    .pg-card-grid.is-2 { grid-template-columns: repeat(2, 1fr); }
+    .pg-card-grid.is-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .pg-row-head {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--sp-4);
+      margin-top: var(--sp-5);
+      padding-bottom: var(--sp-2);
+      border-bottom: 1px dashed var(--rule-soft);
+    }
+    .pg-row-head .label {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+    }
+    .pg-row-head .meta {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      color: var(--ink-soft);
+      border: none;
+      padding: 0;
+    }
+
+    .pg-atom-table {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: var(--sp-4) var(--sp-6);
+      align-items: baseline;
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      padding: var(--sp-5);
+    }
+    .pg-atom-table .atom-name {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+      letter-spacing: var(--ls-mono);
+    }
+
+    /* ──────────────────────────────────────────────
+       SLIDE PREVIEW — a true 1920×1080 mini stage
+       at the bottom showing how 02-why-saea would
+       look if rebuilt with the new system.
+       ────────────────────────────────────────────── */
+
+    .pg-stage-frame {
+      border: 1px solid var(--rule);
+      background: var(--bg);
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-card-hover);
+    }
+    .pg-stage-frame .mini-slide {
+      width: 1920px;
+      height: 1080px;
+      transform-origin: top left;
+      /* JS will set scale based on container width */
+      position: absolute; top: 0; left: 0;
+      background: var(--bg);
+    }
+
+    /* The mini-slide itself uses real --sp-* / --fs-* tokens, so it
+       reads as the deck would render after refactor. */
+    .ms-content {
+      position: absolute;
+      inset: var(--sp-gutter);
+    }
+    .ms-eyebrow {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+      margin: 0 0 var(--sp-3);
+    }
+    .ms-title {
+      font-family: var(--display);
+      font-weight: var(--fw-medium);
+      font-size: var(--fs-h1);
+      line-height: var(--lh-headline);
+      letter-spacing: var(--ls-headline);
+      margin: 0 0 var(--sp-7);
+      color: var(--ink);
+    }
+    .ms-title em { font-style: italic; color: var(--accent); }
+    .ms-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-7);
+      margin-bottom: var(--sp-7);
+    }
+    .ms-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-5);
+      counter-reset: axis-counter;
+    }
+    .ms-claim {
+      position: absolute;
+      bottom: var(--sp-7);
+      left: var(--sp-gutter);
+      right: var(--sp-gutter);
+    }
+    .pg-stage-note {
+      margin-top: var(--sp-4);
+      padding: var(--sp-4) var(--sp-5);
+      background: rgba(176, 125, 44, 0.08);
+      border-left: 3px solid var(--ochre);
+      font-family: var(--body);
+      font-size: var(--fs-caption);
+      line-height: var(--lh-body);
+      color: var(--ink-soft);
+    }
+    .pg-stage-note strong { color: var(--ink); }
+    .pg-stage-note code {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      background: rgba(250, 247, 238, 0.6);
+      padding: 1px 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="pg-wrap">
+
+    <header class="pg-head">
+      <p class="pg-eyebrow">Container Playground · session 2 of framework refactor</p>
+      <h1 class="pg-title">All <em>containers</em> + atoms, on one page.</h1>
+      <p class="pg-sub">
+        Atoms come first (tag, eyebrow, headline, body-text, meta, kpi, chip, cite).
+        Then <code>.panel</code> with all 13 semantic variants, populated with real proposal content.
+        Then <code>.band</code> and <code>.legend</code>.
+        At the bottom, a mini 16:9 stage shows what slide 02-why-saea would look like
+        if rebuilt on this system. Edit values in <code>:root</code> tokens
+        (already in <code>../assets/slide-base.css</code>) and refresh.
+      </p>
+    </header>
+
+    <!-- ════════════════════════════════════════════════════ -->
+    <!-- SECTION 1 — ATOMS                                    -->
+    <!-- ════════════════════════════════════════════════════ -->
+    <section class="pg-section">
+      <div class="pg-section-head">
+        <span class="pg-section-num">§ 01</span>
+        <h2 class="pg-section-title">Atoms</h2>
+        <span class="pg-section-note">8 reusable elements</span>
+      </div>
+
+      <div class="pg-atom-table">
+
+        <span class="atom-name">.tag</span>
+        <div style="display:flex;gap:var(--sp-3);flex-wrap:wrap;">
+          <span class="tag">surrogate · GP</span>
+          <span class="tag is-soft">legacy</span>
+          <span class="tag is-ochre">iteration</span>
+          <span class="tag is-sage">outcome</span>
+          <span class="tag is-teal">model</span>
+          <span class="tag is-bare">§ 5.5 · contract</span>
+        </div>
+
+        <span class="atom-name">.eyebrow</span>
+        <p class="eyebrow">§ 5.5 · coordination contract</p>
+
+        <span class="atom-name">.headline</span>
+        <div style="display:flex;flex-direction:column;gap:var(--sp-3);">
+          <h2 class="headline is-h2">Three <em>modules</em>, one conversation</h2>
+          <h3 class="headline">Knob 1 — probabilistic dominance</h3>
+          <h4 class="headline is-card">SSGP · primary online surrogate</h4>
+        </div>
+
+        <span class="atom-name">.body-text</span>
+        <div style="display:flex;flex-direction:column;gap:var(--sp-3);">
+          <p class="body-text">
+            Cruz et al. (2024) review 54 surrogate-assisted optimisation studies.
+            Training-set sizes range from <strong>several hundred to several thousand</strong>.
+          </p>
+          <p class="body-text is-soft">
+            The <em>offline-surrogate paradigm</em> presumes a single, one-directional
+            interaction between surrogate and optimisation process.
+          </p>
+        </div>
+
+        <span class="atom-name">.meta</span>
+        <p class="meta">role: anchor · σ²: native · scaling: O(N³)</p>
+
+        <span class="atom-name">.kpi</span>
+        <div style="display:flex;gap:var(--sp-7);">
+          <div class="kpi">
+            <span class="kpi-num">≥ 0.33</span>
+            <span class="kpi-lab">Cliff's δ · medium effect</span>
+          </div>
+          <div class="kpi is-large">
+            <span class="kpi-num">3 / 3</span>
+            <span class="kpi-lab">contract knobs · τ λ θ</span>
+          </div>
+          <div class="kpi is-small">
+            <span class="kpi-num">≥ 0.6</span>
+            <span class="kpi-lab">Cohen's κ · annotator agreement</span>
+          </div>
+        </div>
+
+        <span class="atom-name">.chip</span>
+        <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;">
+          <span class="chip"><strong>m</strong> = 2,3,4</span>
+          <span class="chip"><strong>q</strong> = batch 10</span>
+          <span class="chip"><strong>τ</strong> = 0.5</span>
+          <span class="chip"><strong>seeds</strong> ≥ 30</span>
+          <span class="chip"><strong>cases</strong> ≥ 3</span>
+        </div>
+
+        <span class="atom-name">.cite</span>
+        <p class="cite">
+          <span class="src">Wu et al. (2024)</span>
+          — BO-XGBoost-NSGA-II with 2,000 LHS samples ·
+          <a href="#">doi.org/10.1016/j.buildenv.2024.111386</a>
+        </p>
+
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════ -->
+    <!-- SECTION 2 — PANELS                                   -->
+    <!-- ════════════════════════════════════════════════════ -->
+    <section class="pg-section">
+      <div class="pg-section-head">
+        <span class="pg-section-num">§ 02</span>
+        <h2 class="pg-section-title">Panel · 13 semantic variants</h2>
+        <span class="pg-section-note">.panel.is-X — replaces .axis-card / .reg-card / etc.</span>
+      </div>
+
+      <div class="pg-card-grid">
+
+        <!-- ROW: PAGE 02 -->
+        <div class="pg-row-head">
+          <span class="label">page 02 — why SAEA</span>
+          <span class="meta">.panel.is-axis · .panel.is-premise</span>
+        </div>
+
+        <article class="panel is-axis">
+          <span class="tag">m-axis · failure</span>
+          <h3 class="headline">m ≥ 4</h3>
+          <p class="body-text">
+            Exact <em>EHVI</em> becomes prohibitive; BO falls back to Monte-Carlo
+            with high variance. Decomposition or reference-vector MOEAs scale better.
+          </p>
+          <p class="meta">Daulton 2020 · Emmerich 2005</p>
+        </article>
+
+        <article class="panel is-axis">
+          <span class="tag">q-axis · failure</span>
+          <h3 class="headline">q ≈ 10</h3>
+          <p class="body-text">
+            Batch BO acquisition becomes the bottleneck.
+            Evolutionary infill of q=100 candidates is cheap by comparison.
+          </p>
+          <p class="meta">BoTorch parallel-q wall · Yu 2023</p>
+        </article>
+
+        <article class="panel is-axis">
+          <span class="tag">d-axis · failure</span>
+          <h3 class="headline">d ≈ 30</h3>
+          <p class="body-text">
+            TPE / GP marginal-likelihood degrades; mixed-integer variables push
+            BO further out of its comfort zone.
+          </p>
+          <p class="meta">Cruz 2024 review</p>
+        </article>
+
+        <article class="panel is-premise">
+          <span class="tag is-teal">premise · left</span>
+          <h3 class="headline"><em style="color:var(--teal);">Expensive</em> simulation</h3>
+          <p class="body-text">
+            EnergyPlus annual: minutes-hours. Radiance daylight: minutes.
+            CFD wind: hours. Multi-objective stacks the cost.
+          </p>
+        </article>
+
+        <article class="panel is-premise">
+          <span class="tag">premise · right</span>
+          <h3 class="headline"><em>High-d</em> mixed search</h3>
+          <p class="body-text">
+            Continuous sliders, categorical envelopes, integer counts.
+            Evolutionary operators handle this natively.
+          </p>
+        </article>
+
+        <article class="panel is-bare">
+          <p class="body-text is-soft" style="font-style:italic;">
+            <code>is-bare</code> — no border, sits inside an outer grid.
+            Used for things like <code>.vs .col</code> on page 02
+            where the outer container already provides the rectangle.
+          </p>
+        </article>
+
+        <!-- ROW: PAGE 03 -->
+        <div class="pg-row-head">
+          <span class="label">page 03 — surrogate spectrum</span>
+          <span class="meta">.panel.is-reg + .panel.is-rejected</span>
+        </div>
+
+        <article class="panel is-reg is-current">
+          <span class="tag">surrogate · GP anchor</span>
+          <h3 class="headline">Kriging</h3>
+          <p class="body-text">
+            Native posterior mean and variance. Direct comparability with
+            K-RVEA and MOEA/D-EGO. Cubic in N.
+          </p>
+          <p class="meta">σ² native · O(N³) · anchor</p>
+        </article>
+
+        <article class="panel is-reg is-accent">
+          <span class="tag">surrogate · transition</span>
+          <h3 class="headline">SSGP</h3>
+          <p class="body-text">
+            Approximate GP uncertainty with improved scaling.
+            Random Fourier features · per-target ARD ·
+            PRESS τ-calibration via LOO.
+          </p>
+          <p class="meta">σ² approx · O(M³) · primary online</p>
+        </article>
+
+        <article class="panel is-reg is-rejected">
+          <span class="tag is-soft">surrogate · legacy</span>
+          <h3 class="headline">ELM family</h3>
+          <p class="body-text">
+            OS-ELM / EOS-ELM / Ensemble-ELM / classic ELM.
+            Fast incremental fit; no native uncertainty.
+            Engineering baseline only.
+          </p>
+          <p class="meta">σ² post-hoc · status: legacy</p>
+        </article>
+
+        <!-- ROW: PAGE 04 -->
+        <div class="pg-row-head">
+          <span class="label">page 04 — acquisition strategies</span>
+          <span class="meta">.panel.is-acq</span>
+        </div>
+
+        <article class="panel is-acq">
+          <span class="tag is-ochre">bayesian</span>
+          <h3 class="headline">EI · UCB · ParEGO</h3>
+          <p class="body-text">
+            Surrogate uncertainty enters the score directly.
+            Algorithm-agnostic — works under any MOEA host.
+          </p>
+        </article>
+
+        <article class="panel is-acq">
+          <span class="tag is-ochre">moo-coupled</span>
+          <h3 class="headline">Variance + rank</h3>
+          <p class="body-text">
+            Uses non-dominated rank, crowding distance, population state.
+            Signals BO simply doesn't have access to.
+          </p>
+        </article>
+
+        <article class="panel is-acq is-accent">
+          <span class="tag is-ochre">default</span>
+          <h3 class="headline">Mixed (λ-controlled)</h3>
+          <p class="body-text">
+            Within batch q, exploit/explore operators are weighted by
+            <em>λ</em> from the contract. Falls back to maximin distance
+            when σ² unreliable.
+          </p>
+          <p class="meta">λ ∈ [0,1] · contract knob 2</p>
+        </article>
+
+        <!-- ROW: PAGE 05 -->
+        <div class="pg-row-head">
+          <span class="label">page 05 — MOO algorithms</span>
+          <span class="meta">.panel.is-alg</span>
+        </div>
+
+        <article class="panel is-alg">
+          <span class="tag is-sage">m = 2-3</span>
+          <h3 class="headline">NSGA-II</h3>
+          <p class="body-text">
+            Non-dominated sort + crowding. Canonical baseline.
+            Used as fixed-solver comparator in falsification trials.
+          </p>
+        </article>
+
+        <article class="panel is-alg">
+          <span class="tag is-sage">m = 3-10</span>
+          <h3 class="headline">NSGA-III · RVEA</h3>
+          <p class="body-text">
+            Reference-point and reference-vector selection.
+            Many-objective extension beyond crowding.
+          </p>
+        </article>
+
+        <article class="panel is-alg">
+          <span class="tag is-sage">m = 2-4</span>
+          <h3 class="headline">MOEA/D-DE</h3>
+          <p class="body-text">
+            Decomposition into scalar sub-problems.
+            Alternative to dominance-based selection.
+          </p>
+        </article>
+
+        <!-- ROW: PAGE 06 -->
+        <div class="pg-row-head">
+          <span class="label">page 06 — coordination contract</span>
+          <span class="meta">.panel.is-knob · .panel.is-lineage</span>
+        </div>
+
+        <article class="panel is-knob">
+          <span class="tag">knob 1 · τ</span>
+          <h3 class="headline">Probabilistic dominance</h3>
+          <p class="body-text">
+            <em>P(A ≻ B | μ, σ) ≥ τ</em>. τ=1 → deterministic;
+            τ=0.5 → expected dominance suffices.
+          </p>
+          <p class="meta">surrogate → MOEA channel</p>
+        </article>
+
+        <article class="panel is-knob">
+          <span class="tag">knob 2 · λ</span>
+          <h3 class="headline">Exploit-explore balance</h3>
+          <p class="body-text">
+            <em>λ = f(niche, stagnation)</em>.
+            MOEA state controls acquisition mixture.
+          </p>
+          <p class="meta">MOEA → acquisition channel</p>
+        </article>
+
+        <article class="panel is-knob">
+          <span class="tag">knob 3 · θ</span>
+          <h3 class="headline">Perturbation retrain</h3>
+          <p class="body-text">
+            Refresh when ∑(μ̂−f_true)²/N_recent > θ.
+            Auditable discrete event.
+          </p>
+          <p class="meta">acquisition/MOEA → surrogate</p>
+        </article>
+
+        <article class="panel is-lineage">
+          <span class="tag is-bare">prior art</span>
+          <h3 class="headline is-card">K-RVEA</h3>
+          <p class="body-text">Chugh et al. (2018). Kriging σ² + ref-vectors. Algorithm-internal.</p>
+        </article>
+
+        <article class="panel is-lineage">
+          <span class="tag is-bare">prior art</span>
+          <h3 class="headline is-card">MOEA/D-EGO</h3>
+          <p class="body-text">Q. Zhang et al. (2010). GP per scalar sub-problem.</p>
+        </article>
+
+        <article class="panel is-lineage">
+          <span class="tag is-bare">prior art</span>
+          <h3 class="headline is-card">TSDEA</h3>
+          <p class="body-text">Yu et al. (2023). Two-stage σ²-aware dominance test.</p>
+        </article>
+
+        <!-- ROW: PAGE 00 -->
+        <div class="pg-row-head">
+          <span class="label">page 00 — framework overview</span>
+          <span class="meta">.panel.is-branch · .panel.is-trait · .panel.is-meta-q</span>
+        </div>
+
+        <article class="panel is-branch">
+          <span class="tag is-teal">B1 · year 2</span>
+          <h3 class="headline is-card">Algorithmic adaptation</h3>
+          <p class="body-text">
+            Can the main solver itself be a run-time variable —
+            switching on Pareto geometry, niche, stagnation?
+          </p>
+          <p class="meta">SQ1 · falsified at |δ| ≥ 0.33</p>
+        </article>
+
+        <article class="panel is-branch">
+          <span class="tag is-teal">B2 · year 1 · in progress</span>
+          <h3 class="headline is-card">Surrogate integration</h3>
+          <p class="body-text">
+            Once the surrogate exposes σ² and accepts refresh,
+            how does it shape the search trajectory?
+          </p>
+          <p class="meta">SQ2 · trajectory-level distinguishability</p>
+        </article>
+
+        <article class="panel is-branch">
+          <span class="tag is-teal">B3 · year 3</span>
+          <h3 class="headline is-card">Emergence &amp; dynamics</h3>
+          <p class="body-text">
+            Can Pareto geometry and trajectory motifs be read as
+            system-level signatures of the design problem?
+          </p>
+          <p class="meta">SQ3 · κ ≥ 0.6 cross-annotator</p>
+        </article>
+
+        <article class="panel is-trait">
+          <span class="tag is-ochre">CAS · adaptation</span>
+          <h3 class="headline is-card">Local rules, run-time revision</h3>
+          <p class="body-text is-soft">
+            Holland 1995 — the optimisation system revises its internal rules
+            at run time according to its own state.
+          </p>
+        </article>
+
+        <article class="panel is-trait">
+          <span class="tag is-ochre">CAS · feedback</span>
+          <h3 class="headline is-card">Bidirectional channels</h3>
+          <p class="body-text is-soft">
+            Surrogate ↔ solver, surrogate ↔ acquisition,
+            solver ↔ acquisition. Three knobs, three channels.
+          </p>
+        </article>
+
+        <article class="panel is-meta-q">
+          <span class="tag is-ochre is-bare">open question</span>
+          <h3 class="headline is-card">CAS positioning · Position B</h3>
+          <p class="body-text">
+            Working position — CAS as <em>interpretive lens</em>.
+            Decision deferred to mid-Year-2.
+          </p>
+        </article>
+
+        <!-- ROW: PAGE 07 + 08 -->
+        <div class="pg-row-head">
+          <span class="label">page 07 — roadmap · page 08 — literature</span>
+          <span class="meta">.panel.is-year · .panel.is-cluster</span>
+        </div>
+
+        <article class="panel is-year">
+          <span class="tag is-ochre">year 1 · 25-09 → 26-09</span>
+          <h3 class="headline is-card">Surrogate integration</h3>
+          <p class="body-text">
+            Medusa skeleton · Pure / Offline / Online · lit review · prep full reg.
+          </p>
+          <p class="meta">deliverables: proposal, presentation, Medusa v1, ch1-3 draft</p>
+        </article>
+
+        <article class="panel is-year">
+          <span class="tag is-ochre">year 2 · 26-09 → 27-09</span>
+          <h3 class="headline is-card">Algorithmic adaptation</h3>
+          <p class="body-text">
+            Implement contract knobs · staged case studies · fixed vs adaptive.
+          </p>
+          <p class="meta">deliverables: algorithm paper, tools paper, empirical chapters</p>
+        </article>
+
+        <article class="panel is-cluster is-accent">
+          <span class="tag">methods · 8 papers</span>
+          <h3 class="headline is-card">SAEA model management</h3>
+          <p class="body-text">
+            Jin 2011 (anchor) · Chugh 2018, 2019 ·
+            Q. Zhang 2010 · Yu 2023 · Wang 2023 · Bamdad 2020.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════ -->
+    <!-- SECTION 3 — BAND                                     -->
+    <!-- ════════════════════════════════════════════════════ -->
+    <section class="pg-section">
+      <div class="pg-section-head">
+        <span class="pg-section-num">§ 03</span>
+        <h2 class="pg-section-title">Band · horizontal banners</h2>
+        <span class="pg-section-note">.band.is-claim · .band.is-banner</span>
+      </div>
+
+      <aside class="band is-claim" style="margin-bottom: var(--sp-5);">
+        <span class="band-label">claim</span>
+        <p class="band-text">
+          Surrogates solve <em>evaluation scarcity</em>; MOO operators solve
+          <em>search scarcity</em> — BO bundles both jobs into one engine,
+          <span class="ins">and that engine breaks at the q, m, and mixed-variable thresholds</span>.
+        </p>
+      </aside>
+
+      <aside class="band is-banner">
+        <span class="band-vlabel">thesis</span>
+        <blockquote class="body-text" style="font-family:var(--display);font-style:italic;font-size:var(--fs-h3);line-height:var(--lh-tight);margin:0;">
+          Optimisation should be designed as <em style="color:var(--accent);">an adaptive system</em>,
+          not a fixed algorithmic pipeline — surrogate, acquisition and MOEA modules
+          <span style="background:rgba(176,125,44,0.18);padding:0 4px;">communicating through an explicit contract</span>.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════ -->
+    <!-- SECTION 4 — LEGEND                                   -->
+    <!-- ════════════════════════════════════════════════════ -->
+    <section class="pg-section">
+      <div class="pg-section-head">
+        <span class="pg-section-num">§ 04</span>
+        <h2 class="pg-section-title">Legend</h2>
+        <span class="pg-section-note">.legend.is-atom — for SVG-heavy slides</span>
+      </div>
+
+      <div class="legend is-atom" style="display:inline-grid;">
+        <span class="legend-item">
+          <span class="legend-shape" style="background:var(--node-process);"></span>
+          process
+        </span>
+        <span class="legend-item">
+          <span class="legend-shape" style="background:var(--node-data); transform:skew(-16deg);"></span>
+          data
+        </span>
+        <span class="legend-item">
+          <span class="legend-shape" style="background:var(--node-decision); width:16px; height:16px; transform:rotate(45deg); border-color:var(--accent);"></span>
+          decision
+        </span>
+        <span class="legend-item">
+          <span class="legend-shape" style="background:var(--node-output); border-radius:8px;"></span>
+          output
+        </span>
+        <span class="legend-item">
+          <span class="legend-shape" style="background:var(--node-model); border-style:double; border-width:3px;"></span>
+          model
+        </span>
+        <span class="legend-item">
+          <span class="legend-shape" style="background:var(--accent);"></span>
+          accent / online
+        </span>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════ -->
+    <!-- SECTION 5 — MINI SLIDE PREVIEW                       -->
+    <!-- ════════════════════════════════════════════════════ -->
+    <section class="pg-section">
+      <div class="pg-section-head">
+        <span class="pg-section-num">§ 05</span>
+        <h2 class="pg-section-title">Slide preview · 02-why-saea rebuilt</h2>
+        <span class="pg-section-note">1920 × 1080 mini stage scaled to fit</span>
+      </div>
+
+      <div class="pg-stage-frame" id="miniFrame">
+        <div class="mini-slide" id="miniSlide">
+
+          <div class="ms-content">
+
+            <p class="ms-eyebrow">— § 4.2 · why SAEA, not BO/TPE</p>
+            <h2 class="ms-title">Why <em>surrogate-assisted MOO</em>, and not BO / TPE.</h2>
+
+            <div class="ms-grid-2">
+              <article class="panel is-premise">
+                <span class="tag is-teal">premise · left</span>
+                <h3 class="headline is-card"><em style="color:var(--teal);">Expensive</em> simulation</h3>
+                <p class="body-text">
+                  EnergyPlus annual: minutes-hours. Radiance: minutes.
+                  CFD: hours. Multi-objective stacks the cost.
+                </p>
+              </article>
+              <article class="panel is-premise">
+                <span class="tag">premise · right</span>
+                <h3 class="headline is-card"><em>High-d</em> mixed search</h3>
+                <p class="body-text">
+                  Continuous + categorical + integer.
+                  Evolutionary operators handle this natively.
+                </p>
+              </article>
+            </div>
+
+            <div class="ms-grid-3">
+              <article class="panel is-axis">
+                <span class="tag">m-axis · failure</span>
+                <h3 class="headline is-card">m ≥ 4</h3>
+                <p class="body-text">EHVI prohibitive; Monte-Carlo fallback noisy.</p>
+                <p class="meta">Daulton 2020 · Emmerich 2005</p>
+              </article>
+              <article class="panel is-axis">
+                <span class="tag">q-axis · failure</span>
+                <h3 class="headline is-card">q ≈ 10</h3>
+                <p class="body-text">Batch BO chokes; SAEA does q=100 cheaply.</p>
+                <p class="meta">Yu 2023 · BoTorch limit</p>
+              </article>
+              <article class="panel is-axis">
+                <span class="tag">d-axis · failure</span>
+                <h3 class="headline is-card">d ≈ 30</h3>
+                <p class="body-text">TPE/GP marginal-likelihood degrades; mixed-int hurts.</p>
+                <p class="meta">Cruz 2024 review</p>
+              </article>
+            </div>
+
+          </div>
+
+          <aside class="ms-claim band is-claim">
+            <span class="band-label">claim</span>
+            <p class="band-text">
+              Surrogates solve <em>evaluation scarcity</em>;
+              MOO operators solve <em>search scarcity</em> —
+              <span class="ins">BO breaks at the q, m, and mixed-variable thresholds</span>.
+            </p>
+          </aside>
+
+        </div>
+      </div>
+
+      <p class="pg-stage-note">
+        <strong>What you are looking at.</strong>
+        A real 1920×1080 stage drawn with the proposed atom + container system.
+        The grid layouts (<code>.ms-grid-2</code>, <code>.ms-grid-3</code>) are the
+        only per-slide CSS — everything else (.panel, .tag, .headline, .body-text,
+        .meta, .band) comes from the shared system. If this reads cleanly,
+        all 11 slides can be rebuilt the same way. If anything feels off
+        (padding, colour stripe weight, hover lift, type rhythm), call out
+        which atom or which <code>.is-X</code> variant and I tune it before we
+        commit to <code>slide-base.css</code>.
+      </p>
+    </section>
+
+  </div>
+
+  <script>
+    // Scale the mini-slide (1920×1080) to fit the parent frame width.
+    (function () {
+      const frame = document.getElementById('miniFrame');
+      const slide = document.getElementById('miniSlide');
+      if (!frame || !slide) return;
+      function fit() {
+        const w = frame.clientWidth;
+        const scale = w / 1920;
+        slide.style.transform = 'scale(' + scale + ')';
+        // Lock frame height to scaled slide height
+        frame.style.height = (1080 * scale) + 'px';
+      }
+      fit();
+      window.addEventListener('resize', fit);
+    })();
+  </script>
+
+</body>
+</html>

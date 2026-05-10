@@ -6,26 +6,45 @@
   <title>Framework overview — three branches, one CAS lens</title>
   <link rel="stylesheet" href="../../assets/slide-base.css">
   <style>
+    /* ============================================================
+       framework-overview — fixed-Y absolute layout.
+       All sections have hardcoded top/height. Tokens are still used
+       for type, colour, spacing, but layout positions are explicit.
+       ============================================================ */
 
-.main-rq {
+    /* ── slide-body wrapper ────────────────────────────────────
+       head ends at slide-header bottom (~226px).
+       24px gap → body starts at 250px.
+       footer top rule sits at ~994px.
+       body bottom anchored at 86px (36 + 50). */
+    .body-zone {
       position: absolute;
-      top: 245px;
-      left: 96px;
-      right: 96px;
-      height: 110px;
+      top: 250px;
+      left: var(--sp-gutter);
+      right: var(--sp-gutter);
+      bottom: 86px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ── Section 1 · main RQ band ──────────────────────────── */
+    .main-rq {
+      flex: 0 0 auto;
       display: flex;
       align-items: stretch;
-      background: rgba(250, 247, 238, 0.5);
+      background: var(--card-bg-soft);
       border-top: 1px solid var(--rule);
       border-bottom: 1px solid var(--rule);
+      min-height: 110px;
     }
     .main-rq .label {
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.28em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--accent);
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
       writing-mode: vertical-rl;
       transform: rotate(180deg);
       flex-shrink: 0;
@@ -38,18 +57,19 @@
     }
     .main-rq blockquote {
       flex: 1;
-      padding: 0 36px;
+      padding: 0 var(--sp-6);
       display: flex;
       align-items: center;
+      margin: 0;
     }
     .main-rq blockquote p {
       font-family: var(--display);
       font-style: italic;
-      font-size: 30px;
-      line-height: 1.25;
+      font-size: var(--fs-h3);
+      line-height: var(--lh-tight);
+      letter-spacing: var(--ls-headline);
       color: var(--ink);
       margin: 0;
-      letter-spacing: -0.005em;
     }
     .main-rq blockquote p em { color: var(--accent); font-style: italic; }
     .main-rq blockquote p .ins {
@@ -57,29 +77,26 @@
       padding: 0 4px;
       font-style: italic;
     }
-    .main-rq blockquote { margin: 0; }
 
-.branches {
-      position: absolute;
-      top: 380px;
-      left: 96px;
-      right: 96px;
-      height: 440px;
+    /* ── Section 2 · branches grid ──────────────────────────── */
+    .branches {
+      flex: 0 0 auto;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: var(--sp-5);
+      align-items: start;
     }
+
     .branch {
       background: var(--paper);
       border: 1px solid var(--rule);
-      padding: 22px 26px 20px;
+      padding: var(--sp-5);
       display: flex;
       flex-direction: column;
+      gap: var(--sp-3);
       position: relative;
-    }
-    
-    .branch .keyq-block {
-      margin-top: auto;
+      box-shadow: var(--shadow-card-rest);
+      border-radius: var(--radius-md);
     }
     .branch.b1 { border-top: 4px solid var(--teal);   }
     .branch.b2 { border-top: 4px solid var(--accent); }
@@ -87,13 +104,13 @@
 
     .branch-num {
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.24em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--ink-soft);
-      margin: 0 0 6px;
+      margin: 0;
     }
-    .branch-num .num { color: var(--accent); font-weight: 600; }
+    .branch-num .num { font-weight: var(--fw-semibold); }
     .branch.b1 .branch-num .num { color: var(--teal);   }
     .branch.b2 .branch-num .num { color: var(--accent); }
     .branch.b3 .branch-num .num { color: var(--ochre);  }
@@ -101,12 +118,12 @@
     .branch h2 {
       font-family: var(--display);
       font-style: italic;
-      font-weight: 500;
-      font-size: 26px;
-      line-height: 1;
-      letter-spacing: -0.01em;
+      font-weight: var(--fw-medium);
+      font-size: var(--fs-h3);
+      line-height: var(--lh-headline);
+      letter-spacing: var(--ls-headline);
       color: var(--ink);
-      margin: 0 0 4px;
+      margin: 0;
     }
     .branch h2 em { font-style: italic; }
     .branch.b1 h2 em { color: var(--teal);   }
@@ -115,92 +132,93 @@
 
     .branch .layer {
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.18em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--ink-soft);
-      margin: 0 0 14px;
+      margin: 0;
     }
-    .branch .layer strong { color: var(--ink); font-weight: 600; }
+    .branch .layer strong { color: var(--ink); font-weight: var(--fw-semibold); }
 
     .branch .rq {
       font-family: var(--body);
-      font-size: 12.5px;
-      line-height: 1.5;
+      font-size: var(--fs-caption);
+      line-height: var(--lh-body);
       color: var(--ink);
-      margin: 0 0 16px;
-      padding: 12px 14px;
+      margin: 0;
+      padding: var(--sp-3);
       background: var(--bg);
       border-left: 3px solid var(--rule);
     }
     .branch.b1 .rq { border-left-color: var(--teal);   }
     .branch.b2 .rq { border-left-color: var(--accent); }
     .branch.b3 .rq { border-left-color: var(--ochre);  }
-    .branch .rq strong { color: var(--ink); font-weight: 600; }
+    .branch .rq strong { color: var(--ink); font-weight: var(--fw-semibold); }
     .branch .rq em { font-style: italic; color: var(--accent); }
 
-    .branch .keyq-head {
+    .keyq-head {
       font-family: var(--mono);
-      font-size: 9.5px;
-      letter-spacing: 0.18em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--accent);
-      margin: 0 0 10px;
-      padding-bottom: 8px;
+      font-weight: var(--fw-semibold);
+      margin: 0 0 var(--sp-2);
+      padding-bottom: var(--sp-2);
       border-bottom: 1px dashed var(--rule);
     }
     .branch.b1 .keyq-head { color: var(--teal);   }
-    .branch.b2 .keyq-head { color: var(--accent); }
     .branch.b3 .keyq-head { color: var(--ochre);  }
 
-    .branch .keyq-list {
+    .keyq-list {
       list-style: none;
       margin: 0;
       padding: 0;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: var(--sp-2);
     }
-    .branch .keyq-list li {
+    .keyq-list li {
       font-family: var(--body);
-      font-size: 11px;
-      line-height: 1.4;
+      font-size: var(--fs-caption);
+      line-height: var(--lh-body);
       color: var(--ink);
-      padding-left: 18px;
+      padding-left: 22px;
       position: relative;
     }
-    .branch .keyq-list li::before {
+    .keyq-list li::before {
       content: "?";
       position: absolute;
-      left: 0; top: 0;
+      left: 0;
+      top: 0;
       font-family: var(--display);
       font-style: italic;
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 1.2;
+      font-size: var(--fs-h3);
+      font-weight: var(--fw-semibold);
+      line-height: 1;
     }
     .branch.b1 .keyq-list li::before { color: var(--teal);   }
     .branch.b2 .keyq-list li::before { color: var(--accent); }
     .branch.b3 .keyq-list li::before { color: var(--ochre);  }
 
-.branch .status {
-      margin-top: 14px;
-      padding-top: 10px;
+    .branch .status {
+      margin-top: var(--sp-3);
+      padding-top: var(--sp-3);
       border-top: 1px solid var(--rule);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: var(--sp-3);
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.16em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--ink-soft);
     }
     .branch .status .pill {
       padding: 3px 10px;
       border: 1px solid currentColor;
-      font-weight: 600;
-      letter-spacing: 0.12em;
+      border-radius: var(--radius-sm);
+      font-weight: var(--fw-semibold);
     }
     .branch .status .pill.done {
       background: var(--sage);
@@ -223,121 +241,120 @@
       letter-spacing: 0;
       color: var(--ink);
       text-transform: none;
-      font-size: 12px;
+      font-size: var(--fs-caption);
     }
 
-.meta {
-      position: absolute;
-      top: 830px;
-      left: 96px;
-      right: 96px;
-      height: 160px;
+    /* ── Section 3 · CAS band ─────────────────────────────────
+       Two-column layout:
+         Left  · cas-title   narrative explainer (label + headline + sub)
+         Right · cas-cards   grid of 4 equal-width .panel cards:
+                  is-trait b1/b2/b3 + is-meta-q
+       — */
+    .cas-band {
+      flex: 0 0 auto;
       display: grid;
-      grid-template-columns: 280px 1fr 320px;
-      gap: 32px;
+      grid-template-columns: 280px 1fr;
+      gap: var(--sp-6);
       align-items: stretch;
+      min-height: 160px;
     }
-    .meta-title {
+
+    .cas-title {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 4px;
-      padding: 8px 0;
+      gap: var(--sp-1);
+      padding: var(--sp-2) var(--sp-5) var(--sp-2) 0;
       border-right: 1px solid var(--rule);
-      padding-right: 24px;
     }
-    .meta-title .lab {
+    .cas-title .lab {
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.24em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--accent);
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
     }
-    .meta-title h3 {
+    .cas-title h3 {
       font-family: var(--display);
       font-style: italic;
-      font-size: 28px;
-      line-height: 1.1;
+      font-size: var(--fs-h3);
+      line-height: var(--lh-headline);
       color: var(--ink);
       margin: 0;
-      font-weight: 500;
+      font-weight: var(--fw-medium);
     }
-    .meta-title h3 em { color: var(--accent); }
-    .meta-title p {
+    .cas-title h3 em { color: var(--accent); }
+    .cas-title p {
       font-family: var(--body);
-      font-size: 11.5px;
-      line-height: 1.4;
+      font-size: var(--fs-caption);
+      line-height: var(--lh-body);
       color: var(--ink-soft);
-      margin: 4px 0 0;
+      margin: var(--sp-1) 0 0;
     }
 
-    .meta-traits {
+    .cas-cards {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--sp-4);
       align-items: stretch;
     }
-    .trait {
-      background: var(--paper);
-      border: 1px solid var(--rule);
-      border-top: 3px solid var(--ink);
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .trait .name {
-      font-family: var(--display);
-      font-style: italic;
-      font-size: 22px;
-      line-height: 1;
-      color: var(--ink);
-      margin: 0;
-      font-weight: 500;
-    }
-    .trait .glyph {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--ink-soft);
-    }
-    .trait .body {
-      font-family: var(--body);
-      font-size: 11.5px;
-      line-height: 1.4;
-      color: var(--ink-soft);
-      margin: 0;
-    }
-    .trait .body strong { color: var(--ink); font-weight: 600; }
 
-.meta-question {
-      background: rgba(139, 39, 39, 0.06);
-      border: 1px dashed var(--accent);
-      padding: 16px 18px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 6px;
+    /* Variant overrides for CAS-trait colour stripes */
+    .panel.is-trait.is-b1 { border-top-color: var(--teal);   }
+    .panel.is-trait.is-b2 { border-top-color: var(--accent); }
+    .panel.is-trait.is-b3 { border-top-color: var(--ochre);  }
+
+    /* Open-question card — sage dashed top, the only colour token not
+       used by the three trait cards (teal / accent / ochre). */
+    .cas-cards .panel.is-meta-q {
+      border-top: 3px dashed var(--sage);
     }
-    .meta-question .lab {
+    .cas-cards .panel.is-meta-q .lab {
+      color: var(--sage);
+    }
+
+    /* Inner slots used by both is-meta-q and is-trait */
+    .cas-cards .panel .lab {
       font-family: var(--mono);
-      font-size: 9.5px;
-      letter-spacing: 0.22em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--accent);
-      font-weight: 600;
-    }
-    .meta-question p {
-      font-family: var(--display);
-      font-style: italic;
-      font-size: 16px;
-      line-height: 1.3;
-      color: var(--ink);
+      font-weight: var(--fw-semibold);
       margin: 0;
     }
-    .meta-question p em { color: var(--accent); font-style: italic; font-weight: 500; }
+    .cas-cards .panel.is-trait.is-b1 .lab { color: var(--teal);   }
+    .cas-cards .panel.is-trait.is-b3 .lab { color: var(--ochre);  }
+
+    .cas-cards .panel .name {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: var(--fs-card);
+      line-height: var(--lh-tight);
+      letter-spacing: var(--ls-headline);
+      color: var(--ink);
+      margin: 0;
+      font-weight: var(--fw-medium);
+    }
+    .cas-cards .panel .name em { color: var(--accent); font-style: italic; }
+
+    .cas-cards .panel .body-text {
+      font-family: var(--body);
+      font-size: var(--fs-caption);
+      line-height: var(--lh-body);
+      color: var(--ink-soft);
+      margin: 0;
+    }
+    .cas-cards .panel .body-text strong {
+      color: var(--ink);
+      font-weight: var(--fw-semibold);
+    }
+    .cas-cards .panel .body-text em {
+      color: var(--accent);
+      font-style: italic;
+      font-weight: var(--fw-medium);
+    }
   </style>
 </head>
 <body>
@@ -359,7 +376,9 @@
         </div>
       </header>
 
-<section class="main-rq" aria-label="Main research question">
+      <div class="body-zone">
+
+      <section class="main-rq" aria-label="Main research question">
         <span class="label">main RQ</span>
         <blockquote>
           <p>
@@ -369,9 +388,9 @@
         </blockquote>
       </section>
 
-<section class="branches" aria-label="Three research branches">
+      <section class="branches" aria-label="Three research branches">
 
-<article class="branch b1">
+        <article class="branch b1">
           <p class="branch-num"><span class="num">Branch 01</span> &nbsp;/&nbsp; algorithm adaptation</p>
           <h2><em>Strategy</em> layer.</h2>
           <p class="layer">layer · <strong>strategy</strong> &nbsp;·&nbsp; trait · adaptation</p>
@@ -380,21 +399,19 @@
             an <em>adaptive variable</em>, capable of switching or evolving according to system state —
             rather than being fixed by tool convention (e.g. NSGA-II)?
           </p>
-          <div class="keyq-block">
-            <p class="keyq-head">key questions</p>
-            <ul class="keyq-list">
-              <li>What indicators reflect problem structure mid-run?</li>
-              <li>When should algorithm switching occur?</li>
-              <li>Is switching beneficial in architectural cases?</li>
-            </ul>
-          </div>
+          <p class="keyq-head">key questions</p>
+          <ul class="keyq-list">
+            <li>What indicators reflect problem structure mid-run?</li>
+            <li>When should algorithm switching occur?</li>
+            <li>Is switching beneficial in architectural cases?</li>
+          </ul>
           <div class="status">
             <span class="pill planned">planned</span>
             <span class="ref">Year 2 &nbsp;·&nbsp; thesis ch. 5</span>
           </div>
         </article>
 
-<article class="branch b2">
+        <article class="branch b2">
           <p class="branch-num"><span class="num">Branch 02</span> &nbsp;/&nbsp; surrogate integration</p>
           <h2><em>Cognition</em> layer.</h2>
           <p class="layer">layer · <strong>cognition</strong> &nbsp;·&nbsp; trait · feedback</p>
@@ -403,21 +420,19 @@
             instead of being an offline accelerator, how does it <em>alter the system's perception</em> of the
             problem space — and how should it self-correct against systematic bias?
           </p>
-          <div class="keyq-block">
-            <p class="keyq-head">key questions</p>
-            <ul class="keyq-list">
-              <li>How to balance prediction and true simulation?</li>
-              <li>How to manage and propagate model uncertainty?</li>
-              <li>Does the surrogate change search dynamics?</li>
-            </ul>
-          </div>
+          <p class="keyq-head">key questions</p>
+          <ul class="keyq-list">
+            <li>How to balance prediction and true simulation?</li>
+            <li>How to manage and propagate model uncertainty?</li>
+            <li>Does the surrogate change search dynamics?</li>
+          </ul>
           <div class="status">
-            <span class="pill done">in progress</span>
-            <span class="ref">Year 1 &nbsp;·&nbsp; ch. 3 — see slides 02–06</span>
+            <span class="pill inprog">in progress</span>
+            <span class="ref">Year 1 &nbsp;·&nbsp; ch. 3</span>
           </div>
         </article>
 
-<article class="branch b3">
+        <article class="branch b3">
           <p class="branch-num"><span class="num">Branch 03</span> &nbsp;/&nbsp; emergence &amp; dynamics</p>
           <h2><em>Dynamics</em> layer.</h2>
           <p class="layer">layer · <strong>dynamics</strong> &nbsp;·&nbsp; trait · emergence</p>
@@ -426,14 +441,12 @@
             the structure of the design problem itself — through emergent patterns in Pareto fronts and
             variable-evolution trajectories?
           </p>
-          <div class="keyq-block">
-            <p class="keyq-head">key questions</p>
-            <ul class="keyq-list">
-              <li>Can optimisation reveal hidden problem structure?</li>
-              <li>Do different strategies produce different emergent forms?</li>
-              <li>Are trajectory motifs interpretable as system signatures?</li>
-            </ul>
-          </div>
+          <p class="keyq-head">key questions</p>
+          <ul class="keyq-list">
+            <li>Can optimisation reveal hidden problem structure?</li>
+            <li>Do different strategies produce different emergent forms?</li>
+            <li>Are trajectory motifs interpretable as system signatures?</li>
+          </ul>
           <div class="status">
             <span class="pill planned">planned</span>
             <span class="ref">Year 3 &nbsp;·&nbsp; thesis ch. 6</span>
@@ -442,42 +455,57 @@
 
       </section>
 
-<section class="meta" aria-label="CAS positioning">
+      <section class="cas-band" aria-label="CAS positioning">
 
-        <div class="meta-title">
+        <div class="cas-title">
           <span class="lab">CAS lens</span>
           <h3>Three traits, one <em>open</em> position.</h3>
           <p>The three branches each surface one CAS trait — the framework's vocabulary, not (yet) its formal core.</p>
         </div>
 
-        <div class="meta-traits">
-          <article class="trait" style="border-top-color: var(--teal);">
-            <p class="glyph">trait · branch 01</p>
+        <div class="cas-cards">
+
+          <article class="panel is-trait is-b1">
+            <span class="lab">trait &middot; branch 01</span>
             <p class="name">Adaptation.</p>
-            <p class="body">Algorithms adjust to system state — strategy is <strong>not fixed</strong> at design time.</p>
+            <p class="body-text">
+              Algorithms adjust to system state — strategy is
+              <strong>not fixed</strong> at design time.
+            </p>
           </article>
-          <article class="trait" style="border-top-color: var(--accent);">
-            <p class="glyph">trait · branch 02</p>
+
+          <article class="panel is-trait is-b2">
+            <span class="lab">trait &middot; branch 02</span>
             <p class="name">Feedback.</p>
-            <p class="body">Surrogate &harr; optimiser &harr; environment form a <strong>closed loop</strong>, not a pipeline.</p>
+            <p class="body-text">
+              Surrogate &harr; optimiser &harr; environment form a
+              <strong>closed loop</strong>, not a pipeline.
+            </p>
           </article>
-          <article class="trait" style="border-top-color: var(--ochre);">
-            <p class="glyph">trait · branch 03</p>
+
+          <article class="panel is-trait is-b3">
+            <span class="lab">trait &middot; branch 03</span>
             <p class="name">Emergence.</p>
-            <p class="body">Pareto-front shape and trajectory motifs are <strong>not designed</strong> — they appear.</p>
+            <p class="body-text">
+              Pareto-front shape and trajectory motifs are
+              <strong>not designed</strong> — they appear.
+            </p>
           </article>
+
+          <article class="panel is-meta-q">
+            <span class="lab">open question</span>
+            <p class="name">CAS positioning &middot; <em>Position B</em></p>
+            <p class="body-text">
+              Working position — CAS as <em>interpretive lens</em>.
+              Decision deferred to mid-Year 2.
+            </p>
+          </article>
+
         </div>
 
-        <aside class="meta-question">
-          <span class="lab">open positioning</span>
-          <p>
-            Should CAS serve as the <em>theoretical core</em> of this thesis, or as an
-            <em>interpretative lens</em> for analysing optimisation behaviour?
-            The choice determines whether the contribution is paradigm-, system-, or algorithm-level.
-          </p>
-        </aside>
-
       </section>
+
+      </div><!-- /.body-zone -->
 
       <footer class="slide-footer">
         <span><span class="ref">Chapter 2</span> &nbsp;·&nbsp; framework overview</span>

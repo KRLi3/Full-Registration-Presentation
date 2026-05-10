@@ -188,3 +188,40 @@ html, body {
   text-transform: none;
   color: #faf7ee;
 }
+
+/* ============================================================
+   Zoom badge — appears bottom-left when slide user-zoom > 100%.
+   ============================================================ */
+#deck-zoom-badge {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 30;
+  background: rgba(26, 41, 66, 0.92);
+  color: #faf7ee;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  padding: 8px 14px;
+  border-radius: 4px;
+  box-shadow: 0 8px 20px -10px rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.18s, transform 0.18s;
+  pointer-events: none;
+}
+#deck-zoom-badge.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+#deck-zoom-badge .z {
+  color: #b07d2c;
+  font-weight: 600;
+}
+#deck-zoom-badge kbd {
+  background: rgba(250, 247, 238, 0.12);
+  padding: 1px 6px;
+  border-radius: 2px;
+  margin: 0 2px;
+  color: #faf7ee;
+}

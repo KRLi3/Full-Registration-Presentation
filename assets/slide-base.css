@@ -7,7 +7,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Paper / ink palette */
+  /* ============================================================
+     COLOR — paper / ink palette
+     ============================================================ */
   --bg:        #f3efe5;
   --paper:     #faf7ee;
   --ink:       #1a2942;
@@ -15,11 +17,11 @@
   --rule:      #c7bfa9;
   --rule-soft: #d9d0b8;
 
-  /* Accents (used semantically, not decoratively) */
-  --accent: #8b2727;   /* burgundy — burgundy = "online" / emphasis  */
+  /* Accents — used semantically, not decoratively */
+  --accent: #8b2727;   /* burgundy — "online" / emphasis / current */
   --ochre:  #b07d2c;   /* ochre    — iteration / loop / second voice */
-  --sage:   #5e7458;   /* sage     — outcome / output                */
-  --teal:   #2f5d6e;   /* teal     — model / surrogate               */
+  --sage:   #5e7458;   /* sage     — outcome / output */
+  --teal:   #2f5d6e;   /* teal     — model / surrogate */
 
   /* Node fills (flowchart palette) */
   --node-process:  #faf7ee;
@@ -28,10 +30,74 @@
   --node-output:   #e6ece2;
   --node-model:    #dde6e9;
 
-  /* Type stack */
+  /* Card surface aliases */
+  --card-bg:           var(--paper);
+  --card-bg-rejected:  #ede4d2;
+  --card-bg-soft:      rgba(250, 247, 238, 0.6);
+
+  /* ============================================================
+     TYPOGRAPHY — font stacks
+     ============================================================ */
   --display: "Cormorant Garamond", "Times New Roman", serif;
   --body:    "Inter Tight", "Helvetica Neue", sans-serif;
   --mono:    "JetBrains Mono", "SF Mono", "Consolas", monospace;
+
+  /* Font-size scale — semantic, in px on the 1920×1080 canvas.
+     17″ 1080p physical mm benchmarks shown in comments.
+     12px is the floor; nothing in the deck should drop below --fs-micro. */
+  --fs-micro:    12px;   /* corner mark · eyebrow · tag · legend · node label */
+  --fs-caption:  14px;   /* card meta · small body caption */
+  --fs-body:     18px;   /* paragraph · card body */
+  --fs-card:     22px;   /* card emphasis · key data point */
+  --fs-h3:       28px;   /* card headline · sub-section */
+  --fs-h2:       40px;   /* section title · synthesis claim */
+  --fs-h1:       56px;   /* slide title */
+  --fs-display:  84px;   /* title-page only */
+
+  /* Letter-spacing */
+  --ls-display:        -0.02em;
+  --ls-headline:       -0.005em;
+  --ls-body:            0;
+  --ls-mono:            0.04em;   /* mono lower-case body */
+  --ls-mono-eyebrow:    0.18em;   /* mono uppercase eyebrow / tag */
+  --ls-mono-stamp:      0.28em;   /* extreme mono stamp (cover only) */
+
+  /* Line-height */
+  --lh-display:   0.95;
+  --lh-headline:  1.05;
+  --lh-tight:     1.2;
+  --lh-body:      1.45;
+  --lh-loose:     1.6;
+
+  /* Font-weight */
+  --fw-regular:   400;
+  --fw-medium:    500;
+  --fw-semibold:  600;
+  --fw-bold:      700;
+
+  /* ============================================================
+     SPACING — 8-step scale, plus the slide-edge gutter
+     ============================================================ */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  22px;   /* canonical card padding */
+  --sp-6:  32px;
+  --sp-7:  48px;
+  --sp-8:  64px;
+  --sp-gutter: 96px;   /* slide left/right safe-area */
+
+  /* ============================================================
+     RADIUS · SHADOW
+     ============================================================ */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+
+  --shadow-card-rest:  0 1px 0 rgba(26, 41, 66, 0.06),
+                       0 8px 24px -16px rgba(26, 41, 66, 0.18);
+  --shadow-card-hover: 0 14px 32px -14px rgba(26, 41, 66, 0.25);
 }
 
 * { box-sizing: border-box; }
@@ -355,6 +421,76 @@ footer.slide-footer .pageno {
 }
 
 /* ============================================================
+   SLIDE-BODY — sandwich-flow layout region.
+
+   Use it like this in a slide:
+
+     <main class="slide">
+       <span class="corner-mark corner-tl">…</span>
+       <header class="slide-header">…</header>     <!-- pinned top -->
+       <div class="slide-body">                    <!-- middle, flexible -->
+         <section>… premise row …</section>
+         <section>… failures row …</section>
+       </div>
+       <aside class="synthesis">…</aside>          <!-- pinned bottom -->
+       <footer class="slide-footer">…</footer>
+     </main>
+
+   slide-base.js measures the natural heights of slide-header,
+   synthesis, and slide-footer at runtime, then sets the body's
+   top / bottom anchors and per-page gap values via the gap-as-min
+   algorithm. Pages don't need to write absolute top/height numbers.
+
+   .slide-body must contain at least one section. Multiple sections
+   stack vertically with --gap-body between them. The first section
+   uses flex: 0 0 auto (natural height); subsequent sections may
+   override with flex: 1 1 auto if they should absorb slack.
+   ============================================================ */
+.slide-body {
+  position: absolute;
+  left: var(--sp-gutter);
+  right: var(--sp-gutter);
+
+  /* slide-base.js writes top/bottom on us. These are placeholders
+     in case the JS hasn't run yet (e.g. fonts still loading). */
+  top:    270px;
+  bottom: 156px;
+
+  /* Per-page gap variables. JS picks final values per
+     gap-as-min-value algorithm. Pages declare their layouts in
+     terms of these variables, never raw px. */
+  --gap-body: 32px;   /* between sections inside body */
+  --gap-row:  22px;   /* between cards within a section row */
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-body);
+  overflow: visible;
+}
+
+/* When even MIN gap doesn't fit, JS adds this class to make the
+   problem visible instead of silently truncating. */
+.slide-body.is-overflow {
+  outline: 2px dashed var(--accent);
+  outline-offset: 4px;
+}
+.slide-body.is-overflow::after {
+  content: "content overflows · please trim";
+  position: absolute;
+  top: -28px;
+  right: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: var(--accent);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-weight: var(--fw-semibold);
+}
+
+/* ============================================================
    Universal card hover — every paper-card across the deck gets a
    subtle scale + lift on pointer hover. This is purely cosmetic
    feedback. Excluded:
@@ -392,4 +528,361 @@ footer.slide-footer .pageno {
   transform: scale(1.05);
   box-shadow: 0 14px 32px -14px rgba(26, 41, 66, 0.25);
   z-index: 2;
+}
+
+/* ============================================================
+   ATOM SYSTEM — small reusable elements
+   These replace per-slide redefinitions of tag / headline / body
+   text / meta / cite / kpi / chip. Each slide should use these
+   directly; per-slide CSS only overrides where genuinely needed.
+   ============================================================ */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono-eyebrow);
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: var(--fw-semibold);
+  padding: 3px 8px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  align-self: flex-start;
+  white-space: nowrap;
+}
+.tag.is-soft  { color: var(--ink-soft); border-color: var(--rule); }
+.tag.is-ochre { color: var(--ochre); border-color: var(--ochre); }
+.tag.is-sage  { color: var(--sage);  border-color: var(--sage); }
+.tag.is-teal  { color: var(--teal);  border-color: var(--teal); }
+.tag.is-bare  { border: none; padding: 0; }
+
+.headline {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-h3);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-headline);
+  color: var(--ink);
+  margin: 0;
+}
+.headline em { font-style: italic; color: var(--accent); }
+.headline em.is-teal { color: var(--teal); }
+.headline.is-h2     { font-size: var(--fs-h2); }
+.headline.is-card   { font-size: var(--fs-card); }
+
+.body-text {
+  font-family: var(--body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+  margin: 0;
+}
+.body-text.is-soft    { color: var(--ink-soft); }
+.body-text.is-caption { font-size: var(--fs-caption); }
+.body-text strong { font-weight: var(--fw-semibold); }
+.body-text em     { font-style: italic; color: var(--accent); }
+
+.meta {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono);
+  color: var(--ink-soft);
+  margin: 0;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--rule-soft);
+}
+.meta.is-bare {
+  padding-top: 0;
+  border-top: none;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.kpi .kpi-num {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-h2);
+  line-height: var(--lh-tight);
+  color: var(--accent);
+}
+.kpi .kpi-lab {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: var(--fw-semibold);
+}
+.kpi.is-large .kpi-num { font-size: var(--fs-h1); }
+.kpi.is-small .kpi-num { font-size: var(--fs-h3); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  color: var(--ink);
+  background: rgba(176, 125, 44, 0.12);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  letter-spacing: var(--ls-mono);
+  white-space: nowrap;
+}
+.chip strong { color: var(--accent); font-weight: var(--fw-semibold); }
+
+.cite {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono);
+  color: var(--ink-soft);
+  line-height: var(--lh-body);
+  margin: 0;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cite .src { color: var(--ink); font-weight: var(--fw-semibold); }
+.cite a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.18s, border-color 0.18s;
+}
+.cite a:hover, .cite a:focus-visible {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  outline: none;
+}
+.cite a.pdf {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ochre);
+  padding: 0 2px;
+  margin-left: 2px;
+}
+.cite a.pdf:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ============================================================
+   PANEL SYSTEM — the unified container.
+   Replaces .axis-card / .premise-card / .reg-card / .acq-card /
+   .alg-card / .knob-col / .year-card / .demo-card / .branch /
+   .trait / .cluster / .lineage-card / .meta-question.
+
+   USE: <article class="panel is-axis"> ...content... </article>
+
+   Per-slide CSS may override padding / gap / border on
+   .panel.is-X for that slide's layout — but font-size,
+   colour and basic chrome come from here.
+
+   NOTE: page 06 currently uses .panel for its diptych at 2× zoom.
+   That class will be renamed to .diptych-panel in step [4].
+   ============================================================ */
+
+.panel {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: var(--sp-5);
+  box-shadow: var(--shadow-card-rest);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  position: relative;
+  transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.2, 1),
+              box-shadow 0.22s ease;
+}
+.panel:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  z-index: 2;
+}
+
+/* — Generic state modifiers — */
+.panel.is-accent     { border-top: 3px solid var(--accent); }
+.panel.is-accent-l   { border-left: 3px solid var(--accent); }
+.panel.is-rejected   { background: var(--card-bg-rejected); opacity: 0.85; }
+.panel.is-current    { border: 2px solid var(--accent); padding: calc(var(--sp-5) - 1px); }
+.panel.is-soft       { background: var(--card-bg-soft); border-style: dashed; }
+.panel.is-bare {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+.panel.is-bare:hover { transform: none; box-shadow: none; }
+
+/* — Per-slide semantic variants —
+   Each carries the per-slide colour signature. Padding & gap are
+   the playground defaults; per-slide CSS may override. */
+.panel.is-axis    { border-top: 3px solid var(--accent); }
+.panel.is-premise { /* premise sets accent on left/right via .is-left/.is-right */ }
+.panel.is-premise.is-left  { border-left:  3px solid var(--teal); }
+.panel.is-premise.is-right { border-right: 3px solid var(--accent); }
+.panel.is-reg     { border-top: 3px solid var(--teal); }
+.panel.is-acq     { border-top: 3px solid var(--ochre); }
+.panel.is-alg     { border-top: 3px solid var(--sage); }
+.panel.is-knob    { border-top: 3px solid var(--accent); }
+.panel.is-year    { border-top: 3px solid var(--ochre); }
+.panel.is-demo    { border-top: 3px solid var(--accent); }
+.panel.is-branch  { border-top: 3px solid var(--teal); }
+.panel.is-trait   { border-top: 3px solid var(--ochre); }
+.panel.is-cluster { border-top: 3px solid var(--ochre); border-style: dashed; border-width: 1px; }
+.panel.is-cluster.is-accent { border-top-style: solid; border-top-width: 3px; }
+.panel.is-lineage { border-left: 3px solid var(--ochre); border-top: 1px solid var(--rule); }
+.panel.is-meta-q  { border-top: 3px solid var(--ochre); border-style: dashed; }
+
+/* ============================================================
+   BAND SYSTEM — horizontal banners (claim bars, thesis bars).
+   .band.is-claim    has accent left rule (replaces ad-hoc .synthesis
+                     reuse outside the standard footer slot)
+   .band.is-banner   paper-tone soft container for thesis statements
+   ============================================================ */
+
+.band {
+  padding: var(--sp-4) 0 var(--sp-4) var(--sp-5);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+}
+.band.is-claim {
+  border-left: 3px solid var(--accent);
+}
+.band.is-claim .band-label {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono-eyebrow);
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: var(--fw-semibold);
+  flex-shrink: 0;
+}
+.band.is-claim .band-text {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: var(--fs-h3);
+  line-height: var(--lh-tight);
+  color: var(--ink);
+  margin: 0;
+}
+.band.is-claim .band-text em { color: var(--accent); }
+.band.is-claim .band-text .ins {
+  background: rgba(176, 125, 44, 0.18);
+  padding: 0 4px;
+}
+.band.is-banner {
+  background: var(--card-bg-soft);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: var(--sp-5) var(--sp-6);
+}
+.band.is-banner .band-vlabel {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono-eyebrow);
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: var(--fw-semibold);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  flex-shrink: 0;
+  padding: 0 var(--sp-2);
+  border-right: 1px solid var(--rule);
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================================
+   PRINT — A3 landscape (420 × 297 mm), one slide per page.
+   Browser print dialog must have:
+     - Paper size: A3
+     - Orientation: Landscape
+     - Margins: None  (or "Custom" with all margins = 0)
+     - Background graphics: ENABLED  (otherwise paper tone & accents drop)
+   ============================================================ */
+@media print {
+  @page {
+    size: A3 landscape;
+    margin: 0;
+  }
+
+  /* Force colour fidelity — without this Chromium / Safari strip
+     non-text background and colour fills to save toner. */
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html, body {
+    background: var(--bg);
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Override slide-base.js's runtime scale transform — print at 1:1 then
+     let the browser fit-to-page. No on-screen chrome. */
+  body {
+    display: block;
+    place-items: unset;
+    min-height: auto;
+    padding: 0;
+  }
+
+  .stage {
+    width: 1920px;
+    height: 1080px;
+    transform: none !important;
+    page-break-after: avoid;
+  }
+
+  .slide {
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  /* Hide on-screen-only chrome */
+  #deck-loading,
+  #deck-hud,
+  #deck-overview,
+  #deck-zoom-badge {
+    display: none !important;
+  }
+
+  /* If printing the parent deck index.html, force the iframe to fill the page */
+  #slide-frame {
+    position: static !important;
+    width: 1920px !important;
+    height: 1080px !important;
+    border: none !important;
+    page-break-inside: avoid;
+  }
+
+  /* Universal-card hover transitions paused for print */
+  .panel,
+  .panel:hover,
+  .axis-card, .premise-card, .reg-card, .acq-card, .var-card, .knob-col,
+  .alg-card, .year-card, .demo-card, .cluster, .branch, .trait,
+  .axis-card:hover, .premise-card:hover, .reg-card:hover, .acq-card:hover,
+  .var-card:hover, .knob-col:hover, .alg-card:hover, .year-card:hover,
+  .demo-card:hover, .cluster:hover, .branch:hover, .trait:hover,
+  .diptych-panel, .diptych-panel:hover {
+    transform: none !important;
+    box-shadow: 0 0 0 1px rgba(26, 41, 66, 0.05) !important;
+    transition: none !important;
+  }
 }

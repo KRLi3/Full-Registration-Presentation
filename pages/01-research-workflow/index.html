@@ -7,152 +7,32 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/slide-base.css">
   <style>
-    :root {
-      --bg: #f3efe5;
-      --paper: #faf7ee;
-      --ink: #1a2942;
-      --ink-soft: #44546c;
-      --rule: #c7bfa9;
-      --rule-soft: #d9d0b8;
-      --accent: #8b2727;
-      --ochre: #b07d2c;
-      --sage: #5e7458;
-      --teal: #2f5d6e;
+    /* ============================================================
+       research-workflow — uses slide-base.css for chrome (root tokens,
+       .stage / .slide / .corner-mark / header / .eyebrow / h1 /
+       .subtitle / footer). Page-local CSS only adds:
+         · the SVG flowchart styles
+         · the mode-bar / notes interactive controls
+         · the legend variant used by this slide
+       ============================================================ */
 
-      --display: "Cormorant Garamond", "Times New Roman", serif;
-      --body: "Inter Tight", "Helvetica Neue", sans-serif;
-      --mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
-    }
-
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0; padding: 0;
-      background: #d9d2c1;
-      color: var(--ink);
-      font-family: var(--body);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    body {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px 18px;
-    }
-
-.stage {
-      width: 1920px;
-      height: 1080px;
-      transform-origin: center center;
-      position: relative;
-    }
-
-    .slide {
-      width: 1920px;
-      height: 1080px;
-      background: var(--bg);
-      position: relative;
-      overflow: hidden;
-      box-shadow:
-        0 1px 0 rgba(26, 41, 66, 0.06),
-        0 30px 80px -30px rgba(26, 41, 66, 0.25);
-    }
-
-    .slide::before {
-      content: "";
-      position: absolute; inset: 0;
-      background-image:
-        radial-gradient(rgba(26, 41, 66, 0.04) 1px, transparent 1px),
-        radial-gradient(rgba(176, 125, 44, 0.03) 1px, transparent 1px);
-      background-size: 40px 40px, 73px 73px;
-      background-position: 0 0, 12px 18px;
-      pointer-events: none;
-      mix-blend-mode: multiply;
-    }
-
-    .slide::after {
-      content: "";
-      position: absolute; inset: 0;
-      background:
-        linear-gradient(180deg, transparent 0, transparent 92%, rgba(26, 41, 66, 0.04) 100%),
-        linear-gradient(0deg, transparent 0, transparent 92%, rgba(26, 41, 66, 0.04) 100%);
-      pointer-events: none;
-    }
-
-.corner-mark {
-      position: absolute;
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 0.1em;
-      color: var(--ink-soft);
-      top: 28px;
-    }
-    .corner-tl { left: 96px; }
-    .corner-tr { right: 96px; text-align: right; }
-
-    header {
-      position: absolute;
-      top: 64px;
-      left: 96px;
-      right: 96px;
-      display: grid;
+    /* Header on this slide uses a 2-col grid (text + legend) instead of
+       base's default 1fr 360px. Keep base typography, override layout. */
+    header.slide-header {
       grid-template-columns: 1fr 220px;
-      gap: 64px;
-      align-items: end;
-    }
-
-    .eyebrow {
-      font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin: 0 0 12px;
-      display: flex;
-      gap: 14px;
-      align-items: center;
-    }
-    .eyebrow::before {
-      content: "";
-      width: 32px; height: 1px;
-      background: var(--accent);
-    }
-
-    h1 {
-      font-family: var(--display);
-      font-weight: 500;
-      font-size: 56px;
-      line-height: 1.02;
-      letter-spacing: -0.01em;
-      margin: 0;
-      color: var(--ink);
-    }
-    h1 em {
-      font-style: italic;
-      color: var(--accent);
-      font-weight: 500;
-    }
-
-    .subtitle {
-      margin: 14px 0 0;
-      font-size: 16px;
-      line-height: 1.45;
-      color: var(--ink-soft);
-      max-width: 1180px;
     }
 
     .legend {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: var(--sp-2);
       font-family: var(--mono);
-      font-size: 10.5px;
-      letter-spacing: 0.06em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono);
       color: var(--ink-soft);
-      padding: 14px 18px;
+      padding: var(--sp-3) var(--sp-4);
       border: 1px solid var(--rule);
       background: var(--paper);
       align-self: end;
@@ -160,7 +40,7 @@
     .legend-row {
       display: grid;
       grid-template-columns: 36px 1fr;
-      gap: 14px;
+      gap: var(--sp-3);
       align-items: center;
       white-space: nowrap;
     }
@@ -185,8 +65,8 @@
     .legend-row.online .arrow { background: transparent; border-top: 1.6px dashed currentColor; }
     .legend-row .lbl {
       font-family: var(--mono);
-      font-size: 10.5px;
-      letter-spacing: 0.06em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono);
       color: var(--ink-soft);
       text-transform: uppercase;
     }
@@ -210,23 +90,23 @@
 
     .mode-bar-label {
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.2em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--ink-soft);
-      margin-right: 6px;
+      margin-right: var(--sp-1);
     }
 
     .mode-btn {
       height: 40px;
-      padding: 0 22px;
+      padding: 0 var(--sp-5);
       background: var(--paper);
       border: 1px solid var(--rule);
       border-top: 3px solid var(--rule);
       cursor: pointer;
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.2em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       line-height: 1;
       color: var(--ink-soft);
@@ -256,12 +136,16 @@
       border-top-color: var(--ochre);
     }
 
-.diagram {
+    /* SVG container — sits below control-row, ends just above the
+       footer rule. 340 → 1024 = 684 px tall, matches VIEW_H exactly so
+       1 logical unit = 1 physical pixel (with viewBox preserveAspectRatio
+       meet, the SVG glyphs render at their authored size). */
+    .diagram {
       position: absolute;
       top: 340px;
-      left: 96px;
-      right: 96px;
-      bottom: 100px;
+      left: var(--sp-gutter);
+      right: var(--sp-gutter);
+      bottom: 56px;
     }
 
     svg {
@@ -286,34 +170,34 @@
     .node-title {
       fill: var(--ink);
       font-family: var(--body);
-      font-size: 13.5px;
-      font-weight: 600;
+      font-size: var(--fs-caption);   /* 14 (was 13.5) */
+      font-weight: var(--fw-semibold);
       letter-spacing: -0.005em;
       text-anchor: start;
     }
     .node-sub {
       fill: var(--ink-soft);
       font-family: var(--mono);
-      font-size: 10.5px;
-      letter-spacing: 0.02em;
+      font-size: var(--fs-micro);     /* 12 (was 10.5) */
+      letter-spacing: var(--ls-mono);
       text-anchor: start;
     }
     .node-tag {
       fill: var(--ink-soft);
       font-family: var(--mono);
-      font-size: 9.5px;
-      letter-spacing: 0.22em;
+      font-size: var(--fs-micro);     /* 12 (was 9.5) */
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
-      font-weight: 500;
+      font-weight: var(--fw-medium);
       text-anchor: start;
     }
     .node-typetag {
       fill: var(--ink-soft);
       font-family: var(--mono);
-      font-size: 9px;
-      letter-spacing: 0.22em;
+      font-size: var(--fs-micro);     /* 12 (was 9) */
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
-      font-weight: 500;
+      font-weight: var(--fw-medium);
       text-anchor: end;
       opacity: 0.7;
     }
@@ -345,22 +229,22 @@
     .edge-label {
       fill: var(--ink-soft);
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.06em;
+      font-size: var(--fs-micro);     /* 12 (was 10) */
+      letter-spacing: var(--ls-mono);
       text-anchor: middle;
     }
     .edge-label.online {
       fill: var(--accent);
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
     }
 
     .phase-rule { stroke: var(--rule-soft); stroke-width: 1; stroke-dasharray: 1 5; }
     .phase-label {
       fill: var(--accent);
       font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.22em;
+      font-size: var(--fs-micro);     /* 12 (was 10) */
+      font-weight: var(--fw-semibold);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-anchor: start;
       text-transform: uppercase;
     }
@@ -369,8 +253,8 @@
       font-family: var(--display);
       font-style: italic;
       font-size: 22px;
-      font-weight: 500;
-      letter-spacing: -0.01em;
+      font-weight: var(--fw-medium);
+      letter-spacing: var(--ls-headline);
       text-anchor: start;
     }
 
@@ -400,47 +284,31 @@
       display: none;
     }
 
-footer {
-      position: absolute;
-      bottom: 36px;
-      left: 96px;
-      right: 96px;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      color: var(--ink-soft);
-      border-top: 1px solid var(--rule-soft);
-      padding-top: 14px;
-    }
-    footer .ref { color: var(--ink); font-weight: 600; }
-    footer .pageno { font-family: var(--display); font-style: italic; font-size: 18px; color: var(--ink); }
+    /* footer / .corner-mark / header chrome inherit from slide-base.css */
 
 .notes {
       flex: 1 1 auto;
       min-width: 0;
       min-height: 40px;
-      padding: 4px 0 4px 16px;
+      padding: 4px 0 4px var(--sp-4);
       border-left: 2px solid var(--ochre);
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: var(--sp-4);
     }
     .notes .key {
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: var(--fs-micro);
       color: var(--ochre);
-      letter-spacing: 0.22em;
-      font-weight: 600;
+      letter-spacing: var(--ls-mono-eyebrow);
+      font-weight: var(--fw-semibold);
       text-transform: uppercase;
       flex-shrink: 0;
     }
     .notes p {
       margin: 0;
-      font-size: 12.5px;
-      line-height: 1.4;
+      font-size: var(--fs-caption);
+      line-height: var(--lh-body);
       color: var(--ink-soft);
     }
     .notes-content { display: none; }
@@ -448,8 +316,6 @@ footer {
     .stage[data-mode="offline"] .notes-content[data-for="offline"] { display: contents; }
     .stage[data-mode="online"]  .notes-content[data-for="online"]  { display: contents; }
   </style>
-  <script src="../../assets/glossary-tooltips.js"></script>
-  <script src="../../assets/slide-bridge.js"></script>
 </head>
 <body>
   <div class="stage" id="stage" data-mode="pure">
@@ -457,10 +323,10 @@ footer {
       <span class="corner-mark corner-tl">RESEARCH WORKFLOW</span>
       <span class="corner-mark corner-tr">CHAPTER 3 &nbsp;·&nbsp; METHODOLOGY</span>
 
-      <header>
+      <header class="slide-header">
         <div>
           <p class="eyebrow">Methodology &nbsp;·&nbsp; surrogate-assisted multi-objective optimisation</p>
-          <h1>The research <em>workflow</em>, end&nbsp;to&nbsp;end.</h1>
+          <h1 class="slide-title">The research <em>workflow</em>, end&nbsp;to&nbsp;end.</h1>
           <p class="subtitle">From problem definition through statistical reporting — the procedural map every experiment in this thesis follows. Pick a regime to see the active flow; greyed-out nodes are skipped in that mode.</p>
         </div>
 
@@ -496,7 +362,7 @@ footer {
       </div>
 
       <section class="diagram" aria-label="Research workflow flowchart">
-        <svg id="flowchart" viewBox="0 0 1728 600" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="diagram-title">
+        <svg id="flowchart" viewBox="0 0 1728 684" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="diagram-title">
           <title id="diagram-title">End-to-end research workflow (mode-aware)</title>
 
           <defs>
@@ -519,7 +385,7 @@ footer {
         </svg>
       </section>
 
-      <footer>
+      <footer class="slide-footer">
         <span><span class="ref">Chapter 3</span> &nbsp;·&nbsp; methodology</span>
         <span class="pageno">— 04 —</span>
       </footer>
@@ -529,45 +395,57 @@ footer {
   <script>
     'use strict';
 
-const VIEW_W = 1728;
-    const VIEW_H = 600;
+/* SVG logical viewBox.
+       Width 1908 = 6 phases × 270 + 5 gaps × 40 (with phase 4 = 370).
+       Height 684 ≈ stage 1080 − header 226 − head/control gap 24
+                    − control-row 60 − control/svg gap 10 − footer 56. */
+    const VIEW_W = 1908;
+    const VIEW_H = 684;
 
     const PHASES = [
-      { id: 1, label: 'PHASE 01', name: 'Problem',      x:    0, width: 240 },
-      { id: 2, label: 'PHASE 02', name: 'Sampling',     x:  280, width: 240, modes: ['offline', 'online'] },
-      { id: 3, label: 'PHASE 03', name: 'Surrogate',    x:  560, width: 240, modes: ['offline', 'online'] },
-      { id: 4, label: 'PHASE 04', name: 'Optimisation', x:  840, width: 340 },
-      { id: 5, label: 'PHASE 05', name: 'Validation',   x: 1220, width: 240 },
-      { id: 6, label: 'PHASE 06', name: 'Reporting',    x: 1500, width: 228 },
+      { id: 1, label: 'PHASE 01', name: 'Problem',      x:    0, width: 270 },
+      { id: 2, label: 'PHASE 02', name: 'Sampling',     x:  310, width: 270, modes: ['offline', 'online'] },
+      { id: 3, label: 'PHASE 03', name: 'Surrogate',    x:  620, width: 270, modes: ['offline', 'online'] },
+      { id: 4, label: 'PHASE 04', name: 'Optimisation', x:  930, width: 370 },
+      { id: 5, label: 'PHASE 05', name: 'Validation',   x: 1340, width: 270 },
+      { id: 6, label: 'PHASE 06', name: 'Reporting',    x: 1650, width: 258 },
     ];
 
-const ROW_Y_BY_PHASE = {
-      1: { 0:  90, 1: 220, 4: 410 },
-      2: { 0:  90, 1: 220, 4: 410 },
-      3: { 0:  90, 1: 220, 4: 410 },
-      5: { 0:  90, 1: 220, 4: 410 },
-      6: { 0:  90, 1: 220, 4: 410 },
-    };
-    const ROW_Y_PHASE4 = {
-      online:  { 0:  90, 1: 220, 2: 360, 3: 480 },
-      offline: { 0:  90, 1: 220, 4: 410 },
-      pure:    { 0:  90, 1: 220, 4: 410 },
-    };
+    /* Equal-split row layout. The SVG body is ALWAYS divided into 4
+       equal slots (rows 0..3) regardless of mode. Modes differ only
+       in which slots have nodes:
+         pure / offline → row 3 is empty (no Phase-4 D, all phase-bottom
+                          nodes named C sit at row 2)
+         online        → row 3 has Phase-4 D; row 2 holds the C tier
+                          including the infill module 04C
+       A fixed top strip is reserved for the PHASE header band. */
+    /* Top reserved strip for PHASE labels. */
+    const HEADER_BAND = 70;
+    const ROW_GAP = 18;
+
+    /* Strict 4-equal-rows layout regardless of mode.
+       slot = (VIEW_H − HEADER_BAND − 3 × ROW_GAP) / 4
+       Each row's slot has the same height; node height = slot.
+       Content (title + subs) rendered top-anchored inside the slot
+       (short content leaves blank space at the bottom of its node). */
+    function slotHeight() {
+      return (VIEW_H - HEADER_BAND - 3 * ROW_GAP) / 4;
+    }
     function rowY(phase, row, mode) {
-      if (phase === 4) {
-        const schema = ROW_Y_PHASE4[mode] || ROW_Y_PHASE4.online;
-        if (schema[row] !== undefined) return schema[row];
-      }
-      const schema = ROW_Y_BY_PHASE[phase];
-      if (schema && schema[row] !== undefined) return schema[row];
-      return 90 + row * 130;
+      return HEADER_BAND + row * (slotHeight() + ROW_GAP);
     }
 
-    const NODE_W = { 1: 240, 2: 240, 3: 240, 4: 340, 5: 240, 6: 228 };
-    const NODE_H = 70;
-    const DECISION_H = 78;
-    const OUTPUT_H = 78;
-    const TALL_H = 86;
+    const NODE_W = { 1: 270, 2: 270, 3: 270, 4: 370, 5: 270, 6: 258 };
+
+    /* Row indices are physical 0/1/2/3 — same in every mode.
+       Naming convention is row-locked:
+         row 0 = A row     row 1 = B row
+         row 2 = C row     row 3 = D row (phase-4 only, online only)
+       So the "C node" of every phase (01c, 02c, 03c, 05c, 06c) sits
+       at row 2 in every mode. Row 3 is empty except for Phase-4's
+       04D in online mode. Phase 4 also inserts 04C into row 2 in
+       online mode (the infill module). */
+    const BOTTOM_BY_MODE = { pure: 2, offline: 2, online: 2 };
 
     const NODES = [
       { id: '01a', phase: 1, row: 0, kind: 'rect',
@@ -576,7 +454,7 @@ const ROW_Y_BY_PHASE = {
       { id: '01b', phase: 1, row: 1, kind: 'decision',
         title: 'Convention',
         subs: ['A — fixed FE budget', 'B — offline-SBO'] },
-      { id: '01c', phase: 1, row: 4, kind: 'rect',
+      { id: '01c', phase: 1, rowByMode: BOTTOM_BY_MODE, kind: 'rect',
         title: 'Setup',
         subs: ['N seeds · pop · gen · mut', 'infill cadence (online only)'] },
 
@@ -589,7 +467,7 @@ const ROW_Y_BY_PHASE = {
         subs: ['slider evaluator → GH canvas', 'expensive · main thread', 'cost: N₀ × t_sim'],
         accentSub: 2,
         modes: ['offline', 'online'] },
-      { id: '02c', phase: 2, row: 4, kind: 'data',
+      { id: '02c', phase: 2, rowByMode: BOTTOM_BY_MODE, kind: 'data',
         title: 'Initial training set',
         subs: ['(X₀, Y₀) · n×d, n×m', 'samples.json'],
         modes: ['offline', 'online'] },
@@ -602,7 +480,7 @@ const ROW_Y_BY_PHASE = {
         title: 'CV adequate?',
         subs: ['leave-one-out · PRESS', 'τ-cal · R² threshold'],
         modes: ['offline', 'online'] },
-      { id: '03c', phase: 3, row: 4, kind: 'model',
+      { id: '03c', phase: 3, rowByMode: BOTTOM_BY_MODE, kind: 'model',
         title: 'Trained surrogate M₀',
         subs: ['.pkl / .json on disk', 'batch predict ready', 'replaces true sim'],
         tealSub: 2,
@@ -620,7 +498,7 @@ const ROW_Y_BY_PHASE = {
         modes: ['online'],
         hideWhenOff: true },
       { id: '04d', phase: 4,
-        rowByMode: { online: 3, offline: 4, pure: 4 },
+        rowByMode: { online: 3, offline: 2, pure: 2 },
         tagByMode: { online: '04·D', offline: '04·C', pure: '04·C' },
         kind: 'rect',
         title: 'EA advance generation',
@@ -633,7 +511,7 @@ const ROW_Y_BY_PHASE = {
         title: 'Post-hoc verification',
         subs: ['Pareto X → slider eval → Y_true', 'Ŷ vs Y_true · R² · RMSE · MAE', 'surrogate-only modes'],
         modes: ['offline', 'online'] },
-      { id: '05c', phase: 5, row: 4, kind: 'rect',
+      { id: '05c', phase: 5, rowByMode: BOTTOM_BY_MODE, kind: 'rect',
         title: 'Hypervolume + IGD',
         subs: ['per-seed local · global ref', 'HV(P,R), HV(T,R)', 'T/R · P/T ratios', 'IGD vs reference Pareto'] },
 
@@ -643,7 +521,7 @@ const ROW_Y_BY_PHASE = {
       { id: '06b', phase: 6, row: 1, kind: 'output',
         title: 'SeedXX/ artefacts',
         subs: ['pareto · pareto_x', 'convergence · hypervolume', 'population · population_x', 'Setting.txt · Report.txt'] },
-      { id: '06c', phase: 6, row: 4, kind: 'output',
+      { id: '06c', phase: 6, rowByMode: BOTTOM_BY_MODE, kind: 'output',
         title: 'folder/ aggregate',
         subs: ['global Setting / Report.txt', 'reference_pareto.csv', 'paper-ready CSVs'],
         accentSub: 2 },
@@ -731,16 +609,41 @@ const EDGES = [
     function getPhase(id) { return PHASES.find(p => p.id === id); }
     function nodeById(id) { return NODES.find(n => n.id === id); }
 
-    function autoHeight(n) {
-      // Title baseline at y=22; subs from y=40 stepping 14; pad bottom 12.
-      // 2 subs → 80, 3 subs → 94, 4 subs → 108, 5 subs → 122.
-      const mode = (stage && stage.dataset.mode) || 'online';
+    /* Height a node needs given its visible sub list in the current
+       mode: title baseline at y=26, subs from y=46 step 17, pad 14. */
+    function nodeNeededHeight(n, mode) {
       let subs = n.subs || [];
-      if (n.dynamic && DYNAMIC[n.dynamic][mode]) {
+      if (n.dynamic && DYNAMIC[n.dynamic] && DYNAMIC[n.dynamic][mode]) {
         subs = DYNAMIC[n.dynamic][mode].subs;
       }
-      const nSubs = subs.length;
-      return Math.max(NODE_H, 40 + nSubs * 14 + 12);
+      return Math.max(60, 46 + subs.length * 17 + 14);
+    }
+
+    /* Per-row height: take max of (nodeNeededHeight) within row,
+       capped at slotHeight() so 4 rows always fit inside the SVG.
+       All nodes in the same row use the row's height (so cards in
+       a row align vertically). */
+    function computeRowHeights(mode) {
+      const slot = slotHeight();
+      const heights = { 0: 0, 1: 0, 2: 0, 3: 0 };
+      for (const n of NODES) {
+        if (n.modes && !n.modes.includes(mode)) continue;
+        const row = (n.rowByMode && n.rowByMode[mode] !== undefined)
+                    ? n.rowByMode[mode] : n.row;
+        if (row === undefined) continue;
+        const need = nodeNeededHeight(n, mode);
+        heights[row] = Math.max(heights[row], Math.min(need, slot));
+      }
+      return heights;
+    }
+
+    let CURRENT_ROW_HEIGHTS = { 0: 0, 1: 0, 2: 0, 3: 0 };
+
+    function autoHeight(n) {
+      const mode = (stage && stage.dataset.mode) || 'online';
+      const row = (n.rowByMode && n.rowByMode[mode] !== undefined)
+                  ? n.rowByMode[mode] : n.row;
+      return CURRENT_ROW_HEIGHTS[row] || slotHeight();
     }
 
     function nodeRect(n) {
@@ -923,12 +826,12 @@ const EDGES = [
       }
 
       if (kind !== 'rect') {
-        text(g, r.w - 12, 16, KIND_LABEL[kind], 'node-typetag');
+        text(g, r.w - 12, 18, KIND_LABEL[kind], 'node-typetag');
       }
-      text(g, padX, 22, title, 'node-title', { style: titleStyle });
+      text(g, padX, 26, title, 'node-title', { style: titleStyle });
 
-      const subStartY = 40;
-      const subStep = 14;
+      const subStartY = 46;
+      const subStep = 17;
       subs.forEach((s, i) => {
         const subStyle = (i === n.accentSub) ? 'fill: var(--accent); font-weight: 600;'
                        : (i === n.tealSub)   ? 'fill: var(--teal); font-weight: 600;'
@@ -1030,6 +933,9 @@ const EDGES = [
       stage.dataset.mode = mode;
       buttons.forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === mode));
 
+      // Recompute per-row heights for this mode before re-rendering.
+      CURRENT_ROW_HEIGHTS = computeRowHeights(mode);
+
       let css = `
         #flowchart #layer-nodes [data-modes]:not([data-modes~="${mode}"]) {
           opacity: 0.18;
@@ -1073,9 +979,13 @@ const EDGES = [
 
     renderRules();
     renderHeaders();
-    renderNodes();
-    renderEdges();
+    /* applyMode will compute row heights for the chosen mode and call
+       renderNodes / renderEdges with correct geometry. No need to
+       render once before. */
     applyMode('pure');
   </script>
+
+  <script src="../../assets/slide-base.js"></script>
+  <script>SlideBase.fit('stage');</script>
 </body>
 </html>

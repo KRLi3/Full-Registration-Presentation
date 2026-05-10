@@ -6,47 +6,72 @@
   <title>MOO algorithms — four engines, one m-axis</title>
   <link rel="stylesheet" href="../../assets/slide-base.css">
   <style>
+    /* ============================================================
+       05-moo-algorithms — head/body/foot.
+       body holds three sections:
+         · lanes    applicability bars across m
+         · cards    4 alg cards (NSGA-II / NSGA-III / MOEA/D-DE / RVEA)
+         · claim    synthesis
+       Body uses space-between to share leftover Y between sections.
+       ============================================================ */
 
-.lanes-wrap {
+    .body-zone {
       position: absolute;
-      top: 280px;
-      left: 96px;
-      right: 96px;
-      height: 210px;
+      top: 250px;
+      left: var(--sp-gutter);
+      right: var(--sp-gutter);
+      bottom: 86px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .body-zone > .synthesis {
+      position: static;
+      left: auto; right: auto; bottom: auto;
+      flex: 0 0 auto;
+    }
+
+    /* ── Section 1: lanes (caption · SVG bars) ───────────── */
+    .lanes-wrap {
+      flex: 0 0 auto;
       background: var(--paper);
       border: 1px solid var(--rule);
-      padding: 18px 36px 14px;
+      border-radius: var(--radius-md);
+      padding: var(--sp-4) var(--sp-6);
       display: grid;
       grid-template-columns: 220px 1fr;
-      gap: 32px;
+      gap: var(--sp-6);
+      min-height: 220px;
     }
 
     .lanes-caption {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: var(--sp-2);
     }
     .lanes-caption .eb {
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.22em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--accent);
+      font-weight: var(--fw-semibold);
       margin: 0;
     }
     .lanes-caption h2 {
       font-family: var(--display);
       font-style: italic;
-      font-size: 22px;
-      line-height: 1.1;
+      font-size: var(--fs-card);
+      line-height: var(--lh-tight);
       color: var(--ink);
       margin: 0;
-      font-weight: 500;
+      font-weight: var(--fw-medium);
     }
     .lanes-caption h2 em { color: var(--accent); }
     .lanes-caption p {
-      font-size: 11.5px;
-      line-height: 1.45;
+      font-family: var(--body);
+      font-size: var(--fs-caption);
+      line-height: var(--lh-body);
       color: var(--ink-soft);
       margin: 0;
     }
@@ -64,223 +89,209 @@
       display: block;
     }
 
-.ax-tick { stroke: var(--ink); stroke-width: 1; }
+    .ax-tick { stroke: var(--ink); stroke-width: 1; }
     .ax-line { stroke: var(--ink); stroke-width: 1; }
     .ax-grid { stroke: var(--rule-soft); stroke-width: 0.6; stroke-dasharray: 1 4; }
     .ax-label-m {
       fill: var(--ink);
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.04em;
+      font-size: 12px;
+      letter-spacing: var(--ls-mono);
       text-anchor: middle;
-      font-weight: 500;
+      font-weight: var(--fw-medium);
     }
     .ax-label-mtitle {
       fill: var(--ink);
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.22em;
+      font-size: 12px;
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       text-anchor: middle;
     }
     .lane-row-label {
       fill: var(--ink);
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.06em;
+      font-size: 12px;
+      letter-spacing: var(--ls-mono);
       text-anchor: end;
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
     }
     .lane-row-paper {
       fill: var(--ink-soft);
       font-family: var(--mono);
-      font-size: 9px;
-      letter-spacing: 0.04em;
+      font-size: 11px;
+      letter-spacing: var(--ls-mono);
       text-anchor: end;
     }
-
-.lane-bar {
-      stroke-width: 0;
-    }
+    .lane-bar { stroke-width: 0; }
     .lane-bar.alg1 { fill: var(--teal); }
     .lane-bar.alg2 { fill: var(--accent); }
     .lane-bar.alg3 { fill: var(--ochre); }
     .lane-bar.alg4 { fill: var(--sage); }
-
-.lane-sweet {
+    .lane-sweet {
       fill: none;
       stroke: var(--ink);
       stroke-width: 1.2;
     }
-
-.lane-provenance {
+    .lane-provenance {
       fill: var(--ink-soft);
       font-family: var(--mono);
-      font-size: 9px;
-      letter-spacing: 0.04em;
+      font-size: 11px;
+      letter-spacing: var(--ls-mono);
     }
 
-.alg-cards {
-      position: absolute;
-      top: 510px;
-      left: 96px;
-      right: 96px;
-      height: 380px;
+    /* ── Section 2: 4 algorithm cards ───────────────────── */
+    .alg-cards {
+      flex: 0 0 auto;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
+      gap: var(--sp-4);
+      align-items: stretch;
     }
 
+    /* Each card uses .panel-style chrome with per-algorithm accent stripe */
     .alg-card {
-      position: relative;
       background: var(--paper);
       border: 1px solid var(--rule);
-      padding: 22px 24px 20px;
-      display: grid;
-      grid-template-rows: auto auto auto auto 1fr auto;
-      row-gap: 0;
+      border-radius: var(--radius-md);
+      padding: var(--sp-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+      box-shadow: var(--shadow-card-rest);
+      position: relative;
     }
-    .alg-card.alg1 { border-top: 3px solid var(--teal); }
-    .alg-card.alg2 { border-top: 3px solid var(--accent); }
-    .alg-card.alg3 { border-top: 3px solid var(--ochre); }
-    .alg-card.alg4 { border-top: 3px solid var(--sage); }
+    .alg-card.is-alg1 { border-top: 3px solid var(--teal); }
+    .alg-card.is-alg2 { border-top: 3px solid var(--accent); }
+    .alg-card.is-alg3 { border-top: 3px solid var(--ochre); }
+    .alg-card.is-alg4 { border-top: 3px solid var(--sage); }
 
     .alg-tag {
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.22em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--ink-soft);
-      margin: 0 0 8px;
+      margin: 0;
+      font-weight: var(--fw-semibold);
     }
-    .alg-tag .num { color: var(--accent); font-weight: 600; }
+    .alg-tag .num { color: var(--accent); font-weight: var(--fw-semibold); }
 
     .alg-card h3 {
       font-family: var(--display);
-      font-weight: 500;
-      font-size: 26px;
-      line-height: 1;
-      letter-spacing: -0.01em;
-      margin: 0 0 4px;
+      font-weight: var(--fw-medium);
+      font-size: var(--fs-h3);
+      line-height: var(--lh-headline);
+      letter-spacing: var(--ls-headline);
+      margin: 0;
       color: var(--ink);
     }
     .alg-card .subname {
       font-family: var(--body);
-      font-size: 11px;
+      font-size: var(--fs-micro);
       font-style: italic;
       color: var(--ink-soft);
-      margin: 0 0 10px;
-      line-height: 1.3;
+      margin: 0;
+      line-height: var(--lh-body);
     }
 
     .alg-card .m-range {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 6px 0 10px;
+      gap: var(--sp-3);
+      padding: var(--sp-2) 0;
       border-bottom: 1px solid var(--rule);
-      margin-bottom: 12px;
     }
     .alg-card .m-range .key {
       font-family: var(--mono);
-      font-size: 9px;
-      letter-spacing: 0.18em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--ink-soft);
+      font-weight: var(--fw-semibold);
     }
     .alg-card .m-range .val {
       font-family: var(--display);
       font-style: italic;
-      font-size: 18px;
+      font-size: 22px;
       color: var(--ink);
       line-height: 1;
+      font-weight: var(--fw-medium);
     }
-    .alg-card.alg1 .m-range .val { color: var(--teal); }
-    .alg-card.alg2 .m-range .val { color: var(--accent); }
-    .alg-card.alg3 .m-range .val { color: var(--ochre); }
-    .alg-card.alg4 .m-range .val { color: var(--sage); }
+    .alg-card.is-alg1 .m-range .val { color: var(--teal); }
+    .alg-card.is-alg2 .m-range .val { color: var(--accent); }
+    .alg-card.is-alg3 .m-range .val { color: var(--ochre); }
+    .alg-card.is-alg4 .m-range .val { color: var(--sage); }
 
     .alg-card .mech {
       font-family: var(--body);
-      font-size: 12.5px;
-      line-height: 1.5;
+      font-size: var(--fs-caption);
+      line-height: var(--lh-body);
       color: var(--ink);
-      margin: 0 0 12px;
+      margin: 0;
     }
-    .alg-card .mech strong { font-weight: 600; }
-    .alg-card .mech em {
-      color: var(--accent);
-      font-style: italic;
-    }
+    .alg-card .mech strong { font-weight: var(--fw-semibold); }
+    .alg-card .mech em { color: var(--accent); font-style: italic; }
 
     .alg-card .ops {
-      margin: 0 0 12px;
-      padding: 10px 0 0;
+      padding-top: var(--sp-3);
       border-top: 1px dashed var(--rule);
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: var(--sp-2);
     }
     .alg-card .op-row {
       display: grid;
       grid-template-columns: 90px 1fr;
-      gap: 8px;
+      gap: var(--sp-2);
       align-items: baseline;
     }
     .alg-card .op-key {
       font-family: var(--mono);
-      font-size: 9px;
-      letter-spacing: 0.12em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--accent);
+      font-weight: var(--fw-semibold);
     }
     .alg-card .op-val {
       font-family: var(--body);
-      font-size: 11px;
-      line-height: 1.4;
+      font-size: var(--fs-caption);
+      line-height: var(--lh-body);
       color: var(--ink-soft);
     }
     .alg-card .op-val code {
       font-family: var(--mono);
-      font-size: 10.5px;
+      font-size: var(--fs-micro);
       color: var(--ink);
       background: rgba(176, 125, 44, 0.10);
       padding: 0 4px;
     }
-    .alg-card .op-row.nowrap {
-      grid-template-columns: 76px 1fr;
-      gap: 6px;
-    }
-    .alg-card .op-row.nowrap .op-val {
-      white-space: nowrap;
-      font-size: 10.2px;
-    }
 
     .alg-card .cite {
       margin-top: auto;
-      padding-top: 10px;
+      padding-top: var(--sp-3);
       border-top: 1px dashed var(--rule);
       font-family: var(--mono);
-      font-size: 9px;
-      letter-spacing: 0.04em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono);
       color: var(--ink-soft);
-      line-height: 1.5;
+      line-height: var(--lh-body);
     }
     .alg-card .cite a {
       color: inherit;
       text-decoration: none;
       border-bottom: 1px solid transparent;
-      transition: color 0.18s ease, border-color 0.18s ease;
+      transition: color 0.18s, border-color 0.18s;
     }
     .alg-card .cite a:hover {
       color: var(--accent);
       border-bottom-color: var(--accent);
     }
-    .alg-card .cite a:visited { color: inherit; }
-    .alg-card .cite .src { color: var(--ink); font-weight: 600; }
+    .alg-card .cite .src { color: var(--ink); font-weight: var(--fw-semibold); }
     .alg-card .cite .pdf {
       font-family: var(--mono);
-      font-size: 8.5px;
+      font-size: 11px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--ochre);
@@ -290,7 +301,6 @@
     .alg-card .cite a.pdf:hover {
       color: var(--accent);
     }
-
   </style>
 </head>
 <body>
@@ -311,220 +321,224 @@
         </div>
       </header>
 
-<section class="lanes-wrap" aria-label="Applicability of four MOO algorithms across m">
+      <div class="body-zone">
 
-        <div class="lanes-caption">
-          <p class="eb">figure 3.4.a</p>
-          <h2>Applicability across <em>m</em>.</h2>
-          <p>Bars span each algorithm's documented operating range; the heavier outline marks the sweet spot — where its specific mechanism (crowding, reference points, decomposition, APD) gives the cleanest signal.</p>
-        </div>
+        <section class="lanes-wrap" aria-label="Applicability of four MOO algorithms across m">
 
-        <div class="lanes-svg-wrap">
-          <svg viewBox="0 0 1200 230" preserveAspectRatio="xMidYMid meet">
-            
-            <text class="ax-label-mtitle" x="670" y="14">number of objectives &nbsp;·&nbsp; m →</text>
-
-<line class="ax-grid" x1="200"  y1="28" x2="200"  y2="190"/>
-            <line class="ax-grid" x1="305"  y1="28" x2="305"  y2="190"/>
-            <line class="ax-grid" x1="410"  y1="28" x2="410"  y2="190"/>
-            <line class="ax-grid" x1="515"  y1="28" x2="515"  y2="190"/>
-            <line class="ax-grid" x1="620"  y1="28" x2="620"  y2="190"/>
-            <line class="ax-grid" x1="780"  y1="28" x2="780"  y2="190"/>
-            <line class="ax-grid" x1="930"  y1="28" x2="930"  y2="190"/>
-            <line class="ax-grid" x1="1060" y1="28" x2="1060" y2="190"/>
-            <line class="ax-grid" x1="1140" y1="28" x2="1140" y2="190"/>
-
-<text class="ax-label-m" x="200"  y="30">2</text>
-            <text class="ax-label-m" x="305"  y="30">3</text>
-            <text class="ax-label-m" x="410"  y="30">4</text>
-            <text class="ax-label-m" x="515"  y="30">5</text>
-            <text class="ax-label-m" x="620"  y="30">6</text>
-            <text class="ax-label-m" x="780"  y="30">8</text>
-            <text class="ax-label-m" x="930"  y="30">10</text>
-            <text class="ax-label-m" x="1060" y="30">12</text>
-            <text class="ax-label-m" x="1140" y="30">15</text>
-
-<text class="lane-row-label" x="180" y="58">NSGA-II</text>
-            <text class="lane-row-paper" x="180" y="72">Deb 2002</text>
-            <rect class="lane-bar alg1"  x="195" y="50"  width="220" height="24" rx="2"/>
-            <rect class="lane-sweet"     x="195" y="50"  width="115" height="24" rx="2"/>
-
-<text class="lane-row-label" x="180" y="93">NSGA-III</text>
-            <text class="lane-row-paper" x="180" y="107">Deb &amp; Jain 2014</text>
-            <rect class="lane-bar alg2"  x="300" y="85"  width="845" height="24" rx="2"/>
-            <rect class="lane-sweet"     x="300" y="85"  width="635" height="24" rx="2"/>
-
-<text class="lane-row-label" x="180" y="128">MOEA/D-DE</text>
-            <text class="lane-row-paper" x="180" y="142">Zhang 2007 · Li 2009</text>
-            <rect class="lane-bar alg3"  x="195" y="120" width="740" height="24" rx="2"/>
-            <rect class="lane-sweet"     x="195" y="120" width="590" height="24" rx="2"/>
-
-<text class="lane-row-label" x="180" y="163">RVEA</text>
-            <text class="lane-row-paper" x="180" y="177">Cheng 2016</text>
-            <rect class="lane-bar alg4"  x="410" y="155" width="735" height="24" rx="2"/>
-            <rect class="lane-sweet"     x="515" y="155" width="630" height="24" rx="2"/>
-
-<line class="ax-line" x1="195" y1="190" x2="1145" y2="190"/>
-            <line class="ax-tick" x1="200"  y1="190" x2="200"  y2="198"/>
-            <line class="ax-tick" x1="410"  y1="190" x2="410"  y2="198"/>
-            <line class="ax-tick" x1="620"  y1="190" x2="620"  y2="198"/>
-            <line class="ax-tick" x1="930"  y1="190" x2="930"  y2="198"/>
-            <line class="ax-tick" x1="1140" y1="190" x2="1140" y2="198"/>
-
-            <text class="ax-label-m" x="200"  y="212">2</text>
-            <text class="ax-label-m" x="410"  y="212">4</text>
-            <text class="ax-label-m" x="620"  y="212">6</text>
-            <text class="ax-label-m" x="930"  y="212">10</text>
-            <text class="ax-label-m" x="1140" y="212">15</text>
-
-<text class="lane-provenance" x="1145" y="226" text-anchor="end">sweet-spot ranges per author benchmarks</text>
-          </svg>
-        </div>
-
-      </section>
-
-<section class="alg-cards" aria-label="Four MOO algorithms">
-
-        <article class="alg-card alg1">
-          <p class="alg-tag"><span class="num">01</span> &nbsp;·&nbsp; bi/tri-objective baseline</p>
-          <h3>NSGA-II</h3>
-          <p class="subname">Deb, Pratap, Agarwal &amp; Meyarivan 2002 — IEEE TEVC</p>
-
-          <div class="m-range">
-            <span class="key">sweet&nbsp;m</span>
-            <span class="val">2 — 3</span>
+          <div class="lanes-caption">
+            <p class="eb">figure 3.4.a</p>
+            <h2>Applicability across <em>m</em>.</h2>
+            <p>Bars span each algorithm's documented operating range; the heavier outline marks the sweet spot — where its specific mechanism (crowding, reference points, decomposition, APD) gives the cleanest signal.</p>
           </div>
 
-          <p class="mech">
-            Non-dominated sorting layers + <strong>crowding distance</strong> for diversity.
-            Workhorse of architectural optimisation literature; <em>crowding loses resolution past m=4</em>
-            because nearly all points become near-isolated in high-d objective space.
-          </p>
+          <div class="lanes-svg-wrap">
+            <svg data-design-vb="0 0 1200 230">
 
-          <div class="ops">
-            <div class="op-row">
-              <span class="op-key">mating</span>
-              <span class="op-val">binary tournament &nbsp;·&nbsp; <code>SBX</code> + polynomial mutation</span>
-            </div>
-            <div class="op-row">
-              <span class="op-key">env&nbsp;sel.</span>
-              <span class="op-val">rank, then crowding distance within rank</span>
-            </div>
+              <text class="ax-label-mtitle" x="670" y="14">number of objectives &nbsp;·&nbsp; m →</text>
+
+              <line class="ax-grid" x1="200"  y1="28" x2="200"  y2="190"/>
+              <line class="ax-grid" x1="305"  y1="28" x2="305"  y2="190"/>
+              <line class="ax-grid" x1="410"  y1="28" x2="410"  y2="190"/>
+              <line class="ax-grid" x1="515"  y1="28" x2="515"  y2="190"/>
+              <line class="ax-grid" x1="620"  y1="28" x2="620"  y2="190"/>
+              <line class="ax-grid" x1="780"  y1="28" x2="780"  y2="190"/>
+              <line class="ax-grid" x1="930"  y1="28" x2="930"  y2="190"/>
+              <line class="ax-grid" x1="1060" y1="28" x2="1060" y2="190"/>
+              <line class="ax-grid" x1="1140" y1="28" x2="1140" y2="190"/>
+
+              <text class="ax-label-m" x="200"  y="30">2</text>
+              <text class="ax-label-m" x="305"  y="30">3</text>
+              <text class="ax-label-m" x="410"  y="30">4</text>
+              <text class="ax-label-m" x="515"  y="30">5</text>
+              <text class="ax-label-m" x="620"  y="30">6</text>
+              <text class="ax-label-m" x="780"  y="30">8</text>
+              <text class="ax-label-m" x="930"  y="30">10</text>
+              <text class="ax-label-m" x="1060" y="30">12</text>
+              <text class="ax-label-m" x="1140" y="30">15</text>
+
+              <text class="lane-row-label" x="180" y="58">NSGA-II</text>
+              <text class="lane-row-paper" x="180" y="72">Deb 2002</text>
+              <rect class="lane-bar alg1"  x="195" y="50"  width="220" height="24" rx="2"/>
+              <rect class="lane-sweet"     x="195" y="50"  width="115" height="24" rx="2"/>
+
+              <text class="lane-row-label" x="180" y="93">NSGA-III</text>
+              <text class="lane-row-paper" x="180" y="107">Deb &amp; Jain 2014</text>
+              <rect class="lane-bar alg2"  x="300" y="85"  width="845" height="24" rx="2"/>
+              <rect class="lane-sweet"     x="300" y="85"  width="635" height="24" rx="2"/>
+
+              <text class="lane-row-label" x="180" y="128">MOEA/D-DE</text>
+              <text class="lane-row-paper" x="180" y="142">Zhang 2007 · Li 2009</text>
+              <rect class="lane-bar alg3"  x="195" y="120" width="740" height="24" rx="2"/>
+              <rect class="lane-sweet"     x="195" y="120" width="590" height="24" rx="2"/>
+
+              <text class="lane-row-label" x="180" y="163">RVEA</text>
+              <text class="lane-row-paper" x="180" y="177">Cheng 2016</text>
+              <rect class="lane-bar alg4"  x="410" y="155" width="735" height="24" rx="2"/>
+              <rect class="lane-sweet"     x="515" y="155" width="630" height="24" rx="2"/>
+
+              <line class="ax-line" x1="195" y1="190" x2="1145" y2="190"/>
+              <line class="ax-tick" x1="200"  y1="190" x2="200"  y2="198"/>
+              <line class="ax-tick" x1="410"  y1="190" x2="410"  y2="198"/>
+              <line class="ax-tick" x1="620"  y1="190" x2="620"  y2="198"/>
+              <line class="ax-tick" x1="930"  y1="190" x2="930"  y2="198"/>
+              <line class="ax-tick" x1="1140" y1="190" x2="1140" y2="198"/>
+
+              <text class="ax-label-m" x="200"  y="212">2</text>
+              <text class="ax-label-m" x="410"  y="212">4</text>
+              <text class="ax-label-m" x="620"  y="212">6</text>
+              <text class="ax-label-m" x="930"  y="212">10</text>
+              <text class="ax-label-m" x="1140" y="212">15</text>
+
+              <text class="lane-provenance" x="1145" y="226" text-anchor="end">sweet-spot ranges per author benchmarks</text>
+            </svg>
           </div>
 
-          <p class="cite">
-            <a href="https://doi.org/10.1109/4235.996017" target="_blank" rel="noopener"><span class="src">Deb 2002</span></a> — IEEE TEVC 6(2)
-          </p>
-        </article>
+        </section>
 
-        <article class="alg-card alg2">
-          <p class="alg-tag"><span class="num">02</span> &nbsp;·&nbsp; many-objective reference</p>
-          <h3>NSGA-III</h3>
-          <p class="subname">Deb &amp; Jain 2014 — IEEE TEVC</p>
+        <section class="alg-cards" aria-label="Four MOO algorithms">
 
-          <div class="m-range">
-            <span class="key">sweet&nbsp;m</span>
-            <span class="val">3 — 10</span>
-          </div>
+          <article class="alg-card is-alg1">
+            <p class="alg-tag"><span class="num">01</span> &nbsp;·&nbsp; bi/tri-objective baseline</p>
+            <h3>NSGA-II</h3>
+            <p class="subname">Deb, Pratap, Agarwal &amp; Meyarivan 2002 — IEEE TEVC</p>
 
-          <p class="mech">
-            Same non-dominated sort, but <strong>crowding replaced by reference points</strong>
-            (Das–Dennis simplex grid). Each individual associates to its nearest reference;
-            <em>ref-point niching scales where crowding fails</em>.
-          </p>
-
-          <div class="ops">
-            <div class="op-row">
-              <span class="op-key">mating</span>
-              <span class="op-val">binary tournament &nbsp;·&nbsp; SBX + polynomial mutation</span>
+            <div class="m-range">
+              <span class="key">sweet&nbsp;m</span>
+              <span class="val">2 — 3</span>
             </div>
-            <div class="op-row">
-              <span class="op-key">env&nbsp;sel.</span>
-              <span class="op-val">rank + ref-point niching &nbsp;·&nbsp; <code>p</code> divisions</span>
+
+            <p class="mech">
+              Non-dominated sorting layers + <strong>crowding distance</strong> for diversity.
+              Workhorse of architectural optimisation literature; <em>crowding loses resolution past m=4</em>
+              because nearly all points become near-isolated in high-d objective space.
+            </p>
+
+            <div class="ops">
+              <div class="op-row">
+                <span class="op-key">mating</span>
+                <span class="op-val">binary tournament &nbsp;·&nbsp; <code>SBX</code> + polynomial mutation</span>
+              </div>
+              <div class="op-row">
+                <span class="op-key">env&nbsp;sel.</span>
+                <span class="op-val">rank, then crowding distance within rank</span>
+              </div>
             </div>
-          </div>
 
-          <p class="cite">
-            <a href="https://doi.org/10.1109/TEVC.2013.2281535" target="_blank" rel="noopener"><span class="src">Deb &amp; Jain 2014</span></a><a class="pdf" href="https://www.egr.msu.edu/~kdeb/papers/k2012009.pdf" target="_blank" rel="noopener" title="Author copy on Deb's MSU page">[pdf]</a> — IEEE TEVC 18(4)
-          </p>
-        </article>
+            <p class="cite">
+              <a href="https://doi.org/10.1109/4235.996017" target="_blank" rel="noopener"><span class="src">Deb 2002</span></a> — IEEE TEVC 6(2)
+            </p>
+          </article>
 
-        <article class="alg-card alg3">
-          <p class="alg-tag"><span class="num">03</span> &nbsp;·&nbsp; decomposition + DE</p>
-          <h3>MOEA/D-DE</h3>
-          <p class="subname">Zhang &amp; Li 2007 + Li &amp; Zhang 2009 (DE variant)</p>
+          <article class="alg-card is-alg2">
+            <p class="alg-tag"><span class="num">02</span> &nbsp;·&nbsp; many-objective reference</p>
+            <h3>NSGA-III</h3>
+            <p class="subname">Deb &amp; Jain 2014 — IEEE TEVC</p>
 
-          <div class="m-range">
-            <span class="key">sweet&nbsp;m</span>
-            <span class="val">2 — 8</span>
-          </div>
-
-          <p class="mech">
-            <strong>No non-dominated sort.</strong> Decomposes MO into N scalar sub-problems via
-            Tchebycheff / PBI; neighbours collaborate. <em>DE crossover replaces SBX</em> —
-            stronger exploration on irregular / disconnected / concave Pareto fronts.
-          </p>
-
-          <div class="ops">
-            <div class="op-row">
-              <span class="op-key">mating</span>
-              <span class="op-val">neighbour selection &nbsp;·&nbsp; polynomial mutation</span>
+            <div class="m-range">
+              <span class="key">sweet&nbsp;m</span>
+              <span class="val">3 — 10</span>
             </div>
-            <div class="op-row nowrap">
-              <span class="op-key">env&nbsp;sel.</span>
-              <span class="op-val">aggregation function (Tchebycheff / PBI) &nbsp;·&nbsp; nr replacement</span>
+
+            <p class="mech">
+              Same non-dominated sort, but <strong>crowding replaced by reference points</strong>
+              (Das–Dennis simplex grid). Each individual associates to its nearest reference;
+              <em>ref-point niching scales where crowding fails</em>.
+            </p>
+
+            <div class="ops">
+              <div class="op-row">
+                <span class="op-key">mating</span>
+                <span class="op-val">binary tournament &nbsp;·&nbsp; SBX + polynomial mutation</span>
+              </div>
+              <div class="op-row">
+                <span class="op-key">env&nbsp;sel.</span>
+                <span class="op-val">rank + ref-point niching &nbsp;·&nbsp; <code>p</code> divisions</span>
+              </div>
             </div>
-          </div>
 
-          <p class="cite">
-            <a href="https:
-            <a href="https://doi.org/10.1109/TEVC.2008.925798" target="_blank" rel="noopener"><span class="src">Li &amp; Zhang 2009</span></a>
-          </p>
-        </article>
+            <p class="cite">
+              <a href="https://doi.org/10.1109/TEVC.2013.2281535" target="_blank" rel="noopener"><span class="src">Deb &amp; Jain 2014</span></a><a class="pdf" href="https://www.egr.msu.edu/~kdeb/papers/k2012009.pdf" target="_blank" rel="noopener" title="Author copy on Deb's MSU page">[pdf]</a> — IEEE TEVC 18(4)
+            </p>
+          </article>
 
-        <article class="alg-card alg4">
-          <p class="alg-tag"><span class="num">04</span> &nbsp;·&nbsp; many-objective angular</p>
-          <h3>RVEA</h3>
-          <p class="subname">Cheng, Jin, Olhofer &amp; Sendhoff 2016</p>
+          <article class="alg-card is-alg3">
+            <p class="alg-tag"><span class="num">03</span> &nbsp;·&nbsp; decomposition + DE</p>
+            <h3>MOEA/D-DE</h3>
+            <p class="subname">Zhang &amp; Li 2007 + Li &amp; Zhang 2009 (DE variant)</p>
 
-          <div class="m-range">
-            <span class="key">sweet&nbsp;m</span>
-            <span class="val">5 — 15</span>
-          </div>
-
-          <p class="mech">
-            <strong>Angle-Penalised Distance</strong> instead of dominance: APD = ‖f‖·(1+θ·γ<sub>α</sub>)
-            penalises convergence and angular deviation simultaneously.
-            <em>Reference vectors adapt periodically</em> to track ideal/nadir drift — robust on
-            disparately-scaled objectives.
-          </p>
-
-          <div class="ops">
-            <div class="op-row">
-              <span class="op-key">mating</span>
-              <span class="op-val">random selection &nbsp;·&nbsp; SBX + polynomial mutation</span>
+            <div class="m-range">
+              <span class="key">sweet&nbsp;m</span>
+              <span class="val">2 — 8</span>
             </div>
-            <div class="op-row">
-              <span class="op-key">env&nbsp;sel.</span>
-              <span class="op-val">APD niche-by-niche &nbsp;·&nbsp; ref vectors adapt every <code>fr·G<sub>max</sub></code></span>
+
+            <p class="mech">
+              <strong>No non-dominated sort.</strong> Decomposes MO into N scalar sub-problems via
+              Tchebycheff / PBI; neighbours collaborate. <em>DE crossover replaces SBX</em> —
+              stronger exploration on irregular / disconnected / concave Pareto fronts.
+            </p>
+
+            <div class="ops">
+              <div class="op-row">
+                <span class="op-key">mating</span>
+                <span class="op-val">neighbour selection &nbsp;·&nbsp; polynomial mutation</span>
+              </div>
+              <div class="op-row">
+                <span class="op-key">env&nbsp;sel.</span>
+                <span class="op-val">aggregation function (Tchebycheff / PBI) &nbsp;·&nbsp; nr replacement</span>
+              </div>
             </div>
-          </div>
 
-          <p class="cite">
-            <a href="https://doi.org/10.1109/TEVC.2016.2519378" target="_blank" rel="noopener"><span class="src">Cheng 2016</span></a> — IEEE TEVC 20(5)
-          </p>
-        </article>
+            <p class="cite">
+              <a href="https://doi.org/10.1109/TEVC.2007.892759" target="_blank" rel="noopener"><span class="src">Zhang &amp; Li 2007</span></a> &nbsp;·&nbsp;
+              <a href="https://doi.org/10.1109/TEVC.2008.925798" target="_blank" rel="noopener"><span class="src">Li &amp; Zhang 2009</span></a>
+            </p>
+          </article>
 
-      </section>
+          <article class="alg-card is-alg4">
+            <p class="alg-tag"><span class="num">04</span> &nbsp;·&nbsp; many-objective angular</p>
+            <h3>RVEA</h3>
+            <p class="subname">Cheng, Jin, Olhofer &amp; Sendhoff 2016</p>
 
-<aside class="synthesis" aria-label="Synthesis claim">
-        <span class="label">claim</span>
-        <blockquote>
-          Four MOEAs cover <span class="ins">m = 2 through 15 with no single algorithm dominating</span> —
-          dominance, decomposition and angle-penalised distance each handle a different region of the m axis.
-          The same surrogate and acquisition stack swap onto any of them; <em>the backbone is a parameter, not a commitment</em>.
-        </blockquote>
-      </aside>
+            <div class="m-range">
+              <span class="key">sweet&nbsp;m</span>
+              <span class="val">5 — 15</span>
+            </div>
+
+            <p class="mech">
+              <strong>Angle-Penalised Distance</strong> instead of dominance: APD = ‖f‖·(1+θ·γ<sub>α</sub>)
+              penalises convergence and angular deviation simultaneously.
+              <em>Reference vectors adapt periodically</em> to track ideal/nadir drift — robust on
+              disparately-scaled objectives.
+            </p>
+
+            <div class="ops">
+              <div class="op-row">
+                <span class="op-key">mating</span>
+                <span class="op-val">random selection &nbsp;·&nbsp; SBX + polynomial mutation</span>
+              </div>
+              <div class="op-row">
+                <span class="op-key">env&nbsp;sel.</span>
+                <span class="op-val">APD niche-by-niche &nbsp;·&nbsp; ref vectors adapt every <code>fr·G<sub>max</sub></code></span>
+              </div>
+            </div>
+
+            <p class="cite">
+              <a href="https://doi.org/10.1109/TEVC.2016.2519378" target="_blank" rel="noopener"><span class="src">Cheng 2016</span></a> — IEEE TEVC 20(5)
+            </p>
+          </article>
+
+        </section>
+
+        <aside class="synthesis" aria-label="Synthesis claim">
+          <span class="label">claim</span>
+          <blockquote>
+            Four MOEAs cover <span class="ins">m = 2 through 15 with no single algorithm dominating</span> —
+            dominance, decomposition and angle-penalised distance each handle a different region of the m axis.
+            The same surrogate and acquisition stack swap onto any of them; <em>the backbone is a parameter, not a commitment</em>.
+          </blockquote>
+        </aside>
+
+      </div>
 
       <footer class="slide-footer">
         <span><span class="ref">Chapter 3</span> &nbsp;·&nbsp; method &nbsp;·&nbsp; §3.4 &nbsp;·&nbsp; MOO algorithms</span>

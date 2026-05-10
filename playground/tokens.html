@@ -1,0 +1,1505 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Token Playground — Full Registration Deck</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       PROPOSED TOKENS — these are what we are evaluating.
+       Edit values here to live-tune. Once accepted, copy into
+       slide-base.css :root.
+       ============================================================ */
+    :root {
+      /* ---- Color (existing, kept) ---- */
+      --bg:        #f3efe5;
+      --paper:     #faf7ee;
+      --ink:       #1a2942;
+      --ink-soft:  #44546c;
+      --rule:      #c7bfa9;
+      --rule-soft: #d9d0b8;
+      --accent:    #8b2727;
+      --ochre:     #b07d2c;
+      --sage:      #5e7458;
+      --teal:      #2f5d6e;
+      --node-process:  #faf7ee;
+      --node-data:     #f0e9d3;
+      --node-decision: #f5e3df;
+      --node-output:   #e6ece2;
+      --node-model:    #dde6e9;
+
+      /* ---- Type stack (existing, kept) ---- */
+      --display: "Cormorant Garamond", "Times New Roman", serif;
+      --body:    "Inter Tight", "Helvetica Neue", sans-serif;
+      --mono:    "JetBrains Mono", "SF Mono", "Consolas", monospace;
+
+      /* ---- NEW: Font size scale ---- */
+      --fs-micro:    12px;
+      --fs-caption:  14px;
+      --fs-body:     18px;
+      --fs-card:     22px;
+      --fs-h3:       28px;
+      --fs-h2:       40px;
+      --fs-h1:       56px;
+      --fs-display:  84px;
+
+      /* ---- NEW: Spacing scale (8 steps) ---- */
+      --sp-1:  4px;
+      --sp-2:  8px;
+      --sp-3:  12px;
+      --sp-4:  16px;
+      --sp-5:  22px;
+      --sp-6:  32px;
+      --sp-7:  48px;
+      --sp-8:  64px;
+      --sp-gutter: 96px;
+
+      /* ---- NEW: Letter-spacing ---- */
+      --ls-display:        -0.02em;
+      --ls-headline:       -0.005em;
+      --ls-body:            0;
+      --ls-mono:            0.04em;
+      --ls-mono-eyebrow:    0.18em;
+      --ls-mono-stamp:      0.28em;
+
+      /* ---- NEW: Line-height ---- */
+      --lh-display:   0.95;
+      --lh-headline:  1.05;
+      --lh-tight:     1.2;
+      --lh-body:      1.45;
+      --lh-loose:     1.6;
+
+      /* ---- NEW: Font weight ---- */
+      --fw-regular:   400;
+      --fw-medium:    500;
+      --fw-semibold:  600;
+      --fw-bold:      700;
+
+      /* ---- NEW: Radius ---- */
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 12px;
+
+      /* ---- NEW: Shadow ---- */
+      --shadow-card-rest:  0 1px 0 rgba(26,41,66,0.06),
+                           0 8px 24px -16px rgba(26,41,66,0.18);
+      --shadow-card-hover: 0 14px 32px -14px rgba(26,41,66,0.25);
+
+      /* ---- NEW: Card surface aliases ---- */
+      --card-bg:           var(--paper);
+      --card-bg-rejected:  #ede4d2;
+      --card-bg-soft:      rgba(250,247,238,0.6);
+    }
+
+    /* ============================================================
+       Playground chrome — NOT part of the deck.
+       This page itself uses normal CSS resets, not the deck canvas.
+       ============================================================ */
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============================================================
+       Physical-size simulator toolbar — sticky top.
+       Lets you preview the page at 17.3" 1080p physical size on
+       whatever screen you are actually using.
+       ============================================================ */
+    .sim-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(26, 41, 66, 0.96);
+      color: #faf7ee;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      box-shadow: 0 8px 24px -12px rgba(0,0,0,0.4);
+    }
+    .sim-bar .sim-label {
+      color: var(--ochre);
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .sim-bar select,
+    .sim-bar input {
+      background: rgba(250,247,238,0.08);
+      color: #faf7ee;
+      border: 1px solid rgba(250,247,238,0.25);
+      padding: 6px 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      border-radius: 3px;
+    }
+    .sim-bar select { min-width: 240px; }
+    .sim-bar input { width: 70px; text-align: right; }
+    .sim-bar .sim-readout {
+      margin-left: auto;
+      color: rgba(250,247,238,0.7);
+      font-size: 11px;
+    }
+    .sim-bar .sim-readout strong {
+      color: var(--ochre);
+      font-weight: 600;
+    }
+    .sim-bar .sim-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(250,247,238,0.2);
+    }
+    .sim-bar button {
+      background: var(--accent);
+      color: #faf7ee;
+      border: none;
+      padding: 6px 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .sim-bar button:hover { filter: brightness(1.15); }
+    .sim-manual {
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .sim-manual.show { display: flex; }
+    .sim-manual span { color: rgba(250,247,238,0.6); }
+
+    /* The transform target: when sim is active, scale the page wrapper. */
+    .sim-stage {
+      transform-origin: top center;
+      transition: transform 0.2s ease-out;
+    }
+
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 64px 48px 120px;
+    }
+
+    /* Page header */
+    .page-head {
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 32px;
+      margin-bottom: 48px;
+    }
+    .page-eyebrow {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+      margin: 0 0 12px;
+    }
+    .page-title {
+      font-family: var(--display);
+      font-style: italic;
+      font-weight: var(--fw-medium);
+      font-size: 56px;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin: 0 0 14px;
+      color: var(--ink);
+    }
+    .page-title em { color: var(--accent); }
+    .page-sub {
+      font-family: var(--body);
+      font-size: var(--fs-body);
+      line-height: var(--lh-body);
+      color: var(--ink-soft);
+      margin: 0;
+      max-width: 880px;
+    }
+
+    /* Section blocks */
+    .section {
+      margin-bottom: 80px;
+    }
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      gap: 18px;
+      margin-bottom: 32px;
+      border-bottom: 1px dashed var(--rule-soft);
+      padding-bottom: 14px;
+    }
+    .section-num {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      color: var(--ochre);
+      font-weight: var(--fw-semibold);
+    }
+    .section-title {
+      font-family: var(--display);
+      font-style: italic;
+      font-weight: var(--fw-medium);
+      font-size: 32px;
+      line-height: 1.1;
+      margin: 0;
+      color: var(--ink);
+    }
+    .section-note {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      color: var(--ink-soft);
+      margin-left: auto;
+    }
+
+    /* ============================================================
+       SECTION 1 — TYPE STACK
+       Three font families × four sample uses
+       ============================================================ */
+    .typestack-grid {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0;
+      border: 1px solid var(--rule);
+      background: var(--paper);
+    }
+    .ts-row {
+      display: contents;
+    }
+    .ts-label {
+      padding: 24px 20px;
+      border-right: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      background: rgba(176, 125, 44, 0.06);
+    }
+    .ts-row:last-child .ts-label,
+    .ts-row:last-child .ts-samples { border-bottom: none; }
+    .ts-label .ts-tag {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .ts-label .ts-fam {
+      font-size: var(--fs-caption);
+      font-family: var(--body);
+      color: var(--ink);
+      font-weight: var(--fw-semibold);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .ts-label .ts-css {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+      display: block;
+    }
+    .ts-samples {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .ts-samples > div {
+      display: flex;
+      align-items: baseline;
+      gap: 18px;
+    }
+    .ts-samples .lab {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+      width: 100px;
+      flex-shrink: 0;
+    }
+    .ts-display { font-family: var(--display); font-style: italic; font-size: 36px; font-weight: 500; line-height: 1.1; }
+    .ts-display em { color: var(--accent); }
+    .ts-body    { font-family: var(--body);    font-size: 18px; line-height: 1.45; }
+    .ts-body strong { font-weight: 600; }
+    .ts-mono    { font-family: var(--mono);    font-size: 14px; letter-spacing: 0.04em; }
+    .ts-mono-eb { font-family: var(--mono);    font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+
+    /* Weights row inside type stack */
+    .weights-row {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+    .weights-row span {
+      font-size: 22px;
+    }
+    .weights-row .w-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ink-soft);
+      letter-spacing: 0.1em;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* ============================================================
+       SECTION 2 — FONT SIZE SCALE
+       8 sizes with real-life sample lines + physical mm at multiple ppi
+       ============================================================ */
+    .fs-table {
+      border: 1px solid var(--rule);
+      background: var(--paper);
+    }
+    .fs-row {
+      display: grid;
+      grid-template-columns: 110px 60px 1fr 320px;
+      align-items: baseline;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--rule-soft);
+      gap: 24px;
+    }
+    .fs-row:last-child { border-bottom: none; }
+    .fs-row .fs-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .fs-row .fs-px {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--ink-soft);
+      text-align: right;
+    }
+    .fs-row .fs-sample {
+      color: var(--ink);
+      line-height: 1.25;
+    }
+    .fs-row .fs-mm {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+      letter-spacing: 0.04em;
+      text-align: right;
+      line-height: 1.5;
+    }
+    .fs-row .fs-mm strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* Row variants — set the actual font-size on the sample */
+    .fs-row.t-micro    .fs-sample { font-size: var(--fs-micro);    font-family: var(--mono); letter-spacing: var(--ls-mono-eyebrow); text-transform: uppercase; color: var(--accent); font-weight: 600; }
+    .fs-row.t-caption  .fs-sample { font-size: var(--fs-caption);  font-family: var(--body); }
+    .fs-row.t-body     .fs-sample { font-size: var(--fs-body);     font-family: var(--body); }
+    .fs-row.t-card     .fs-sample { font-size: var(--fs-card);     font-family: var(--body); }
+    .fs-row.t-h3       .fs-sample { font-size: var(--fs-h3);       font-family: var(--display); font-style: italic; font-weight: 500; }
+    .fs-row.t-h2       .fs-sample { font-size: var(--fs-h2);       font-family: var(--display); font-style: italic; font-weight: 500; }
+    .fs-row.t-h2 em    { color: var(--accent); }
+    .fs-row.t-h1       .fs-sample { font-size: var(--fs-h1);       font-family: var(--display); font-weight: 500; line-height: 1.05; letter-spacing: -0.01em; }
+    .fs-row.t-h1 em    { color: var(--accent); font-style: italic; }
+    .fs-row.t-display  .fs-sample { font-size: var(--fs-display);  font-family: var(--display); font-weight: 500; line-height: 0.95; letter-spacing: -0.02em; }
+    .fs-row.t-display em { color: var(--accent); font-style: italic; }
+
+    /* Physical-size note explainer */
+    .fs-note {
+      margin-top: 16px;
+      padding: 14px 18px;
+      background: rgba(176, 125, 44, 0.08);
+      border-left: 3px solid var(--ochre);
+      font-family: var(--body);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--ink-soft);
+    }
+    .fs-note strong { color: var(--ink); font-weight: 600; }
+    .fs-note code {
+      font-family: var(--mono);
+      background: rgba(250,247,238,0.6);
+      padding: 1px 5px;
+      font-size: 12px;
+    }
+
+    /* ============================================================
+       SECTION 3 — LETTER-SPACING + LINE-HEIGHT
+       Two side-by-side matrices
+       ============================================================ */
+    .ls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .ls-card {
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      padding: 0;
+    }
+    .ls-card .ls-head {
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--rule);
+      background: rgba(176, 125, 44, 0.06);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .ls-row {
+      padding: 14px 22px;
+      border-bottom: 1px dashed var(--rule-soft);
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 18px;
+      align-items: baseline;
+    }
+    .ls-row:last-child { border-bottom: none; }
+    .ls-row .ls-name {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+    }
+    .ls-row .ls-name strong { color: var(--accent); font-weight: 600; }
+    .ls-row .ls-sample.mono {
+      font-family: var(--mono);
+      font-size: 13px;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .ls-row .ls-sample.disp {
+      font-family: var(--display);
+      font-size: 26px;
+      font-style: italic;
+      color: var(--ink);
+    }
+
+    .lh-row {
+      padding: 14px 22px;
+      border-bottom: 1px dashed var(--rule-soft);
+    }
+    .lh-row:last-child { border-bottom: none; }
+    .lh-row .lh-name {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+    }
+    .lh-row .lh-name strong { color: var(--accent); font-weight: 600; }
+    .lh-row .lh-sample {
+      font-family: var(--body);
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    /* ============================================================
+       SECTION 4 — SPACING SCALE
+       Visual bars for each step + real usage labels
+       ============================================================ */
+    .sp-table {
+      border: 1px solid var(--rule);
+      background: var(--paper);
+    }
+    .sp-row {
+      display: grid;
+      grid-template-columns: 100px 60px 1fr 300px;
+      align-items: center;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--rule-soft);
+      gap: 22px;
+    }
+    .sp-row:last-child { border-bottom: none; }
+    .sp-row .sp-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .sp-row .sp-px {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--ink-soft);
+      text-align: right;
+    }
+    .sp-row .sp-bar {
+      background: var(--ochre);
+      height: 14px;
+      border-radius: 1px;
+    }
+    .sp-row .sp-use {
+      font-family: var(--body);
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+    .sp-row .sp-use strong { color: var(--ink); }
+
+    .sp-bar.s1 { width: 4px; }
+    .sp-bar.s2 { width: 8px; }
+    .sp-bar.s3 { width: 12px; }
+    .sp-bar.s4 { width: 16px; }
+    .sp-bar.s5 { width: 22px; }
+    .sp-bar.s6 { width: 32px; }
+    .sp-bar.s7 { width: 48px; }
+    .sp-bar.s8 { width: 64px; }
+    .sp-bar.sg { width: 96px; }
+
+    /* Combined-spacing demo: actual padding/gap rendered */
+    .sp-demo {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 28px;
+    }
+    .sp-demo .demo-frame {
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      position: relative;
+    }
+    .sp-demo .demo-frame::before {
+      content: attr(data-label);
+      position: absolute;
+      top: -12px; left: 14px;
+      background: var(--bg);
+      padding: 0 8px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+    .sp-demo .demo-frame .inner {
+      display: flex;
+      flex-direction: column;
+    }
+    .sp-demo .demo-frame .child {
+      background: rgba(176,125,44,0.18);
+      padding: 10px 12px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink);
+      letter-spacing: 0.04em;
+    }
+    .sp-demo .demo-padded-3 { padding: var(--sp-3); }
+    .sp-demo .demo-padded-5 { padding: var(--sp-5); }
+    .sp-demo .demo-padded-6 { padding: var(--sp-6); }
+    .sp-demo .demo-gap-2 .child + .child { margin-top: var(--sp-2); }
+    .sp-demo .demo-gap-4 .child + .child { margin-top: var(--sp-4); }
+    .sp-demo .demo-gap-5 .child + .child { margin-top: var(--sp-5); }
+
+    /* ============================================================
+       SECTION 5 — COLOR PALETTE
+       ============================================================ */
+    .col-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .col-swatch {
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      overflow: hidden;
+    }
+    .col-swatch .swatch-fill {
+      height: 92px;
+      width: 100%;
+    }
+    .col-swatch .swatch-meta {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .col-swatch .swatch-name {
+      font-family: var(--body);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--ink);
+    }
+    .col-swatch .swatch-hex {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-soft);
+      letter-spacing: 0.04em;
+    }
+    .col-swatch .swatch-role {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ochre);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* ============================================================
+       SECTION 6 — CARD PREVIEW
+       Three card states using proposed atom defaults
+       ============================================================ */
+    .card-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    /* This is the *proposed* .card atom we are evaluating */
+    .pv-card {
+      background: var(--card-bg);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      padding: var(--sp-5);
+      box-shadow: var(--shadow-card-rest);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      position: relative;
+      transition: transform 0.22s, box-shadow 0.22s;
+    }
+    .pv-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card-hover);
+    }
+    .pv-card.is-accent {
+      border-top: 3px solid var(--accent);
+    }
+    .pv-card.is-rejected {
+      background: var(--card-bg-rejected);
+      opacity: 0.85;
+    }
+    .pv-card.is-current {
+      border: 2px solid var(--accent);
+    }
+
+    .pv-card .pv-tag {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+      align-self: flex-start;
+      padding: 2px 8px;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-sm);
+    }
+    .pv-card .pv-headline {
+      font-family: var(--display);
+      font-style: italic;
+      font-weight: var(--fw-medium);
+      font-size: var(--fs-h3);
+      line-height: var(--lh-tight);
+      color: var(--ink);
+      margin: 0;
+    }
+    .pv-card .pv-body {
+      font-family: var(--body);
+      font-size: var(--fs-body);
+      line-height: var(--lh-body);
+      color: var(--ink);
+      margin: 0;
+    }
+    .pv-card .pv-meta {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono);
+      color: var(--ink-soft);
+      margin: 0;
+      padding-top: var(--sp-3);
+      border-top: 1px solid var(--rule-soft);
+    }
+    .pv-card .pv-kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .pv-card .pv-kpi .kpi-num {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: var(--fs-h2);
+      line-height: var(--lh-tight);
+      color: var(--accent);
+      font-weight: var(--fw-medium);
+    }
+    .pv-card .pv-kpi .kpi-lab {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       Physical-size simulator toolbar
+       Pick your current display (or enter custom size) → page is
+       scaled so what you see equals 17.3" 1080p physical mm.
+       ============================================================ -->
+  <div class="sim-bar" id="simBar">
+    <span class="sim-label">simulate &nbsp;→&nbsp; 17.3″ 1080p laptop</span>
+
+    <span style="color:rgba(250,247,238,0.5);">your screen:</span>
+    <select id="simPreset">
+      <option value="off">— off (1:1 actual size) —</option>
+      <option value="13.3,1920,1080">13.3″ &nbsp;1920×1080</option>
+      <option value="14,1920,1080">14″ &nbsp;1920×1080</option>
+      <option value="14,2560,1600">14″ &nbsp;2560×1600 (MacBook Pro 14)</option>
+      <option value="15.6,1920,1080">15.6″ &nbsp;1920×1080</option>
+      <option value="15.6,2560,1440">15.6″ &nbsp;2560×1440</option>
+      <option value="16,3072,1920">16″ &nbsp;3072×1920 (MacBook Pro 16)</option>
+      <option value="17.3,1920,1080">17.3″ &nbsp;1920×1080 &nbsp;(target — no scale)</option>
+      <option value="17.3,2560,1440">17.3″ &nbsp;2560×1440</option>
+      <option value="24,1920,1080">24″ &nbsp;1920×1080</option>
+      <option value="27,1920,1080">27″ &nbsp;1920×1080</option>
+      <option value="27,2560,1440">27″ &nbsp;2560×1440</option>
+      <option value="27,3840,2160">27″ &nbsp;3840×2160 (4K)</option>
+      <option value="32,3840,2160">32″ &nbsp;3840×2160 (4K)</option>
+      <option value="custom">custom →</option>
+    </select>
+
+    <div class="sim-manual" id="simManual">
+      <input type="number" id="simInches" placeholder="inch" step="0.1" min="5" max="100">″
+      <span>&nbsp;</span>
+      <input type="number" id="simW" placeholder="W" step="1" min="100" max="10000">×
+      <input type="number" id="simH" placeholder="H" step="1" min="100" max="10000">
+      <button id="simApply">apply</button>
+    </div>
+
+    <span class="sim-divider"></span>
+
+    <span class="sim-readout" id="simReadout">
+      &nbsp;
+    </span>
+  </div>
+
+  <div class="sim-stage" id="simStage">
+  <div class="page">
+
+    <!-- ──────────────────────────────────────────────────── -->
+    <header class="page-head">
+      <p class="page-eyebrow">Token Playground · session 1 of framework refactor</p>
+      <h1 class="page-title">Tokens for the <em>full registration</em> deck.</h1>
+      <p class="page-sub">
+        Six review zones — type stack, font-size scale, letter-spacing &amp; line-height,
+        spacing scale, color palette, card preview. Edit values in the inline
+        <code>:root</code> at the top of this file to live-tune. Once accepted,
+        the values are copied into <code>assets/slide-base.css</code>.
+        Nothing here is part of the deck itself.
+      </p>
+    </header>
+
+    <!-- ──────────────────────────────────────────────────── -->
+    <!-- SECTION 1 — TYPE STACK                              -->
+    <!-- ──────────────────────────────────────────────────── -->
+    <section class="section" id="s1">
+      <div class="section-head">
+        <span class="section-num">§ 01</span>
+        <h2 class="section-title">Type stack</h2>
+        <span class="section-note">three families · weights · italic</span>
+      </div>
+
+      <div class="typestack-grid">
+
+        <!-- Display -->
+        <div class="ts-row">
+          <div class="ts-label">
+            <span class="ts-tag">Display</span>
+            <span class="ts-fam">Cormorant Garamond</span>
+            <span class="ts-css">var(--display)</span>
+          </div>
+          <div class="ts-samples">
+            <div>
+              <span class="lab">italic 500</span>
+              <span class="ts-display">A <em>complex&nbsp;adaptive&nbsp;system</em> framework.</span>
+            </div>
+            <div>
+              <span class="lab">regular 500</span>
+              <span class="ts-display" style="font-style:normal;">Three <em style="font-style:normal;">branches</em>, one <em style="font-style:normal;">open question</em>.</span>
+            </div>
+            <div class="weights-row">
+              <span style="font-family:var(--display);font-weight:400;">Aa Bb Cc<span class="w-label">400</span></span>
+              <span style="font-family:var(--display);font-weight:500;">Aa Bb Cc<span class="w-label">500</span></span>
+              <span style="font-family:var(--display);font-weight:600;">Aa Bb Cc<span class="w-label">600</span></span>
+              <span style="font-family:var(--display);font-weight:700;">Aa Bb Cc<span class="w-label">700</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="ts-row">
+          <div class="ts-label">
+            <span class="ts-tag">Body</span>
+            <span class="ts-fam">Inter Tight</span>
+            <span class="ts-css">var(--body)</span>
+          </div>
+          <div class="ts-samples">
+            <div>
+              <span class="lab">regular 18px</span>
+              <span class="ts-body">Surrogates solve <strong>evaluation scarcity</strong>; MOO operators solve <strong>search scarcity</strong>.</span>
+            </div>
+            <div>
+              <span class="lab">caption 14px</span>
+              <span class="ts-body" style="font-size:14px;color:var(--ink-soft);">Cruz et al. (2024) cover 54 surrogate-assisted studies; sample sizes range from a few hundred to several thousand.</span>
+            </div>
+            <div class="weights-row">
+              <span style="font-family:var(--body);font-weight:400;">Aa Bb Cc<span class="w-label">400</span></span>
+              <span style="font-family:var(--body);font-weight:500;">Aa Bb Cc<span class="w-label">500</span></span>
+              <span style="font-family:var(--body);font-weight:600;">Aa Bb Cc<span class="w-label">600</span></span>
+              <span style="font-family:var(--body);font-weight:700;">Aa Bb Cc<span class="w-label">700</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mono -->
+        <div class="ts-row">
+          <div class="ts-label">
+            <span class="ts-tag">Mono</span>
+            <span class="ts-fam">JetBrains Mono</span>
+            <span class="ts-css">var(--mono)</span>
+          </div>
+          <div class="ts-samples">
+            <div>
+              <span class="lab">eyebrow 12px</span>
+              <span class="ts-mono-eb">§ 5.5 · coordination contract</span>
+            </div>
+            <div>
+              <span class="lab">caption 14px</span>
+              <span class="ts-mono">τ = P(A ≻ B | μ_A, σ_A, μ_B, σ_B) ≥ τ</span>
+            </div>
+            <div class="weights-row">
+              <span style="font-family:var(--mono);font-weight:400;">Aa Bb Cc<span class="w-label">400</span></span>
+              <span style="font-family:var(--mono);font-weight:500;">Aa Bb Cc<span class="w-label">500</span></span>
+              <span style="font-family:var(--mono);font-weight:600;">Aa Bb Cc<span class="w-label">600</span></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ──────────────────────────────────────────────────── -->
+    <!-- SECTION 2 — FONT-SIZE SCALE                         -->
+    <!-- ──────────────────────────────────────────────────── -->
+    <section class="section" id="s2">
+      <div class="section-head">
+        <span class="section-num">§ 02</span>
+        <h2 class="section-title">Font-size scale</h2>
+        <span class="section-note">8 steps · physical mm @ canvas-1:1</span>
+      </div>
+
+      <div class="fs-table">
+
+        <div class="fs-row t-display">
+          <span class="fs-name">--fs-display</span>
+          <span class="fs-px">84px</span>
+          <span class="fs-sample">A <em>CAS</em> framework.</span>
+          <span class="fs-mm">
+            17″ 1080p &nbsp;<strong>17.0mm</strong><br>
+            A3 &nbsp;<strong>11.1mm</strong> &nbsp;·&nbsp; A4 &nbsp;<strong>7.9mm</strong>
+          </span>
+        </div>
+
+        <div class="fs-row t-h1">
+          <span class="fs-name">--fs-h1</span>
+          <span class="fs-px">56px</span>
+          <span class="fs-sample">A <em>complex adaptive system</em> framework</span>
+          <span class="fs-mm">
+            17″ 1080p &nbsp;<strong>11.3mm</strong><br>
+            A3 &nbsp;<strong>7.4mm</strong> &nbsp;·&nbsp; A4 &nbsp;<strong>5.3mm</strong>
+          </span>
+        </div>
+
+        <div class="fs-row t-h2">
+          <span class="fs-name">--fs-h2</span>
+          <span class="fs-px">40px</span>
+          <span class="fs-sample"><em>Three modules</em>, one conversation</span>
+          <span class="fs-mm">
+            17″ 1080p &nbsp;<strong>8.1mm</strong><br>
+            A3 &nbsp;<strong>5.3mm</strong> &nbsp;·&nbsp; A4 &nbsp;<strong>3.8mm</strong>
+          </span>
+        </div>
+
+        <div class="fs-row t-h3">
+          <span class="fs-name">--fs-h3</span>
+          <span class="fs-px">28px</span>
+          <span class="fs-sample">Knob 1 — probabilistic dominance</span>
+          <span class="fs-mm">
+            17″ 1080p &nbsp;<strong>5.6mm</strong><br>
+            A3 &nbsp;<strong>3.7mm</strong> &nbsp;·&nbsp; A4 &nbsp;<strong>2.6mm</strong>
+          </span>
+        </div>
+
+        <div class="fs-row t-card">
+          <span class="fs-name">--fs-card</span>
+          <span class="fs-px">22px</span>
+          <span class="fs-sample">P(A ≻ B | μ, σ) ≥ τ — surrogate uncertainty enters the dominance test</span>
+          <span class="fs-mm">
+            17″ 1080p &nbsp;<strong>4.4mm</strong><br>
+            A3 &nbsp;<strong>2.9mm</strong> &nbsp;·&nbsp; A4 &nbsp;<strong>2.1mm</strong>
+          </span>
+        </div>
+
+        <div class="fs-row t-body">
+          <span class="fs-name">--fs-body</span>
+          <span class="fs-px">18px</span>
+          <span class="fs-sample">Cruz et al. (2024) review 54 surrogate-assisted optimisation studies and record training-set sizes ranging from the hundreds to several thousand.</span>
+          <span class="fs-mm">
+            17″ 1080p &nbsp;<strong>3.6mm</strong><br>
+            A3 &nbsp;<strong>2.4mm</strong> &nbsp;·&nbsp; A4 &nbsp;<strong>1.7mm</strong>
+          </span>
+        </div>
+
+        <div class="fs-row t-caption">
+          <span class="fs-name">--fs-caption</span>
+          <span class="fs-px">14px</span>
+          <span class="fs-sample">Each module writes state into S; reads of S map to its own knobs.</span>
+          <span class="fs-mm">
+            17″ 1080p &nbsp;<strong>2.8mm</strong><br>
+            A3 &nbsp;<strong>1.9mm</strong> &nbsp;·&nbsp; A4 &nbsp;<strong>1.3mm</strong>
+          </span>
+        </div>
+
+        <div class="fs-row t-micro">
+          <span class="fs-name">--fs-micro</span>
+          <span class="fs-px">12px</span>
+          <span class="fs-sample">§ 5.5 · COORDINATION CONTRACT · YEAR 2 · IN PROGRESS</span>
+          <span class="fs-mm">
+            17″ 1080p &nbsp;<strong>2.4mm</strong><br>
+            A3 &nbsp;<strong>1.6mm</strong> &nbsp;·&nbsp; A4 &nbsp;<strong>1.1mm</strong>
+          </span>
+        </div>
+
+      </div>
+
+      <p class="fs-note">
+        <strong>How to read the mm column.</strong>
+        17″ 1080p is your delivery laptop (~127 ppi). A3 is the print target Andre asked for.
+        <strong>A4 numbers are listed only to confirm A4 is too small</strong> — readable-text minimum
+        in print is around <code>1.5–2 mm</code>. Anything below that is unreadable. So
+        <strong><code>--fs-micro: 12px</code> is the floor</strong> of the system: at 1.6 mm on A3
+        it just clears the readability line, and on A4 it would not.
+      </p>
+    </section>
+
+    <!-- ──────────────────────────────────────────────────── -->
+    <!-- SECTION 3 — LETTER-SPACING + LINE-HEIGHT            -->
+    <!-- ──────────────────────────────────────────────────── -->
+    <section class="section" id="s3">
+      <div class="section-head">
+        <span class="section-num">§ 03</span>
+        <h2 class="section-title">Letter-spacing &amp; line-height</h2>
+        <span class="section-note">where the deck currently has 9 ad-hoc values</span>
+      </div>
+
+      <div class="ls-grid">
+
+        <div class="ls-card">
+          <div class="ls-head">letter-spacing</div>
+
+          <div class="ls-row">
+            <span class="ls-name"><strong>--ls-display</strong> &nbsp;&nbsp; -0.02em</span>
+            <span class="ls-sample disp"><em>A complex adaptive system framework</em></span>
+          </div>
+          <div class="ls-row">
+            <span class="ls-name"><strong>--ls-headline</strong> &nbsp;&nbsp; -0.005em</span>
+            <span class="ls-sample disp" style="letter-spacing:-0.005em;font-size:22px;">Three modules, one conversation</span>
+          </div>
+          <div class="ls-row">
+            <span class="ls-name"><strong>--ls-body</strong> &nbsp;&nbsp; 0</span>
+            <span class="ls-sample" style="font-family:var(--body);font-size:16px;letter-spacing:0;">Surrogate writes μ̂(x), σ̂²(x), residual info into S.</span>
+          </div>
+          <div class="ls-row">
+            <span class="ls-name"><strong>--ls-mono</strong> &nbsp;&nbsp; 0.04em</span>
+            <span class="ls-sample" style="font-family:var(--mono);font-size:13px;letter-spacing:0.04em;">τ = 0.5 · weak criterion of expected dominance</span>
+          </div>
+          <div class="ls-row">
+            <span class="ls-name"><strong>--ls-mono-eyebrow</strong> &nbsp;&nbsp; 0.18em</span>
+            <span class="ls-sample mono">§ 5.5 · COORDINATION CONTRACT</span>
+          </div>
+          <div class="ls-row">
+            <span class="ls-name"><strong>--ls-mono-stamp</strong> &nbsp;&nbsp; 0.28em</span>
+            <span class="ls-sample mono" style="letter-spacing:0.28em;">PHD &middot; FULL REGISTRATION</span>
+          </div>
+        </div>
+
+        <div class="ls-card">
+          <div class="ls-head">line-height</div>
+
+          <div class="lh-row">
+            <div class="lh-name"><strong>--lh-display</strong> &nbsp;&nbsp; 0.95</div>
+            <div class="lh-sample" style="font-family:var(--display);font-style:italic;font-size:36px;line-height:0.95;">A complex<br>adaptive system<br>framework.</div>
+          </div>
+          <div class="lh-row">
+            <div class="lh-name"><strong>--lh-headline</strong> &nbsp;&nbsp; 1.05</div>
+            <div class="lh-sample" style="font-family:var(--display);font-style:italic;font-size:24px;line-height:1.05;">Three branches,<br>one open question.</div>
+          </div>
+          <div class="lh-row">
+            <div class="lh-name"><strong>--lh-tight</strong> &nbsp;&nbsp; 1.2</div>
+            <div class="lh-sample" style="line-height:1.2;">Knob 1 — probabilistic dominance.<br>Yu et al. (2023) two-stage dominance,<br>elevated to contract layer.</div>
+          </div>
+          <div class="lh-row">
+            <div class="lh-name"><strong>--lh-body</strong> &nbsp;&nbsp; 1.45</div>
+            <div class="lh-sample" style="line-height:1.45;">Cruz et al. (2024) review 54 surrogate-assisted studies; sample sizes range from a few hundred to several thousand. Elwy &amp; Hagishima (2024) cover 72 studies, 15 to 600,000.</div>
+          </div>
+          <div class="lh-row">
+            <div class="lh-name"><strong>--lh-loose</strong> &nbsp;&nbsp; 1.6</div>
+            <div class="lh-sample" style="line-height:1.6;">Three sub-questions:<br>· algorithmic adaptation<br>· surrogate integration<br>· emergence and dynamics</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ──────────────────────────────────────────────────── -->
+    <!-- SECTION 4 — SPACING SCALE                           -->
+    <!-- ──────────────────────────────────────────────────── -->
+    <section class="section" id="s4">
+      <div class="section-head">
+        <span class="section-num">§ 04</span>
+        <h2 class="section-title">Spacing scale</h2>
+        <span class="section-note">8 steps · ochre bars at true pixel width</span>
+      </div>
+
+      <div class="sp-table">
+        <div class="sp-row">
+          <span class="sp-name">--sp-1</span>
+          <span class="sp-px">4px</span>
+          <span class="sp-bar s1"></span>
+          <span class="sp-use"><strong>icon-text gap</strong> · tag padding-y · kpi-num to kpi-lab</span>
+        </div>
+        <div class="sp-row">
+          <span class="sp-name">--sp-2</span>
+          <span class="sp-px">8px</span>
+          <span class="sp-bar s2"></span>
+          <span class="sp-use"><strong>tight inline gap</strong> · list-item gap · chip-cluster gap</span>
+        </div>
+        <div class="sp-row">
+          <span class="sp-name">--sp-3</span>
+          <span class="sp-px">12px</span>
+          <span class="sp-bar s3"></span>
+          <span class="sp-use"><strong>card inner gap</strong> · tag padding-x · kpi-block padding-y</span>
+        </div>
+        <div class="sp-row">
+          <span class="sp-name">--sp-4</span>
+          <span class="sp-px">16px</span>
+          <span class="sp-bar s4"></span>
+          <span class="sp-use"><strong>headline-to-body gap</strong> · acquisition card row gap</span>
+        </div>
+        <div class="sp-row">
+          <span class="sp-name">--sp-5</span>
+          <span class="sp-px">22px</span>
+          <span class="sp-bar s5"></span>
+          <span class="sp-use"><strong>card padding</strong> · the canonical "feels right" card inset</span>
+        </div>
+        <div class="sp-row">
+          <span class="sp-name">--sp-6</span>
+          <span class="sp-px">32px</span>
+          <span class="sp-bar s6"></span>
+          <span class="sp-use"><strong>card-to-card gap</strong> · paragraph block separator</span>
+        </div>
+        <div class="sp-row">
+          <span class="sp-name">--sp-7</span>
+          <span class="sp-px">48px</span>
+          <span class="sp-bar s7"></span>
+          <span class="sp-use"><strong>section gap</strong> · large grid gap · header-to-body gap</span>
+        </div>
+        <div class="sp-row">
+          <span class="sp-name">--sp-8</span>
+          <span class="sp-px">64px</span>
+          <span class="sp-bar s8"></span>
+          <span class="sp-use"><strong>major block gap</strong> · header bottom margin · between zones on slide</span>
+        </div>
+        <div class="sp-row">
+          <span class="sp-name">--sp-gutter</span>
+          <span class="sp-px">96px</span>
+          <span class="sp-bar sg"></span>
+          <span class="sp-use"><strong>slide left/right margin</strong> · canvas safe-area gutter</span>
+        </div>
+      </div>
+
+      <div class="sp-demo">
+        <div class="demo-frame" data-label="card · padding sp-3 · gap sp-2">
+          <div class="inner demo-padded-3 demo-gap-2">
+            <div class="child">child A</div>
+            <div class="child">child B</div>
+            <div class="child">child C</div>
+          </div>
+        </div>
+        <div class="demo-frame" data-label="card · padding sp-5 · gap sp-4">
+          <div class="inner demo-padded-5 demo-gap-4">
+            <div class="child">child A</div>
+            <div class="child">child B</div>
+            <div class="child">child C</div>
+          </div>
+        </div>
+        <div class="demo-frame" data-label="card · padding sp-6 · gap sp-5">
+          <div class="inner demo-padded-6 demo-gap-5">
+            <div class="child">child A</div>
+            <div class="child">child B</div>
+            <div class="child">child C</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ──────────────────────────────────────────────────── -->
+    <!-- SECTION 5 — COLOR PALETTE                           -->
+    <!-- ──────────────────────────────────────────────────── -->
+    <section class="section" id="s5">
+      <div class="section-head">
+        <span class="section-num">§ 05</span>
+        <h2 class="section-title">Color palette</h2>
+        <span class="section-note">existing tokens · semantic roles preserved</span>
+      </div>
+
+      <div class="col-grid">
+
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--accent);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">accent — burgundy</span>
+            <span class="swatch-hex">#8b2727</span>
+            <span class="swatch-role">online · emphasis · current</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--ochre);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">ochre</span>
+            <span class="swatch-hex">#b07d2c</span>
+            <span class="swatch-role">iteration · loop · second voice</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--sage);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">sage</span>
+            <span class="swatch-hex">#5e7458</span>
+            <span class="swatch-role">outcome · output</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--teal);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">teal</span>
+            <span class="swatch-hex">#2f5d6e</span>
+            <span class="swatch-role">model · surrogate</span>
+          </div>
+        </div>
+
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--ink);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">ink</span>
+            <span class="swatch-hex">#1a2942</span>
+            <span class="swatch-role">primary text</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--ink-soft);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">ink-soft</span>
+            <span class="swatch-hex">#44546c</span>
+            <span class="swatch-role">secondary text · captions</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--rule);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">rule</span>
+            <span class="swatch-hex">#c7bfa9</span>
+            <span class="swatch-role">borders · dividers</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--rule-soft);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">rule-soft</span>
+            <span class="swatch-hex">#d9d0b8</span>
+            <span class="swatch-role">soft dashes · weak dividers</span>
+          </div>
+        </div>
+
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--bg);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">bg</span>
+            <span class="swatch-hex">#f3efe5</span>
+            <span class="swatch-role">slide background</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--paper);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">paper</span>
+            <span class="swatch-hex">#faf7ee</span>
+            <span class="swatch-role">card surface · raised</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--card-bg-rejected);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">card-bg-rejected (new)</span>
+            <span class="swatch-hex">#ede4d2</span>
+            <span class="swatch-role">legacy · rejected · de-emphasised</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--card-bg-soft);border:1px dashed var(--rule);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">card-bg-soft (new)</span>
+            <span class="swatch-hex">paper @ 0.6α</span>
+            <span class="swatch-role">thesis-band · banner · soft container</span>
+          </div>
+        </div>
+
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--node-process);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">node-process</span>
+            <span class="swatch-hex">#faf7ee</span>
+            <span class="swatch-role">flowchart · process node</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--node-data);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">node-data</span>
+            <span class="swatch-hex">#f0e9d3</span>
+            <span class="swatch-role">flowchart · data node</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--node-decision);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">node-decision</span>
+            <span class="swatch-hex">#f5e3df</span>
+            <span class="swatch-role">flowchart · decision node</span>
+          </div>
+        </div>
+        <div class="col-swatch">
+          <div class="swatch-fill" style="background:var(--node-output);"></div>
+          <div class="swatch-meta">
+            <span class="swatch-name">node-output</span>
+            <span class="swatch-hex">#e6ece2</span>
+            <span class="swatch-role">flowchart · output node</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ──────────────────────────────────────────────────── -->
+    <!-- SECTION 6 — CARD PREVIEW                            -->
+    <!-- ──────────────────────────────────────────────────── -->
+    <section class="section" id="s6">
+      <div class="section-head">
+        <span class="section-num">§ 06</span>
+        <h2 class="section-title">Card preview · the proposed atom</h2>
+        <span class="section-note">.card / .card.is-accent / .card.is-rejected</span>
+      </div>
+
+      <div class="card-preview-grid">
+
+        <article class="pv-card">
+          <span class="pv-tag">surrogate · GP</span>
+          <h3 class="pv-headline">Kriging — anchor surrogate</h3>
+          <p class="pv-body">Native posterior mean and variance; direct comparability with K-RVEA and MOEA/D-EGO. Cubic in N — limited for larger online datasets.</p>
+          <p class="pv-meta">role: anchor · σ²: native · scaling: O(N³)</p>
+        </article>
+
+        <article class="pv-card is-accent">
+          <span class="pv-tag">surrogate · transition target</span>
+          <h3 class="pv-headline">SSGP — primary online surrogate</h3>
+          <p class="pv-body">Approximate GP uncertainty with improved scaling. Random Fourier features, per-target ARD, PRESS τ-calibration via leave-one-out residuals.</p>
+          <p class="pv-meta">role: online · σ²: approx · scaling: O(M³)</p>
+        </article>
+
+        <article class="pv-card is-rejected">
+          <span class="pv-tag">surrogate · legacy</span>
+          <h3 class="pv-headline">ELM family</h3>
+          <p class="pv-body">Engineering baseline. Fast fit and predict, supports incremental training (OS-ELM, EOS-ELM, Ensemble-ELM). No native uncertainty.</p>
+          <p class="pv-meta">role: deterministic · σ²: none · status: legacy</p>
+        </article>
+
+        <article class="pv-card">
+          <div class="pv-kpi">
+            <span class="kpi-num">≥ 0.33</span>
+            <span class="kpi-lab">Cliff's δ · medium effect</span>
+          </div>
+          <p class="pv-body">Falsification threshold for sub-question 1: across ≥3 cases and ≥30 seeds, run-time switching must beat fixed NSGA-II / RVEA / random-switch.</p>
+        </article>
+
+        <article class="pv-card is-current">
+          <div class="pv-kpi">
+            <span class="kpi-num">3 / 3</span>
+            <span class="kpi-lab">contract knobs · τ &nbsp;λ&nbsp; θ</span>
+          </div>
+          <p class="pv-body">Minimal complete knob set. One per channel: surrogate→MOEA (τ), MOEA→acquisition (λ), acquisition/MOEA→surrogate (θ).</p>
+          <p class="pv-meta">status · current focus</p>
+        </article>
+
+        <article class="pv-card">
+          <div class="pv-kpi">
+            <span class="kpi-num">≥ 0.6</span>
+            <span class="kpi-lab">Cohen's κ · annotator agreement</span>
+          </div>
+          <p class="pv-body">Trajectory motif κ &lt; 0.6 → motifs reported as exploratory rather than confirmatory cross-case CAS evidence.</p>
+        </article>
+
+      </div>
+
+      <p class="fs-note" style="margin-top:32px;">
+        <strong>What you are evaluating in this zone.</strong>
+        Not the words inside the cards, but the <em>visual rhythm</em> — whether the
+        proposed <code>.card</code> atom (paper bg, 1px rule border, sp-5 padding,
+        radius-md, shadow-card-rest, sp-3 inner gap) reads cleanly across content
+        types: text-only card, KPI card, accent variant, rejected variant,
+        current variant. If anything feels off — padding too tight, border too
+        heavy, hover lift too aggressive — call it out by zone and I tune the
+        token before we copy them into <code>slide-base.css</code>.
+      </p>
+    </section>
+
+  </div>
+  </div><!-- /.sim-stage -->
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ── Target physical size we want to simulate
+      const TARGET_INCHES = 17.3;
+      const TARGET_W = 1920;
+      const TARGET_H = 1080;
+      const TARGET_PPI = Math.sqrt(TARGET_W * TARGET_W + TARGET_H * TARGET_H) / TARGET_INCHES;
+      // ≈ 127.34 ppi
+
+      const presetEl = document.getElementById('simPreset');
+      const manualEl = document.getElementById('simManual');
+      const inchesEl = document.getElementById('simInches');
+      const wEl = document.getElementById('simW');
+      const hEl = document.getElementById('simH');
+      const applyBtn = document.getElementById('simApply');
+      const stage = document.getElementById('simStage');
+      const readout = document.getElementById('simReadout');
+
+      const STORAGE_KEY = 'tokenPlaygroundSimChoice';
+
+      function ppiOf(inch, w, h) {
+        return Math.sqrt(w * w + h * h) / inch;
+      }
+
+      function applyScale(inch, w, h, label) {
+        if (!inch || !w || !h) {
+          stage.style.transform = '';
+          readout.innerHTML = '&nbsp;';
+          return;
+        }
+
+        const yourPpi = ppiOf(inch, w, h);
+        const ratio = TARGET_PPI / yourPpi;
+
+        // Apply to the stage (top of the page wrapper)
+        stage.style.transform = 'scale(' + ratio.toFixed(4) + ')';
+
+        // Compensate body width so horizontal scrollbars don't go nuts
+        document.body.style.width = (100 / ratio).toFixed(2) + '%';
+        document.body.style.maxWidth = 'none';
+
+        readout.innerHTML =
+          'your screen <strong>' + yourPpi.toFixed(0) + ' ppi</strong>' +
+          ' &nbsp;·&nbsp; target <strong>' + TARGET_PPI.toFixed(0) + ' ppi</strong>' +
+          ' &nbsp;·&nbsp; scale <strong>' + (ratio * 100).toFixed(1) + '%</strong>' +
+          (label ? ' &nbsp;·&nbsp; ' + label : '');
+      }
+
+      function clearScale() {
+        stage.style.transform = '';
+        document.body.style.width = '';
+        document.body.style.maxWidth = '';
+        readout.innerHTML = '&nbsp;<span style="color:rgba(250,247,238,0.4);">no scaling — 1:1 with current display</span>';
+      }
+
+      function onPresetChange() {
+        const v = presetEl.value;
+        try { localStorage.setItem(STORAGE_KEY, v); } catch (_) {}
+
+        if (v === 'off') {
+          manualEl.classList.remove('show');
+          clearScale();
+          return;
+        }
+        if (v === 'custom') {
+          manualEl.classList.add('show');
+          clearScale();
+          return;
+        }
+        manualEl.classList.remove('show');
+        const parts = v.split(',').map(Number);
+        const [inch, w, h] = parts;
+        const label = inch + '″ &nbsp;' + w + '×' + h;
+        applyScale(inch, w, h, label);
+      }
+
+      function onApplyManual() {
+        const inch = parseFloat(inchesEl.value);
+        const w = parseFloat(wEl.value);
+        const h = parseFloat(hEl.value);
+        if (!inch || !w || !h) {
+          readout.innerHTML = '<span style="color:#ff8;">enter inches and resolution</span>';
+          return;
+        }
+        applyScale(inch, w, h, 'custom · ' + inch + '″ ' + w + '×' + h);
+        try {
+          localStorage.setItem(STORAGE_KEY, 'custom:' + inch + ',' + w + ',' + h);
+        } catch (_) {}
+      }
+
+      presetEl.addEventListener('change', onPresetChange);
+      applyBtn.addEventListener('click', onApplyManual);
+      [inchesEl, wEl, hEl].forEach(el => {
+        el.addEventListener('keydown', e => { if (e.key === 'Enter') onApplyManual(); });
+      });
+
+      // Restore last choice
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          if (saved.startsWith('custom:')) {
+            const [inch, w, h] = saved.slice(7).split(',').map(Number);
+            presetEl.value = 'custom';
+            manualEl.classList.add('show');
+            inchesEl.value = inch;
+            wEl.value = w;
+            hEl.value = h;
+            applyScale(inch, w, h, 'custom · ' + inch + '″ ' + w + '×' + h);
+          } else {
+            presetEl.value = saved;
+            onPresetChange();
+          }
+        } else {
+          clearScale();
+        }
+      } catch (_) {
+        clearScale();
+      }
+    })();
+  </script>
+</body>
+</html>

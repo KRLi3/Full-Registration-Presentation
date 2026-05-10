@@ -69,7 +69,11 @@
   }
 
   window.addEventListener('wheel', evt => {
-    if (evt.ctrlKey) return;
+    // Ctrl+wheel is consumed by slide-base.js for user zoom — don't forward
+    // it to the parent deck (which would pass it through to the browser's
+    // native zoom). slide-base's handler runs first via capture, so by the
+    // time we get here, defaultPrevented is already true.
+    if (evt.ctrlKey || evt.metaKey) return;
     const dy = evt.deltaY;
     if (Math.abs(dy) < 1) return;
     if (evt.target && evt.target.nodeType === 1 && isScrollableAncestor(evt.target, dy)) {

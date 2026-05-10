@@ -230,7 +230,30 @@
       if (overview && overview.classList.contains('show')) return;
       consumeWheel(data.dy);
     }
+    else if (data.type === 'deck:zoom') {
+      updateZoomHud(data.percent);
+    }
   });
+
+  // ────────────────────────────────────────────────────────────
+  // Zoom HUD — appears bottom-left when slide is user-zoomed.
+  // Lazy-create the element so it doesn't add layout when idle.
+  // ────────────────────────────────────────────────────────────
+  let zoomBadge = null;
+  function updateZoomHud(percent) {
+    if (!percent || percent <= 100) {
+      if (zoomBadge) zoomBadge.classList.remove('show');
+      return;
+    }
+    if (!zoomBadge) {
+      zoomBadge = document.createElement('div');
+      zoomBadge.id = 'deck-zoom-badge';
+      zoomBadge.innerHTML = '<span class="z"></span> · <kbd>0</kbd> reset';
+      document.body.appendChild(zoomBadge);
+    }
+    zoomBadge.querySelector('.z').textContent = percent + '%';
+    zoomBadge.classList.add('show');
+  }
 
   // ────────────────────────────────────────────────────────────
   // Mouse / touch
@@ -289,7 +312,14 @@
 
   function handleWheel(evt) {
     if (overview && overview.classList.contains('show')) return;
-    if (evt.ctrlKey) return;
+    // Ctrl/meta + wheel is the slide's own user-zoom gesture. We must
+    // preventDefault here too, otherwise the browser's native page-zoom
+    // kicks in and scales the whole HUD chrome instead. The slide handles
+    // the actual zoom inside its iframe via slide-base.js.
+    if (evt.ctrlKey || evt.metaKey) {
+      evt.preventDefault();
+      return;
+    }
     const dy = evt.deltaY;
     if (Math.abs(dy) < 1) return;
     const target = evt.target;

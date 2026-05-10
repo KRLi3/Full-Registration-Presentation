@@ -6,15 +6,42 @@
   <title>Title — Full Registration Presentation</title>
   <link rel="stylesheet" href="../../assets/slide-base.css">
   <style>
+    /* ============================================================
+       title — cover page (free-poster layout, not three-section).
+       Uses tokens from slide-base.css :root throughout. Only layout
+       grids and a few cover-specific overrides are written here.
+       ============================================================ */
 
-.title-cover::before {
-      background-image: none;
+    /* Suppress the dotted paper grain for the cover */
+    .title-cover::before { background-image: none; }
+
+    /* — Top-left red accent corner mark (heavier than .corner-mark) — */
+    .cover-corner-tl {
+      position: absolute;
+      top: var(--sp-gutter);
+      left: var(--sp-gutter);
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-stamp);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+    }
+    .cover-corner-tl::before {
+      content: "";
+      width: 36px;
+      height: 1px;
+      background: var(--accent);
     }
 
-.emblem {
+    /* — Brand emblem (top-right) — */
+    .emblem {
       position: absolute;
-      top: 96px;
-      right: 96px;
+      top: var(--sp-gutter);
+      right: var(--sp-gutter);
       width: 220px;
       height: 220px;
       pointer-events: none;
@@ -26,165 +53,124 @@
       opacity: 0.85;
     }
 
-.cover-corner-tl {
-      position: absolute;
-      top: 96px;
-      left: 96px;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .cover-corner-tl::before {
-      content: "";
-      width: 36px;
-      height: 1px;
-      background: var(--accent);
-    }
-
-.title-main {
+    /* — Title block: text · vertical rule · meta — */
+    .title-main {
       position: absolute;
       top: 270px;
-      left: 96px;
-      right: 96px;
+      left: var(--sp-gutter);
+      right: var(--sp-gutter);
       display: grid;
       grid-template-columns: 1fr 1px 380px;
-      gap: 64px;
+      gap: var(--sp-8);
       align-items: start;
     }
 
     .title-text .stamp {
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.32em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-stamp);
       text-transform: uppercase;
       color: var(--ink-soft);
-      margin: 0 0 28px;
-      padding-bottom: 10px;
+      margin: 0 0 var(--sp-6);
+      padding-bottom: var(--sp-2);
       border-bottom: 1px solid var(--rule);
       max-width: 320px;
     }
 
     .title-text h1 {
       font-family: var(--display);
-      font-weight: 500;
-      font-size: 84px;
-      line-height: 0.95;
-      letter-spacing: -0.015em;
-      margin: 0 0 32px;
+      font-weight: var(--fw-medium);
+      font-size: var(--fs-display);     /* 84 */
+      line-height: var(--lh-display);   /* 0.95 */
+      letter-spacing: var(--ls-display);
+      margin: 0 0 var(--sp-6);
       color: var(--ink);
       max-width: 1100px;
     }
     .title-text h1 em {
       font-style: italic;
       color: var(--accent);
-      font-weight: 500;
-    }
-    .title-text h1 .triplet {
-      font-style: italic;
-      font-weight: 400;
+      font-weight: var(--fw-medium);
     }
 
     .title-text .subline {
       font-family: var(--display);
       font-style: italic;
-      font-size: 26px;
-      line-height: 1.3;
+      font-size: var(--fs-h3);          /* 28, was 26 — promoted to scale */
+      line-height: var(--lh-tight);
       color: var(--ink-soft);
       margin: 0;
       max-width: 980px;
     }
     .title-text .subline em { color: var(--accent); font-style: italic; }
 
-.title-rule {
+    .title-rule {
       width: 1px;
       background: var(--rule);
       align-self: stretch;
       min-height: 360px;
     }
 
-.meta {
+    /* — Meta column (candidate / institution / supervisors / date) — */
+    .cover-meta {
       display: flex;
       flex-direction: column;
-      gap: 26px;
+      gap: var(--sp-6);
     }
-    .meta-block {
+    .cover-meta-block {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: var(--sp-1);
     }
-    .meta-block .label {
+    .cover-meta-block .label {
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.28em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-stamp);
       text-transform: uppercase;
       color: var(--accent);
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
       margin: 0;
     }
-    .meta-block .value {
+    .cover-meta-block .value {
       font-family: var(--display);
       font-style: italic;
-      font-size: 28px;
-      line-height: 1.1;
+      font-size: var(--fs-h3);          /* 28, was 28 */
+      line-height: var(--lh-headline);
       color: var(--ink);
       margin: 0;
-      font-weight: 500;
+      font-weight: var(--fw-medium);
     }
-    .meta-block .value.smaller {
-      font-size: 22px;
+    .cover-meta-block .value.smaller {
+      font-size: var(--fs-h3);          /* 28, was 22 — unified to scale */
     }
-    .meta-block .value-list {
+    .cover-meta-block .value-list {
       font-family: var(--display);
       font-style: italic;
-      font-size: 22px;
-      line-height: 1.3;
+      font-size: var(--fs-h3);          /* 28, was 22 — unified */
+      line-height: var(--lh-tight);
       color: var(--ink);
       margin: 0;
-      font-weight: 500;
+      font-weight: var(--fw-medium);
     }
-    .meta-block .secondary {
+    .cover-meta-block .secondary {
       font-family: var(--body);
-      font-size: 13px;
+      font-size: var(--fs-caption);     /* 14, was 13 */
       color: var(--ink-soft);
-      margin: 2px 0 0;
-      line-height: 1.4;
+      margin: var(--sp-1) 0 0;
+      line-height: var(--lh-body);
     }
 
-.thesis-band {
+    /* — Thesis band — uses .band.is-banner from base, with cover overrides — */
+    .thesis-band {
       position: absolute;
       bottom: 130px;
-      left: 96px;
-      right: 96px;
-      padding: 28px 32px;
-      border-top: 1px solid var(--rule);
-      border-bottom: 1px solid var(--rule);
-      background: rgba(250, 247, 238, 0.5);
-      display: flex;
-      align-items: center;
-      gap: 36px;
+      left: var(--sp-gutter);
+      right: var(--sp-gutter);
+      padding: var(--sp-6) var(--sp-6);
+      gap: var(--sp-6);
     }
-    .thesis-band .vlabel {
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 600;
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
-      flex-shrink: 0;
-      padding: 0 6px;
-      border-right: 1px solid var(--rule);
-      align-self: stretch;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .thesis-band .band-vlabel {
+      padding: 0 var(--sp-2);
     }
     .thesis-band blockquote {
       margin: 0;
@@ -193,11 +179,11 @@
     .thesis-band blockquote p {
       font-family: var(--display);
       font-style: italic;
-      font-size: 28px;
-      line-height: 1.3;
+      font-size: var(--fs-h3);          /* 28 */
+      line-height: var(--lh-tight);
+      letter-spacing: var(--ls-headline);
       color: var(--ink);
       margin: 0;
-      letter-spacing: -0.005em;
     }
     .thesis-band blockquote p em { color: var(--accent); font-style: italic; }
     .thesis-band blockquote p .ins {
@@ -206,33 +192,34 @@
       font-style: italic;
     }
 
-.cover-footer {
+    /* — Footer (cover variant — no top rule, just mono caption strip) — */
+    .cover-footer {
       position: absolute;
-      bottom: 36px;
-      left: 96px;
-      right: 96px;
+      bottom: var(--sp-7);
+      left: var(--sp-gutter);
+      right: var(--sp-gutter);
       display: flex;
       justify-content: space-between;
       align-items: baseline;
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.18em;
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
       text-transform: uppercase;
       color: var(--ink-soft);
     }
     .cover-footer .lhs {
       display: flex;
-      gap: 18px;
+      gap: var(--sp-4);
       align-items: center;
     }
     .cover-footer .lhs .strong {
       color: var(--ink);
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
     }
     .cover-footer .pageno {
       font-family: var(--display);
       font-style: italic;
-      font-size: 22px;
+      font-size: var(--fs-h3);          /* 28, was 22 — unified */
       letter-spacing: 0;
       text-transform: none;
       color: var(--ink);
@@ -284,21 +271,21 @@
 
         <div class="title-rule" aria-hidden="true"></div>
 
-        <aside class="meta">
-          <div class="meta-block">
+        <aside class="cover-meta">
+          <div class="cover-meta-block">
             <p class="label">candidate</p>
             <p class="value">Keran&nbsp;Li</p>
           </div>
-          <div class="meta-block">
+          <div class="cover-meta-block">
             <p class="label">institution</p>
             <p class="value smaller">Victoria University<br>of Wellington</p>
             <p class="secondary">Te Herenga Waka &nbsp;·&nbsp; Aotearoa New Zealand</p>
           </div>
-          <div class="meta-block">
+          <div class="cover-meta-block">
             <p class="label">supervisors</p>
             <p class="value-list">Andre Brown<br>Antony Pelosi</p>
           </div>
-          <div class="meta-block">
+          <div class="cover-meta-block">
             <p class="label">date</p>
             <p class="value smaller">6 May 2026</p>
           </div>
@@ -306,8 +293,8 @@
 
       </section>
 
-<aside class="thesis-band" aria-label="Thesis statement">
-        <span class="vlabel">thesis</span>
+<aside class="band is-banner thesis-band" aria-label="Thesis statement">
+        <span class="band-vlabel">thesis</span>
         <blockquote>
           <p>
             Optimisation should be designed as <em>an adaptive system</em>, not a fixed
