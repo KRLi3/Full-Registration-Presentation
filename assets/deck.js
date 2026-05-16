@@ -2,19 +2,20 @@
   'use strict';
 
   const SLIDES = [
-    { id: 'title',                     name: 'Title' },
-    { id: 'introduction',              name: 'Introduction' },
-    { id: '00-framework-overview',     name: 'Framework overview' },
-    { id: 'demos-pareto',              name: 'Primer · Pareto' },
-    { id: 'demos-ml',                  name: 'Primer · Surrogate' },
-    { id: '01-research-workflow',      name: 'Research workflow' },
-    { id: '02-why-saea',               name: 'Why SAEA' },
-    { id: '03-surrogate-spectrum',     name: 'Surrogate spectrum' },
-    { id: '04-acquisition-strategies', name: 'Acquisition' },
-    { id: '05-moo-algorithms',         name: 'MOO algorithms' },
-    { id: '06-coordination-contract',  name: 'Coordination contract' },
-    { id: '08-literature-landscape',   name: 'Literature landscape' },
-    { id: '07-roadmap',                name: 'Roadmap' },
+    { file: '01-title.html',                  name: 'Title' },
+    { file: '02-introduction.html',           name: 'Introduction' },
+    { file: '03-framework-overview.html',     name: 'Framework overview' },
+    { file: '04-demos-pareto.html',           name: 'Primer · Pareto' },
+    { file: '05-demos-ml.html',               name: 'Primer · Surrogate' },
+    { file: '06-demos-three-modes.html',      name: 'Demo · Three modes' },
+    { file: '07-research-workflow.html',      name: 'Research workflow' },
+    { file: '08-why-saea.html',               name: 'Why SAEA' },
+    { file: '09-surrogate-spectrum.html',     name: 'Surrogate spectrum' },
+    { file: '10-acquisition-strategies.html', name: 'Acquisition' },
+    { file: '11-moo-algorithms.html',         name: 'MOO algorithms' },
+    { file: '12-coordination-contract.html',  name: 'Coordination contract' },
+    { file: '13-literature-landscape.html',   name: 'Literature landscape' },
+    { file: '14-roadmap.html',                name: 'Roadmap' },
   ];
 
   const total = SLIDES.length;
@@ -31,7 +32,7 @@
   const overviewGrid = document.getElementById('deck-overview-grid');
 
   function pageUrl(i) {
-    return 'pages/' + SLIDES[i].id + '/index.html';
+    return 'pages/' + SLIDES[i].file;
   }
 
   function pad(n) {

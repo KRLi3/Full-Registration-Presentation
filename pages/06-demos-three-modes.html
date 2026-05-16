@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Three modes — pure · offline · online</title>
+  <link rel="stylesheet" href="../assets/slide-base.css">
+  <style>
+    /* ============================================================
+       demos-three-modes — head / body / foot.
+       Body holds two sections:
+         · tm-card     ONE card. Left = fitness column.
+                       Right = 3 videos butted edge-to-edge (no gap).
+         · synthesis   one-line claim (kept inside body-zone).
+       Click any video:
+         · any playing  → pause all (freeze in place)
+         · all ended    → rewind all to 0 and play all
+         · otherwise    → resume all from currentTime (no rewind)
+       Each video's diagnostics panel fades in on its OWN ended.
+       ============================================================ */
+
+    /* Header override — page uses full width for title + subtitle,
+       no right column on this slide. */
+    header.slide-header {
+      grid-template-columns: 1fr;
+    }
+
+    .body-zone {
+      position: absolute;
+      top: 275px;
+      left: var(--sp-gutter);
+      right: var(--sp-gutter);
+      bottom: 86px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .body-zone > .synthesis {
+      position: static;
+      left: auto; right: auto; bottom: auto;
+      flex: 0 0 auto;
+    }
+
+    .tm-card {
+      flex: 1 1 auto;
+      min-height: 0;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--accent);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card-rest);
+      padding: var(--sp-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+      overflow: hidden;
+    }
+
+    .tm-card-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--sp-4);
+      padding-bottom: var(--sp-3);
+      border-bottom: 1px solid var(--rule);
+      flex: 0 0 auto;
+    }
+    .tm-card-head .left { display: flex; flex-direction: column; gap: var(--sp-1); }
+    .tm-card-head .role {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+    }
+    .tm-card-head h2 {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: var(--fs-h3);
+      line-height: var(--lh-headline);
+      color: var(--ink);
+      margin: 0;
+      font-weight: var(--fw-medium);
+    }
+    .tm-card-head .hint {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .tm-card-head .hint em {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: var(--fs-caption);
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--accent);
+      font-weight: var(--fw-medium);
+    }
+
+    /* ── Fitness column (inside .tm-body, left side; no card chrome) ── */
+    .tm-fitness {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .tm-fitness-head {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-bottom: var(--sp-2);
+      border-bottom: 1px solid var(--rule);
+    }
+    .tm-fitness-head .role {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+    }
+    .tm-fitness-head h3 {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: var(--fs-card);
+      line-height: var(--lh-headline);
+      color: var(--ink);
+      margin: 0;
+      font-weight: var(--fw-medium);
+    }
+    .tm-fitness-head .sub {
+      font-family: var(--body);
+      font-size: var(--fs-micro);
+      color: var(--ink-soft);
+      line-height: var(--lh-body);
+      margin: 0;
+    }
+    .tm-fitness-head .sub code {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      background: rgba(176, 125, 44, 0.10);
+      color: var(--accent);
+      padding: 0 3px;
+    }
+
+    .tm-fitness-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+    .tm-f {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      column-gap: var(--sp-3);
+      row-gap: 1px;
+      align-items: baseline;
+    }
+    .tm-f .sym {
+      font-family: var(--mono);
+      font-size: var(--fs-caption);
+      font-weight: var(--fw-semibold);
+      color: var(--accent);
+      letter-spacing: var(--ls-mono);
+      align-self: center;
+    }
+    .tm-f .sym em {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: var(--fs-card);
+      color: var(--accent);
+      letter-spacing: 0;
+      font-weight: var(--fw-semibold);
+      margin-right: 4px;
+    }
+    .tm-f .expr {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      color: var(--ink);
+      line-height: var(--lh-body);
+      letter-spacing: var(--ls-mono);
+    }
+    .tm-f .expr em {
+      font-family: var(--display);
+      font-style: italic;
+      color: var(--ink);
+      font-size: var(--fs-caption);
+      letter-spacing: 0;
+    }
+    .tm-f .note {
+      grid-column: 2;
+      font-family: var(--body);
+      font-size: var(--fs-micro);
+      color: var(--ink-soft);
+      line-height: var(--lh-body);
+    }
+    .tm-f .note strong { color: var(--ink); font-weight: var(--fw-semibold); }
+    .tm-f .note em { font-style: italic; color: var(--accent); }
+
+    /* MOEA params block — sits below the f-list */
+    .tm-moea {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+      padding-top: var(--sp-3);
+      border-top: 1px solid var(--rule);
+    }
+    .tm-moea .role {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+    }
+    .tm-moea-list {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: var(--sp-3);
+      row-gap: 4px;
+    }
+    .tm-moea-list dt {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono);
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      font-weight: var(--fw-semibold);
+    }
+    .tm-moea-list dd {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      color: var(--ink);
+      letter-spacing: var(--ls-mono);
+      margin: 0;
+    }
+    .tm-moea-list dd strong { color: var(--accent); font-weight: var(--fw-semibold); }
+    .tm-moea-list dd em {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: var(--fs-caption);
+      color: var(--ink-soft);
+      letter-spacing: 0;
+      margin-left: 4px;
+    }
+
+    /* ── Body: 2-column layout (fitness col · video strip) ── */
+    .tm-body {
+      flex: 1 1 0;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: var(--sp-5);
+    }
+
+    /* Right column: three video stages butted edge-to-edge (no gap) */
+    .tm-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      min-width: 0;
+      min-height: 0;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .tm-stage {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      background: var(--bg);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .tm-stage video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: left center;
+      display: block;
+      background: var(--bg);
+    }
+
+    /* ── Diagnostics panel — fades in after each stage ends ── */
+    .tm-diag {
+      position: absolute;
+      top: var(--sp-4);
+      bottom: var(--sp-4);
+      right: var(--sp-3);
+      width: 42%;
+      max-width: 280px;
+      min-width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      padding: var(--sp-3) var(--sp-4);
+      background: rgba(250, 247, 238, 0.92);
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--accent);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-card-rest);
+      opacity: 0;
+      transform: translateY(6px);
+      pointer-events: none;
+      transition: opacity 0.32s ease, transform 0.32s ease;
+      z-index: 3;
+      overflow: hidden;
+    }
+    .tm-stage.is-ended .tm-diag {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tm-diag-head {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-bottom: var(--sp-2);
+      border-bottom: 1px solid var(--rule);
+      flex: 0 0 auto;
+    }
+    .tm-diag-head .role {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: var(--fw-semibold);
+    }
+    .tm-diag-head h4 {
+      font-family: var(--display);
+      font-style: italic;
+      font-size: var(--fs-caption);
+      line-height: var(--lh-headline);
+      color: var(--ink);
+      margin: 0;
+      font-weight: var(--fw-medium);
+    }
+
+    .tm-diag-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 0 0 auto;
+    }
+    .tm-diag-block .name {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-mono-eyebrow);
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      font-weight: var(--fw-semibold);
+    }
+    .tm-diag-list {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      column-gap: var(--sp-2);
+      row-gap: 1px;
+    }
+    .tm-diag-list dt {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      color: var(--ink-soft);
+      letter-spacing: var(--ls-mono);
+      white-space: nowrap;
+    }
+    .tm-diag-list dd {
+      font-family: var(--mono);
+      font-size: var(--fs-micro);
+      color: var(--ink);
+      letter-spacing: var(--ls-mono);
+      margin: 0;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .tm-diag-list dd strong { color: var(--accent); font-weight: var(--fw-semibold); }
+
+    /* Play overlay — accent triangle, transparent background */
+    .tm-play {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      cursor: pointer;
+      transition: opacity 0.18s;
+      z-index: 2;
+    }
+    .tm-stage:hover .tm-play .triangle { opacity: 0.85; }
+    .tm-card.is-playing .tm-play { opacity: 0; pointer-events: none; }
+
+    .tm-play .triangle {
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 22px 0 22px 36px;
+      border-color: transparent transparent transparent var(--accent);
+      transition: opacity 0.18s;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <main class="slide">
+      <span class="corner-mark corner-tl">THREE MODES</span>
+      <span class="corner-mark corner-tr">DEMO &nbsp;·&nbsp; PURE · OFFLINE · ONLINE</span>
+
+      <header class="slide-header">
+        <div>
+          <p class="eyebrow">demo &nbsp;·&nbsp; surrogate-coupling regimes</p>
+          <h1 class="slide-title">Three runs, one <em>problem</em>.</h1>
+          <p class="subtitle">
+            Same multi-objective test problem, three coupling regimes — a <em>pure</em> evolutionary
+            run with no surrogate, an <em>offline</em> regime where a pre-trained model replaces real
+            evaluations, and an <em>online</em> regime where the surrogate is refit as the search
+            proceeds.
+          </p>
+          <p class="subtitle">
+            <strong>Note:</strong> each frame change = one simulation. Incident-radiation evaluation
+            would take <em>1–2 min</em> per call under the original Ladybug pipeline; here it is
+            GPU-accelerated. The videos are sped up <em>10×</em> overall, and <em>pure</em> mode is
+            now refreshing too fast to render correctly.
+          </p>
+        </div>
+      </header>
+
+      <div class="body-zone">
+
+        <section class="tm-card" id="tm-card" aria-label="Three-mode comparison">
+
+          <header class="tm-card-head">
+            <div class="left">
+              <span class="role">demo · click any panel to play / pause all</span>
+              <h2>Pure &nbsp;·&nbsp; Offline &nbsp;·&nbsp; Online.</h2>
+            </div>
+            <span class="hint">three regimes <em>·</em> one budget <em>·</em> one front</span>
+          </header>
+
+          <div class="tm-body">
+
+            <aside class="tm-fitness" aria-label="Test problem and fitness definitions">
+              <div class="tm-fitness-head">
+                <span class="role">test problem &nbsp;·&nbsp; 4 objectives</span>
+                <h3>8 blocks on a 3×3 grid.</h3>
+                <p class="sub">
+                  Centre cell empty · two gene-pools of 8:
+                  <code>floors ∈ [3, 15]</code>, <code>scale ∈ [0.3, 0.9]</code> ·
+                  all objectives <em>minimised</em>.
+                </p>
+              </div>
+              <div class="tm-fitness-list">
+                <div class="tm-f">
+                  <span class="sym"><em>f</em>₁</span>
+                  <span class="expr">= − FAR &nbsp;= − Σ Aᵢ · floorsᵢ ⁄ A<sub>site</sub></span>
+                  <span class="note">maximise <strong>floor-area ratio</strong></span>
+                </div>
+                <div class="tm-f">
+                  <span class="sym"><em>f</em>₂</span>
+                  <span class="expr">= − softmin(footprintᵢ, <em>k</em>=8)</span>
+                  <span class="note">protect the <strong>smallest</strong> block — soft floor on footprint</span>
+                </div>
+                <div class="tm-f">
+                  <span class="sym"><em>f</em>₃</span>
+                  <span class="expr">= IR<sub>total</sub></span>
+                  <span class="note">minimise <strong>inter-block interference</strong> (overshadow)</span>
+                </div>
+                <div class="tm-f">
+                  <span class="sym"><em>f</em>₄</span>
+                  <span class="expr">= − softmin(floorsᵢ, <em>k</em>=0.3)</span>
+                  <span class="note">protect the <strong>shortest</strong> tower — soft floor on height</span>
+                </div>
+              </div>
+
+              <div class="tm-moea" aria-label="MOEA parameters">
+                <span class="role">moea &nbsp;·&nbsp; NSGA-III</span>
+                <dl class="tm-moea-list">
+                  <dt>pop</dt>
+                  <dd><strong>56</strong> <em>per generation</em></dd>
+                  <dt>gens</dt>
+                  <dd><strong>100</strong></dd>
+                  <dt>offline</dt>
+                  <dd><strong>500</strong> <em>pre-sampled, no refit</em></dd>
+                  <dt>online</dt>
+                  <dd><strong>200</strong> seed + <strong>300</strong> infill</dd>
+                </dl>
+              </div>
+            </aside>
+
+            <div class="tm-strip" aria-label="Three videos">
+
+              <div class="tm-stage" data-tm-stage>
+                <video preload="metadata" playsinline data-tm-video>
+                  <source src="https://pub-84449e6aea7f49ea803db2e775fadfb1.r2.dev/Pure.mp4" type="video/mp4">
+                </video>
+                <div class="tm-play" aria-hidden="true"><span class="triangle"></span></div>
+                <aside class="tm-diag" aria-label="Pure mode baseline notes">
+                  <div class="tm-diag-head">
+                    <span class="role">baseline &nbsp;·&nbsp; pure</span>
+                    <h4>Ground-truth reference.</h4>
+                  </div>
+                  <div class="tm-diag-block">
+                    <span class="name">Budget</span>
+                    <dl class="tm-diag-list">
+                      <dt>evals</dt>     <dd><strong>5 600</strong></dd>
+                      <dt>wall</dt>      <dd><strong>≈ 100–200 h</strong></dd>
+                    </dl>
+                  </div>
+                  <div class="tm-diag-block">
+                    <span class="name">vs. online</span>
+                    <dl class="tm-diag-list">
+                      <dt>evals</dt>     <dd><strong>11.2×</strong></dd>
+                      <dt>wall</dt>      <dd><strong>≈ 11×</strong></dd>
+                    </dl>
+                  </div>
+                  <div class="tm-diag-block">
+                    <span class="name">Role</span>
+                    <dl class="tm-diag-list">
+                      <dt>front</dt>     <dd>IGD ref</dd>
+                      <dt>HV</dt>        <dd>HV<sub>true</sub></dd>
+                    </dl>
+                  </div>
+                </aside>
+              </div>
+
+              <div class="tm-stage" data-tm-stage>
+                <video preload="metadata" playsinline data-tm-video data-tm-rate="10">
+                  <source src="https://pub-84449e6aea7f49ea803db2e775fadfb1.r2.dev/Offline_1.mp4" type="video/mp4">
+                </video>
+                <div class="tm-play" aria-hidden="true"><span class="triangle"></span></div>
+                <aside class="tm-diag" aria-label="Offline post-hoc diagnostics">
+                  <div class="tm-diag-head">
+                    <span class="role">post-hoc &nbsp;·&nbsp; offline</span>
+                    <h4>Surrogate vs. truth.</h4>
+                  </div>
+                  <div class="tm-diag-block">
+                    <span class="name">HV ratio</span>
+                    <dl class="tm-diag-list">
+                      <dt>T / R</dt><dd><strong>0.775</strong></dd>
+                      <dt>P / T</dt><dd><strong>0.919</strong></dd>
+                    </dl>
+                  </div>
+                  <div class="tm-diag-block">
+                    <span class="name">R² per obj</span>
+                    <dl class="tm-diag-list">
+                      <dt>f₁</dt><dd>0.992</dd>
+                      <dt>f₂</dt><dd>0.975</dd>
+                      <dt>f₃</dt><dd>0.997</dd>
+                      <dt>f₄</dt><dd>0.796</dd>
+                    </dl>
+                  </div>
+                  <div class="tm-diag-block">
+                    <span class="name">Front quality</span>
+                    <dl class="tm-diag-list">
+                      <dt>IGD</dt> <dd>0.026</dd>
+                      <dt>IGD+</dt><dd>0.018</dd>
+                      <dt>|A|</dt> <dd>55 / 56&nbsp;ND</dd>
+                    </dl>
+                  </div>
+                </aside>
+              </div>
+
+              <div class="tm-stage" data-tm-stage>
+                <video preload="metadata" playsinline data-tm-video>
+                  <source src="https://pub-84449e6aea7f49ea803db2e775fadfb1.r2.dev/Online.mp4" type="video/mp4">
+                </video>
+                <div class="tm-play" aria-hidden="true"><span class="triangle"></span></div>
+                <aside class="tm-diag" aria-label="Online post-hoc diagnostics">
+                  <div class="tm-diag-head">
+                    <span class="role">post-hoc &nbsp;·&nbsp; online</span>
+                    <h4>Surrogate vs. truth.</h4>
+                  </div>
+                  <div class="tm-diag-block">
+                    <span class="name">HV ratio</span>
+                    <dl class="tm-diag-list">
+                      <dt>T / R</dt><dd><strong>1.002</strong></dd>
+                      <dt>P / T</dt><dd><strong>0.997</strong></dd>
+                    </dl>
+                  </div>
+                  <div class="tm-diag-block">
+                    <span class="name">R² per obj</span>
+                    <dl class="tm-diag-list">
+                      <dt>f₁</dt><dd>0.997</dd>
+                      <dt>f₂</dt><dd>0.994</dd>
+                      <dt>f₃</dt><dd>0.998</dd>
+                      <dt>f₄</dt><dd>0.913</dd>
+                    </dl>
+                  </div>
+                  <div class="tm-diag-block">
+                    <span class="name">Front quality</span>
+                    <dl class="tm-diag-list">
+                      <dt>IGD</dt> <dd>0.023</dd>
+                      <dt>IGD+</dt><dd>0.013</dd>
+                      <dt>|A|</dt> <dd>56 / 56&nbsp;ND</dd>
+                    </dl>
+                  </div>
+                </aside>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <aside class="synthesis" aria-label="Synthesis claim">
+          <span class="label">claim &nbsp;·&nbsp; what the three runs show</span>
+          <blockquote>
+            With <em>10%</em> of the pure-mode evaluation budget, the surrogate already produces a
+            credible front — and the MOEA has <em>not yet converged</em>. Offline pays its cost up
+            front in a single large-sample fit; if the model is a tree ensemble or a neural net,
+            the per-call inference cost is no longer effectively free and must be traded against
+            the saved real evaluations. Online matches offline's speed once <em>θ is frozen</em>,
+            <span class="ins">and reaches a strictly better front by refitting on the infill the MOEA actually visits.</span>
+          </blockquote>
+        </aside>
+
+      </div>
+
+      <footer class="slide-footer">
+        <span><span class="ref">Demo</span> &nbsp;·&nbsp; three coupling regimes</span>
+        <span class="pageno">— 5b —</span>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../assets/slide-base.js"></script>
+  <script>
+    SlideBase.fit('stage');
+
+    // ── Video controls ───────────────────────────────────────────
+    // Click any tm-stage:
+    //   · any playing  → pause all (keep currentTime, freeze)
+    //   · all ended    → rewind all to 0 and play all
+    //   · otherwise    → resume all from currentTime (no rewind)
+    // Per-video data-tm-rate sets playbackRate (offline = 10×).
+    // On each video's ended, its own stage gets .is-ended → diag fades in.
+    (function () {
+      const card = document.getElementById('tm-card');
+      const videos = Array.from(card.querySelectorAll('[data-tm-video]'));
+      const stages = card.querySelectorAll('[data-tm-stage]');
+
+      // We track ended state ourselves because the 'ended' handler
+      // seeks currentTime back inside [0, duration) to hold the last
+      // frame — that flips video.ended back to false, so we can't
+      // rely on the native property to know "all done".
+      const endedFlag = new WeakSet();
+
+      function applyRate(v) {
+        const r = parseFloat(v.dataset.tmRate || '1');
+        if (Number.isFinite(r) && r > 0) v.playbackRate = r;
+      }
+      function isAnyPlaying() { return videos.some(v => !v.paused && !endedFlag.has(v)); }
+      function areAllEnded()  { return videos.every(v => endedFlag.has(v)); }
+      function stageOf(v) { return v.closest('[data-tm-stage]'); }
+
+      function playFromCurrent() {
+        card.classList.add('is-playing');
+        videos.forEach(v => {
+          endedFlag.delete(v);
+          const s = stageOf(v); if (s) s.classList.remove('is-ended');
+          applyRate(v);
+          v.play().catch(() => {});
+        });
+      }
+      function playFromStart() {
+        videos.forEach(v => {
+          endedFlag.delete(v);
+          const s = stageOf(v); if (s) s.classList.remove('is-ended');
+          try { v.currentTime = 0; } catch (_) {}
+        });
+        playFromCurrent();
+      }
+      function pauseAll() {
+        videos.forEach(v => { try { v.pause(); } catch (_) {} });
+        card.classList.remove('is-playing');
+      }
+
+      function onStageClick() {
+        if (areAllEnded())      playFromStart();
+        else if (isAnyPlaying()) pauseAll();
+        else                    playFromCurrent();
+      }
+      stages.forEach(s => s.addEventListener('click', onStageClick));
+
+      videos.forEach(v => {
+        v.addEventListener('loadedmetadata', () => applyRate(v));
+        v.addEventListener('ended', () => {
+          endedFlag.add(v);
+          const s = stageOf(v); if (s) s.classList.add('is-ended');
+          try {
+            const t = Math.max(0, v.duration - 0.05);
+            if (Number.isFinite(t)) v.currentTime = t;
+          } catch (_) {}
+          if (areAllEnded()) card.classList.remove('is-playing');
+        });
+        v.addEventListener('play', () => endedFlag.delete(v));
+      });
+    })();
+  </script>
+</body>
+</html>
