@@ -425,9 +425,9 @@
           </p>
           <p class="subtitle">
             <strong>Note:</strong> each frame change = one simulation. Incident-radiation evaluation
-            would take <em>1–2 min</em> per call under the original Ladybug pipeline; here it is
-            GPU-accelerated. The videos are sped up <em>10×</em> overall, and <em>pure</em> mode is
-            now refreshing too fast to render correctly.
+            takes <em>~3 s</em> per call under the original Ladybug pipeline; here it is
+            GPU-accelerated to a fraction of that. The videos are sped up <em>10×</em> overall, and
+            <em>pure</em> mode is now refreshing too fast to render correctly.
           </p>
         </div>
       </header>
@@ -510,7 +510,7 @@
                     <span class="name">Budget</span>
                     <dl class="tm-diag-list">
                       <dt>evals</dt>     <dd><strong>5 600</strong></dd>
-                      <dt>wall</dt>      <dd><strong>≈ 100–200 h</strong></dd>
+                      <dt>wall</dt>      <dd><strong>≈ 4.7 h</strong></dd>
                     </dl>
                   </div>
                   <div class="tm-diag-block">
