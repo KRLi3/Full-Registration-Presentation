@@ -6,21 +6,7 @@
   <title>Three modes — pure · offline · online</title>
   <link rel="stylesheet" href="../assets/slide-base.css">
   <style>
-    /* ============================================================
-       demos-three-modes — head / body / foot.
-       Body holds two sections:
-         · tm-card     ONE card. Left = fitness column.
-                       Right = 3 videos butted edge-to-edge (no gap).
-         · synthesis   one-line claim (kept inside body-zone).
-       Click any video:
-         · any playing  → pause all (freeze in place)
-         · all ended    → rewind all to 0 and play all
-         · otherwise    → resume all from currentTime (no rewind)
-       Each video's diagnostics panel fades in on its OWN ended.
-       ============================================================ */
-
-    /* Header override — page uses full width for title + subtitle,
-       no right column on this slide. */
+    
     header.slide-header {
       grid-template-columns: 1fr;
     }
@@ -100,7 +86,7 @@
       font-weight: var(--fw-medium);
     }
 
-    /* ── Fitness column (inside .tm-body, left side; no card chrome) ── */
+    /* Fitness column*/
     .tm-fitness {
       display: flex;
       flex-direction: column;
@@ -201,7 +187,7 @@
     .tm-f .note strong { color: var(--ink); font-weight: var(--fw-semibold); }
     .tm-f .note em { font-style: italic; color: var(--accent); }
 
-    /* MOEA params block — sits below the f-list */
+    /* MOEA params block*/
     .tm-moea {
       display: flex;
       flex-direction: column;
@@ -248,7 +234,7 @@
       margin-left: 4px;
     }
 
-    /* ── Body: 2-column layout (fitness col · video strip) ── */
+    /* Body: 2-column layout*/
     .tm-body {
       flex: 1 1 0;
       min-height: 0;
@@ -257,7 +243,7 @@
       gap: var(--sp-5);
     }
 
-    /* Right column: three video stages butted edge-to-edge (no gap) */
+    /* Right column: three video stages butted edge-to-edge */
     .tm-strip {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -289,7 +275,7 @@
       background: var(--bg);
     }
 
-    /* ── Diagnostics panel — fades in after each stage ends ── */
+    /* Diagnostics panel */
     .tm-diag {
       position: absolute;
       top: var(--sp-4);
@@ -531,7 +517,7 @@
               </div>
 
               <div class="tm-stage" data-tm-stage>
-                <video preload="metadata" playsinline data-tm-video data-tm-rate="10">
+                <video preload="metadata" playsinline data-tm-video>
                   <source src="https://pub-84449e6aea7f49ea803db2e775fadfb1.r2.dev/Offline_1.mp4" type="video/mp4">
                 </video>
                 <div class="tm-play" aria-hidden="true"><span class="triangle"></span></div>
@@ -635,22 +621,13 @@
   <script>
     SlideBase.fit('stage');
 
-    // ── Video controls ───────────────────────────────────────────
-    // Click any tm-stage:
-    //   · any playing  → pause all (keep currentTime, freeze)
-    //   · all ended    → rewind all to 0 and play all
-    //   · otherwise    → resume all from currentTime (no rewind)
-    // Per-video data-tm-rate sets playbackRate (offline = 10×).
-    // On each video's ended, its own stage gets .is-ended → diag fades in.
+    // Video controls
+
     (function () {
       const card = document.getElementById('tm-card');
       const videos = Array.from(card.querySelectorAll('[data-tm-video]'));
       const stages = card.querySelectorAll('[data-tm-stage]');
 
-      // We track ended state ourselves because the 'ended' handler
-      // seeks currentTime back inside [0, duration) to hold the last
-      // frame — that flips video.ended back to false, so we can't
-      // rely on the native property to know "all done".
       const endedFlag = new WeakSet();
 
       function applyRate(v) {
