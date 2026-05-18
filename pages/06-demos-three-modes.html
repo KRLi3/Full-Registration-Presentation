@@ -280,10 +280,8 @@
       position: absolute;
       top: var(--sp-4);
       bottom: var(--sp-4);
-      right: var(--sp-3);
-      width: 42%;
-      max-width: 280px;
-      min-width: 220px;
+      right: 0;
+      width: var(--gap-w, 42%);
       display: flex;
       flex-direction: column;
       gap: var(--sp-3);
@@ -638,6 +636,25 @@
       function areAllEnded()  { return videos.every(v => endedFlag.has(v)); }
       function stageOf(v) { return v.closest('[data-tm-stage]'); }
 
+      const FALLBACK_ASPECT = 9 / 16;
+      function videoAspect(v) {
+        if (v.videoWidth && v.videoHeight) return v.videoWidth / v.videoHeight;
+        return FALLBACK_ASPECT;
+      }
+      function updateGap(stage) {
+        const v = stage.querySelector('[data-tm-video]');
+        if (!v) return;
+        const a = videoAspect(v);
+        const w = stage.clientWidth;
+        const h = stage.clientHeight;
+        if (!w || !h) return;
+
+        const displayW = (w / h > a) ? h * a : w;
+        const gap = Math.max(0, w - displayW);
+        stage.style.setProperty('--gap-w', gap.toFixed(2) + 'px');
+      }
+      function updateAllGaps() { stages.forEach(updateGap); }
+
       function playFromCurrent() {
         card.classList.add('is-playing');
         videos.forEach(v => {
@@ -668,7 +685,10 @@
       stages.forEach(s => s.addEventListener('click', onStageClick));
 
       videos.forEach(v => {
-        v.addEventListener('loadedmetadata', () => applyRate(v));
+        v.addEventListener('loadedmetadata', () => {
+          applyRate(v);
+          const s = stageOf(v); if (s) updateGap(s);
+        });
         v.addEventListener('ended', () => {
           endedFlag.add(v);
           const s = stageOf(v); if (s) s.classList.add('is-ended');
@@ -680,6 +700,9 @@
         });
         v.addEventListener('play', () => endedFlag.delete(v));
       });
+
+      updateAllGaps();
+      window.addEventListener('resize', updateAllGaps);
     })();
   </script>
 </body>
